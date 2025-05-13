@@ -1682,19 +1682,15 @@
         "hash": "9144804729979528076"
       },
       {
-        "file": "libs/workflows/src/saar/specs/ci-cd-configuration.yml",
-        "hash": "3042828201955719271"
-      },
-      {
-        "file": "libs/workflows/src/saar/specs/coding-standards.md",
+        "file": "specs/saar/coding-standards.md",
         "hash": "3505059164726906740"
       },
       {
-        "file": "libs/workflows/src/saar/specs/schemas/performance-benchmarks.json",
+        "file": "specs/saar/schemas/performance-benchmarks.json",
         "hash": "2402757462169804342"
       },
       {
-        "file": "libs/workflows/src/saar/specs/security-requirements.md",
+        "file": "specs/saar/security-requirements.md",
         "hash": "15434272682807127944"
       },
       {
