@@ -8,7 +8,7 @@ This document describes how the Python virtual environment system is integrated 
 
 ### 1. SAAR Chain Script
 
-The main `saar.sh` script has been enhanced to automatically detect and handle externally-managed Python environments. Key integration points:
+The main `saar_chain.sh` script has been enhanced to automatically detect and handle externally-managed Python environments. Key integration points:
 
 1. **Dependency Check**: Enhanced to look for Python packages in the virtual environment
 2. **Setup Process**: Modified to create and use a virtual environment
@@ -122,7 +122,7 @@ sequenceDiagram
     participant Setup as 02_setup.sh
     participant VEnv as Virtual Environment
 
-    User->>SAAR: saar.sh setup
+    User->>SAAR: saar_chain.sh setup
     SAAR->>DependencyCheck: check_dependencies()
     DependencyCheck->>DependencyCheck: check_externally_managed()
     DependencyCheck->>Setup: setup_advanced_dependencies()
