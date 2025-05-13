@@ -73,10 +73,43 @@ check_advanced_dependencies() {
   local missing=0
   local optional_missing=0
   
-  # Python packages
-  if command -v python3 &> /dev/null; then
+  # Python packages - check in virtual environment if available
+  if [ -f "$WORKSPACE_DIR/.venv/bin/python" ]; then
+    log "DEBUG" "Using Python virtual environment for dependency check"
+    # Check packages in virtual environment
+    check_py_package_in_venv() {
+      local pkg=$1
+      if ! "$WORKSPACE_DIR/.venv/bin/python" -c "import $pkg" &> /dev/null; then
+        return 1
+      fi
+      return 0
+    }
+    
     # Required packages
     local required_py_packages=("anthropic" "requests")
+    for pkg in "${required_py_packages[@]}"; do
+      if ! check_py_package_in_venv "$pkg"; then
+        log "WARN" "Python package $pkg not found in virtual environment"
+        missing=$((missing+1))
+      else
+        log "DEBUG" "Found Python package in virtual environment: $pkg"
+      fi
+    done
+    
+    # Optional packages
+    local optional_py_packages=("lancedb" "chromadb" "voyage" "sentence_transformers")
+    for pkg in "${optional_py_packages[@]}"; do
+      if ! check_py_package_in_venv "$pkg"; then
+        log "DEBUG" "Optional Python package $pkg not found in virtual environment"
+        optional_missing=$((optional_missing+1))
+      else
+        log "DEBUG" "Found optional Python package in virtual environment: $pkg"
+      fi
+    done
+  elif command -v python3 &> /dev/null; then
+    log "DEBUG" "Using system Python for dependency check"
+    # Required packages
+    local required_py_packages=("venv")
     for pkg in "${required_py_packages[@]}"; do
       if ! python3 -c "import $pkg" &> /dev/null; then
         log "WARN" "Python package $pkg not found"
@@ -86,16 +119,8 @@ check_advanced_dependencies() {
       fi
     done
     
-    # Optional packages
-    local optional_py_packages=("lancedb" "chromadb" "voyage" "sentence_transformers")
-    for pkg in "${optional_py_packages[@]}"; do
-      if ! python3 -c "import $pkg" &> /dev/null; then
-        log "DEBUG" "Optional Python package $pkg not found"
-        optional_missing=$((optional_missing+1))
-      else
-        log "DEBUG" "Found optional Python package: $pkg"
-      fi
-    done
+    # Warn about using system Python
+    log "WARN" "Python virtual environment not found. Dependencies will be installed in a virtual environment during setup."
   fi
   
   # Node.js packages
@@ -165,19 +190,170 @@ check_advanced_dependencies() {
 setup_advanced_dependencies() {
   log "INFO" "Setting up advanced dependencies"
   
-  # Python packages
-  if command -v python3 &> /dev/null && command -v pip3 &> /dev/null; then
-    log "INFO" "Installing required Python packages"
-    run_command "pip3 install anthropic requests" "Failed to install required Python packages"
+  # Python packages - use virtual environment to avoid externally-managed-environment error
+  if command -v python3 &> /dev/null; then
+    # First ensure we have venv module installed
+    if ! python3 -c "import venv" &> /dev/null; then
+      log "WARN" "Python venv module not found. Attempting to install it..."
+      
+      # Try to install venv module if missing
+      case "$(uname -s)" in
+        Linux*)
+          if command -v apt-get &> /dev/null; then
+            run_command "sudo apt-get update && sudo apt-get install -y python3-venv" "Failed to install python3-venv"
+          elif command -v yum &> /dev/null; then
+            run_command "sudo yum install -y python3-venv" "Failed to install python3-venv"
+          fi
+          ;;
+        Darwin*)
+          log "INFO" "On macOS, venv should be included with Python installation"
+          ;;
+      esac
+    fi
     
-    # Ask about optional packages
-    if [ "$QUIET_MODE" != "true" ]; then
-      read -p "Install optional Python packages for RAG functionality? (y/N): " install_optional
-      if [[ "$install_optional" =~ ^[Yy]$ ]]; then
-        log "INFO" "Installing optional Python packages"
-        run_command "pip3 install lancedb chromadb voyage sentence-transformers" "Failed to install optional Python packages" 
+    # Check if setup_rag.sh exists and use it for environment setup
+    if [ -f "$WORKSPACE_DIR/setup_rag.sh" ]; then
+      log "INFO" "Using setup_rag.sh for virtual environment setup"
+      chmod +x "$WORKSPACE_DIR/setup_rag.sh"
+      
+      # Run setup_rag.sh with --no-confirm flag if in quiet mode
+      if [ "$QUIET_MODE" = "true" ]; then
+        if ! "$WORKSPACE_DIR/setup_rag.sh" --no-confirm; then
+          log "ERROR" "Failed to set up Python virtual environment using setup_rag.sh"
+          log "INFO" "Falling back to manual virtual environment creation"
+          setup_venv_manually=true
+        fi
+      else
+        log "INFO" "Running RAG setup script. This will create a Python virtual environment."
+        if ! "$WORKSPACE_DIR/setup_rag.sh"; then
+          log "ERROR" "Failed to set up Python virtual environment using setup_rag.sh"
+          log "INFO" "Falling back to manual virtual environment creation"
+          setup_venv_manually=true
+        fi
+      fi
+    else
+      log "WARN" "RAG setup script not found. Creating virtual environment manually."
+      setup_venv_manually=true
+    fi
+    
+    # Create virtual environment manually if needed
+    if [ "${setup_venv_manually:-false}" = true ] || [ ! -f "$WORKSPACE_DIR/setup_rag.sh" ]; then
+      # Create virtual environment if it doesn't exist
+      if [ ! -d "$WORKSPACE_DIR/.venv" ]; then
+        log "INFO" "Creating Python virtual environment at $WORKSPACE_DIR/.venv"
+        run_command "python3 -m venv $WORKSPACE_DIR/.venv" "Failed to create Python virtual environment"
+      fi
+      
+      # Check if virtual environment was created successfully
+      if [ -f "$WORKSPACE_DIR/.venv/bin/activate" ]; then
+        log "INFO" "Activating Python virtual environment"
+        source "$WORKSPACE_DIR/.venv/bin/activate"
+        
+        # Update pip in virtual environment
+        log "INFO" "Updating pip in virtual environment"
+        run_command "$WORKSPACE_DIR/.venv/bin/pip install --upgrade pip" "Failed to update pip"
+        
+        # Install required packages
+        log "INFO" "Installing required Python packages in virtual environment"
+        run_command "$WORKSPACE_DIR/.venv/bin/pip install anthropic requests" "Failed to install required Python packages"
+        
+        # Ask about optional packages
+        if [ "$QUIET_MODE" != "true" ]; then
+          read -p "Install optional Python packages for RAG functionality? (y/N): " install_optional
+          if [[ "$install_optional" =~ ^[Yy]$ ]]; then
+            log "INFO" "Installing optional Python packages in virtual environment"
+            run_command "$WORKSPACE_DIR/.venv/bin/pip install lancedb chromadb voyage sentence-transformers" "Failed to install optional Python packages" 
+          fi
+        fi
       fi
     fi
+      
+      # Create activation helper script if it doesn't exist
+      if [ ! -f "$WORKSPACE_DIR/activate_venv.sh" ]; then
+        log "INFO" "Creating virtual environment activation helper"
+        cat > "$WORKSPACE_DIR/activate_venv.sh" << EOF
+#!/bin/bash
+# Helper script to activate Python virtual environment
+source "$WORKSPACE_DIR/.venv/bin/activate"
+echo "Python virtual environment activated. Run 'deactivate' to exit."
+EOF
+        chmod +x "$WORKSPACE_DIR/activate_venv.sh"
+      fi
+      
+      # Create a Python runner script for RAG components if it doesn't exist
+      if [ ! -f "$WORKSPACE_DIR/run_rag.sh" ]; then
+        log "INFO" "Creating RAG runner script"
+        cat > "$WORKSPACE_DIR/run_rag.sh" << EOF
+#!/bin/bash
+# Runner script for RAG functionality
+
+SCRIPT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
+VENV_DIR="\$SCRIPT_DIR/.venv"
+
+if [ ! -f "\$VENV_DIR/bin/activate" ]; then
+  echo "Error: Python virtual environment not found. Please run setup first."
+  exit 1
+fi
+
+# Activate virtual environment
+source "\$VENV_DIR/bin/activate"
+
+# Set PYTHONPATH
+export PYTHONPATH="\$SCRIPT_DIR:\$PYTHONPATH"
+
+# Run command or show help
+if [ \$# -eq 0 ]; then
+  echo "RAG Runner - Run RAG components with correct Python environment"
+  echo ""
+  echo "Usage: \$0 <command> [arguments]"
+  echo ""
+  echo "Available commands:"
+  echo "  run           Run a Python RAG script"
+  echo "  update        Update the vector database"
+  echo "  query         Query the RAG system"
+  echo "  shell         Start Python shell with virtual environment"
+  echo ""
+  echo "Examples:"
+  echo "  \$0 run libs/rag/src/rag_framework.py"
+  echo "  \$0 update docs/"
+  echo "  \$0 query 'How does the RAG system work?'"
+else
+  case "\$1" in
+    run)
+      shift
+      python "\$@"
+      ;;
+    update)
+      shift
+      python "\$SCRIPT_DIR/libs/rag/src/update_vector_db.py" "\$@"
+      ;;
+    query)
+      shift
+      python "\$SCRIPT_DIR/libs/rag/src/query_rag.py" "\$@"
+      ;;
+    shell)
+      python
+      ;;
+    *)
+      python "\$@"
+      ;;
+  esac
+fi
+
+# Deactivate virtual environment
+deactivate
+EOF
+      chmod +x "$WORKSPACE_DIR/run_rag.sh"
+      
+      # Deactivate virtual environment
+      deactivate
+      
+      log "SUCCESS" "Python virtual environment setup complete. Use '$WORKSPACE_DIR/activate_venv.sh' to activate or '$WORKSPACE_DIR/run_rag.sh' to run RAG components."
+    else
+      log "ERROR" "Failed to create or find virtual environment activation script"
+    fi
+  else
+    log "ERROR" "Python 3 not found. Cannot setup Python dependencies."
   fi
   
   # Node.js packages

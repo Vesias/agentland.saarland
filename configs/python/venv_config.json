@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "venv_dir": ".venv",
+  "python_version_min": "3.8.0",
+  "required_packages": [
+    "anthropic",
+    "requests"
+  ],
+  "optional_packages": {
+    "vector_db": [
+      "lancedb",
+      "chromadb"
+    ],
+    "embeddings": [
+      "sentence-transformers"
+    ],
+    "data_processing": [
+      "voyage",
+      "numpy",
+      "pandas"
+    ]
+  },
+  "development_packages": [
+    "pytest",
+    "pylint",
+    "black"
+  ],
+  "scripts": {
+    "activate": "activate_venv.sh",
+    "runner": "run_rag.sh",
+    "setup": "setup_rag.sh"
+  },
+  "environment_variables": {
+    "PYTHONPATH": "${WORKSPACE_DIR}"
+  },
+  "paths": {
+    "logs": "logs",
+    "data": "data/vector_store",
+    "configs": "configs/python"
+  }
+}

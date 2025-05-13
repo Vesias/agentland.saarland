@@ -4,6 +4,56 @@
 # This module handles the Neural Integration Framework components
 # and related templates, commands, and specifications.
 
+# Function to setup global Claude configuration
+setup_global_claude_config() {
+  log "INFO" "Setting up global Claude configuration"
+  
+  # Ensure global Claude directories exist
+  ensure_directory "$HOME/.claude"
+  ensure_directory "$HOME/.claude/commands"
+  ensure_directory "$HOME/.claude/templates"
+  
+  # Link project CLAUDE.md to global location if needed
+  if [ -f "$WORKSPACE_DIR/CLAUDE.md" ]; then
+    # Create a symbolic link if it doesn't exist
+    if [ ! -f "$HOME/.claude/CLAUDE.md" ] || [ -L "$HOME/.claude/CLAUDE.md" ]; then
+      ln -sf "$WORKSPACE_DIR/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+      log "SUCCESS" "Linked CLAUDE.md to global configuration"
+    else
+      log "WARN" "Global CLAUDE.md already exists and is not a symlink. Not overwriting."
+    fi
+  else
+    log "WARN" "Project CLAUDE.md not found"
+  fi
+  
+  log "INFO" "Global Claude configuration setup complete"
+}
+
+# Function to validate MCP tools
+validate_mcp_tools() {
+  log "INFO" "Validating MCP tools"
+  
+  # Check if MCP server configuration exists
+  if [ -f "$WORKSPACE_DIR/mcp_config.json" ]; then
+    log "INFO" "MCP configuration found"
+  else
+    log "WARN" "MCP configuration not found: $WORKSPACE_DIR/mcp_config.json"
+  fi
+  
+  # Check if MCP servers directory exists
+  if [ -d "$WORKSPACE_DIR/mcp_servers" ]; then
+    log "INFO" "MCP servers directory found"
+    
+    # Count MCP server scripts
+    local server_count=$(find "$WORKSPACE_DIR/mcp_servers" -name "*.js" | wc -l)
+    log "INFO" "Found $server_count MCP server scripts"
+  else
+    log "WARN" "MCP servers directory not found: $WORKSPACE_DIR/mcp_servers"
+  fi
+  
+  log "INFO" "MCP tools validation complete"
+}
+
 # Function to setup neural framework components
 setup_neural_framework() {
   log "INFO" "Setting up Neural Integration Framework..."
@@ -753,7 +803,7 @@ setup_global_claude_config() {
     fi
   else
     log "WARN" "Project CLAUDE.md not found, cannot create global link"
-  }
+  fi
   
   # Copy selected commands to global configuration
   if [ -d "$CLAUDE_DIR/commands" ]; then

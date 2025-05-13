@@ -52,11 +52,90 @@ setup_about_profile() {
   local user_id=$2
   local theme=$3
   
+  # Ensure profiles directory exists
+  ensure_directory "$CONFIG_DIR/profiles"
+  
+  # Look for about schema
+  local about_schema=""
+  if [ -f "$WORKSPACE_DIR/about-schema-de.json" ]; then
+    about_schema="$WORKSPACE_DIR/about-schema-de.json"
+    log "INFO" "Using about schema from workspace root"
+  elif [ -f "$WORKSPACE_DIR/libs/core/src/schemas/profile/about-schema.json" ]; then
+    about_schema="$WORKSPACE_DIR/libs/core/src/schemas/profile/about-schema.json"
+    log "INFO" "Using about schema from core library"
+  else
+    log "WARN" "About schema not found. Using default schema."
+  fi
+  
+  # Look for about profile creation script
+  local about_script=""
+  local possible_paths=(
+    "$WORKSPACE_DIR/libs/workflows/src/saar/scripts/setup/create_about_simple.js"
+    "$WORKSPACE_DIR/libs/workflows/src/saar/scripts/setup/create_about.js"
+    "$WORKSPACE_DIR/scripts/setup/create_about.js"
+    "$WORKSPACE_DIR/tools/scripts/setup/create_about.js"
+  )
+  
+  for path in "${possible_paths[@]}"; do
+    if [ -f "$path" ]; then
+      about_script="$path"
+      log "INFO" "Found about profile script at: $path"
+      break
+    fi
+  done
+  
   if [ "$quick_mode" = true ]; then
     log "INFO" "Creating default .about profile"
     
-    # Create a minimal default profile
-    cat > "$CONFIG_DIR/profiles/$user_id.about.json" << EOF
+    if [ -n "$about_script" ]; then
+      # Use script with non-interactive mode
+      log "INFO" "Using create_about.js script in non-interactive mode"
+      export CONFIG_DIR="$CONFIG_DIR"
+      export WORKSPACE_DIR="$WORKSPACE_DIR"
+      node "$about_script" --user="$user_id" --workdir="$WORKSPACE_DIR" --non-interactive
+      
+      if [ $? -ne 0 ]; then
+        log "WARN" "Failed to create profile with script, falling back to template"
+        create_template_profile "$user_id" "$theme"
+      fi
+    else
+      # Create from template
+      log "INFO" "No create_about.js script found, using template"
+      create_template_profile "$user_id" "$theme"
+    fi
+    
+    log "INFO" "Default .about profile created"
+  else
+    log "INFO" "Setting up .about profile interactively"
+    
+    if [ -n "$about_script" ]; then
+      # Export environment variables for script
+      export CONFIG_DIR="$CONFIG_DIR"
+      export WORKSPACE_DIR="$WORKSPACE_DIR"
+      
+      log "INFO" "Running interactive about profile creation"
+      node "$about_script" --user="$user_id" --workdir="$WORKSPACE_DIR"
+      
+      if [ $? -ne 0 ]; then
+        log "WARN" "Interactive profile creation failed, falling back to template"
+        create_template_profile "$user_id" "$theme"
+      fi
+    else
+      log "WARN" "About profile creation script not found. Using template profile."
+      create_template_profile "$user_id" "$theme"
+    fi
+  fi
+}
+
+# Create a template profile from default values
+create_template_profile() {
+  local user_id=$1
+  local theme=$2
+  
+  log "INFO" "Creating template .about profile"
+  
+  # Create a minimal default profile
+  cat > "$CONFIG_DIR/profiles/$user_id.about.json" << EOF
 {
   "userId": "$user_id",
   "personal": {
@@ -87,16 +166,8 @@ setup_about_profile() {
   }
 }
 EOF
-    
-    log "INFO" "Default .about profile created"
-  else
-    log "INFO" "Setting up .about profile interactively"
-    if [ -f "$WORKSPACE_DIR/scripts/setup/create_about.js" ]; then
-      node "$WORKSPACE_DIR/scripts/setup/create_about.js" --user="$user_id"
-    else
-      log "WARN" "About profile creation script not found. Skipping interactive profile setup."
-    fi
-  fi
+  
+  log "INFO" "Template .about profile created at $CONFIG_DIR/profiles/$user_id.about.json"
 }
 
 # Setup MCP servers
@@ -126,6 +197,37 @@ setup_git_agent() {
     log "INFO" "Git Agent setup complete"
   else
     log "WARN" "Git Agent setup script not found. Skipping Git Agent setup."
+  fi
+}
+
+# Setup RAG System
+setup_rag_system() {
+  local quick_mode=$1
+  
+  log "INFO" "Setting up RAG System"
+  
+  # Check if setup_rag.sh exists
+  if [ -f "$WORKSPACE_DIR/setup_rag.sh" ]; then
+    # Make sure it's executable
+    chmod +x "$WORKSPACE_DIR/setup_rag.sh"
+    
+    # Run setup_rag.sh with appropriate flags
+    if [ "$quick_mode" = true ]; then
+      log "INFO" "Running RAG setup in non-interactive mode"
+      run_command "\"$WORKSPACE_DIR/setup_rag.sh\" --no-confirm" "Failed to set up RAG system"
+    else
+      log "INFO" "Running RAG setup in interactive mode"
+      run_command "\"$WORKSPACE_DIR/setup_rag.sh\"" "Failed to set up RAG system"
+    fi
+    
+    if [ $? -eq 0 ]; then
+      log "SUCCESS" "RAG system setup complete"
+    else
+      log "WARN" "RAG system setup encountered issues. Check logs for details."
+    fi
+  else
+    log "WARN" "RAG setup script not found. Skipping RAG setup."
+    log "INFO" "You can setup RAG system later with: ./saar_chain.sh rag setup"
   fi
 }
 
@@ -389,6 +491,7 @@ do_setup() {
   setup_about_profile "$quick_mode" "$user_id" "$theme"
   setup_mcp_servers
   setup_git_agent
+  setup_rag_system "$quick_mode"
   
   # Initialize memory if needed
   if [ ! -f "$MEMORY_FILE" ]; then
@@ -414,6 +517,7 @@ do_setup() {
   echo -e "To configure a project:   ${BOLD}./saar.sh project${NC}"
   echo -e "To launch Claude agent:   ${BOLD}./saar.sh agent${NC}"
   echo -e "To launch the dashboard:  ${BOLD}./saar.sh dashboard${NC}"
+  echo -e "To use RAG system:        ${BOLD}./saar.sh rag query \"your question\"${NC}"
   echo -e "To check system status:   ${BOLD}./saar.sh status${NC}"
   echo ""
   

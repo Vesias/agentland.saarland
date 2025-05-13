@@ -165,19 +165,132 @@ run_command() {
   local command=$1
   local error_message=${2:-"Command failed: $command"}
   local rollback_command=${3:-""}
+  local ignore_error=${4:-false}
+  
+  # Save command output and errors
+  local output_file=$(mktemp)
+  local error_file=$(mktemp)
   
   # Log the command being executed
   log "DEBUG" "Running command: $command"
   
-  # Execute the command
-  if ! eval "$command"; then
+  # Execute the command and capture output/errors
+  if ! eval "$command" > "$output_file" 2> "$error_file"; then
+    local return_code=$?
+    local error_output=$(cat "$error_file")
+    
+    # Log error details
     log "ERROR" "$error_message"
+    log "DEBUG" "Return code: $return_code"
+    
+    # Check for specific Python errors
+    if grep -q "externally-managed-environment" "$error_file"; then
+      log "WARN" "Detected externally-managed-environment error in Python. This is typically seen in system-managed Python installations."
+      log "INFO" "Will attempt to use a virtual environment instead."
+      
+      # Special handling for Python pip errors
+      if [[ "$command" == *"pip install"* ]]; then
+        # Extract just the package list from the pip install command
+        local packages=$(echo "$command" | grep -o "pip install [^\"]*" | sed 's/pip install //')
+        
+        # Check if setup_rag.sh exists
+        if [ -f "$WORKSPACE_DIR/setup_rag.sh" ]; then
+          log "INFO" "Using setup_rag.sh for Python package installation"
+          
+          # Make sure setup_rag.sh is executable
+          chmod +x "$WORKSPACE_DIR/setup_rag.sh"
+          
+          # Run setup_rag.sh with the --no-confirm flag
+          if "$WORKSPACE_DIR/setup_rag.sh" --no-confirm; then
+            # Now install the packages in the virtual environment
+            if [ -f "$WORKSPACE_DIR/.venv/bin/activate" ]; then
+              # Create a temporary script
+              local install_script=$(mktemp)
+              cat > "$install_script" << EOF
+#!/bin/bash
+set -e
+
+# Activate virtual environment
+source "$WORKSPACE_DIR/.venv/bin/activate"
+
+# Install packages
+pip install $packages
+
+# Deactivate virtual environment
+deactivate
+EOF
+              
+              chmod +x "$install_script"
+              
+              # Run the temporary script
+              if bash "$install_script"; then
+                log "SUCCESS" "Successfully installed packages in virtual environment"
+                rm -f "$output_file" "$error_file" "$install_script"
+                return 0
+              else
+                log "ERROR" "Failed to install packages in virtual environment"
+              fi
+              
+              # Clean up
+              rm -f "$install_script"
+            else
+              log "ERROR" "Virtual environment not found after setup"
+            fi
+          else
+            log "ERROR" "Failed to set up Python virtual environment"
+          fi
+        else
+          # Fallback to direct virtual environment creation
+          log "INFO" "Attempting to install packages ($packages) in a virtual environment"
+          
+          # Create a temporary script
+          local venv_script=$(mktemp)
+          cat > "$venv_script" << EOF
+#!/bin/bash
+set -e
+
+# Go to workspace directory
+cd "$WORKSPACE_DIR"
+
+# Create virtual environment if it doesn't exist
+python3 -m venv .venv
+
+# Activate and install
+source .venv/bin/activate
+pip install --upgrade pip
+pip install $packages
+deactivate
+EOF
+          
+          chmod +x "$venv_script"
+          
+          # Run the temporary script
+          if bash "$venv_script"; then
+            log "SUCCESS" "Successfully installed packages in virtual environment"
+            rm -f "$output_file" "$error_file" "$venv_script"
+            return 0
+          else
+            log "ERROR" "Failed to install packages in virtual environment"
+          fi
+          
+          # Clean up
+          rm -f "$venv_script"
+        fi
+      fi
+    fi
+    
+    # Show error details in debug mode
+    if [ "$DEBUG_MODE" = "true" ]; then
+      log "DEBUG" "Command output: $(cat "$output_file")"
+      log "DEBUG" "Error output: $error_output"
+    fi
     
     # If rollback command is provided, execute it
     if [ ! -z "$rollback_command" ]; then
       log "WARN" "Attempting to rollback: $rollback_command"
       
       # Log rollback to rollback log
+      mkdir -p "$(dirname "$ROLLBACK_LOG")"
       echo "$(get_timestamp) - ROLLBACK - Command: $command - Rollback: $rollback_command" >> "$ROLLBACK_LOG"
       
       # Execute rollback
@@ -188,8 +301,25 @@ run_command() {
       fi
     fi
     
-    return 1
+    # Clean up temporary files
+    rm -f "$output_file" "$error_file"
+    
+    # Return error or continue based on ignore_error flag
+    if [ "$ignore_error" = "true" ]; then
+      log "WARN" "Ignoring error and continuing"
+      return 0
+    else
+      return $return_code
+    fi
   fi
+  
+  # Command succeeded, show output in debug mode
+  if [ "$DEBUG_MODE" = "true" ]; then
+    log "DEBUG" "Command output: $(cat "$output_file")"
+  fi
+  
+  # Clean up temporary files
+  rm -f "$output_file" "$error_file"
   
   log "DEBUG" "Command completed successfully"
   return 0

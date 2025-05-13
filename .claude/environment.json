@@ -1,0 +1,43 @@
+{
+  "projectType": "claude-neural-framework",
+  "projectVersion": "2.1.0",
+  "environmentType": "python3-venv",
+  "lastUpdated": "2023-05-13",
+  "python": {
+    "requiresVirtualEnv": true,
+    "virtualEnvPath": ".venv",
+    "activationScript": "activate_venv.sh",
+    "runnerScript": "run_rag.sh",
+    "requiredPackages": [
+      "anthropic",
+      "requests"
+    ],
+    "optionalPackages": [
+      "lancedb",
+      "chromadb",
+      "voyage",
+      "sentence-transformers"
+    ]
+  },
+  "node": {
+    "version": ">=16.0.0",
+    "packageManager": "npm"
+  },
+  "scripts": {
+    "setup": "saar.sh setup",
+    "start": "saar.sh start",
+    "neural": "start_neural_framework.sh",
+    "rag": {
+      "setup": "setup_rag.sh",
+      "run": "run_rag.sh",
+      "query": "run_rag.sh query",
+      "update": "run_rag.sh update"
+    }
+  },
+  "constraints": {
+    "externallyManagedDetection": true,
+    "useVirtualEnvForPython": true,
+    "consolidateMdInAiDocs": true,
+    "singleEntryScript": true
+  }
+}

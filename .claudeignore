@@ -1,0 +1,36 @@
+# Claude Ignore File
+# Files and directories that Claude should ignore during analysis
+
+# Virtual environment
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+# Logs
+logs/
+*.log
+
+# Environment files
+.env
+.env.local
+
+# Build output
+dist/
+build/
+*.egg-info/
+
+# Node modules
+node_modules/
+
+# System files
+.DS_Store
+.vscode/
+.idea/

@@ -1,0 +1,25 @@
+# Claude Rules File
+# This file contains project-specific rules for Claude AI
+
+# Environment Rules
+ENVIRONMENT="python3-venv"
+PYTHON_PACKAGES_USE_VENV=true
+USE_VIRTUAL_ENV_FOR_PYTHON=true
+
+# Script Conventions
+MAIN_STARTER_SCRIPT="saar.sh"
+USE_ABS_PATHS=true
+
+# Directory Structure
+DOCS_DIR="ai_docs"
+SPECS_DIR="specs"
+CONFIG_DIR="configs"
+TOOLS_DIR="tools"
+
+# Integration Standards
+USE_VENV_FOR_RAG=true
+RAG_RUNNER="run_rag.sh"
+NEURAL_STARTER="start_neural_framework.sh"
+
+# Knowledge Base Structure
+CONSOLIDATED_MDS_IN_AI_DOCS=true

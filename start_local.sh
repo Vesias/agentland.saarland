@@ -172,10 +172,85 @@ cleanup() {
 # Register signal handler
 trap cleanup SIGINT SIGTERM
 
+# Run SAAR chain command if available
+run_saar_chain() {
+  local command=$1
+  shift
+  local args=$@
+  
+  # Find SAAR chain script
+  local saar_script=""
+  local possible_paths=(
+    "$CURRENT_DIR/libs/workflows/src/saar/saar_chain.sh"
+    "$CURRENT_DIR/saar/saar_chain.sh"
+    "$CURRENT_DIR/saar_chain.sh"
+  )
+  
+  for path in "${possible_paths[@]}"; do
+    if [ -f "$path" ]; then
+      saar_script="$path"
+      break
+    fi
+  done
+  
+  if [ -n "$saar_script" ]; then
+    log "INFO" "Running SAAR chain command: $command"
+    bash "$saar_script" $command $args
+    return $?
+  else
+    log "ERROR" "SAAR chain script not found"
+    return 1
+  fi
+}
+
+# Create about profile
+create_about_profile() {
+  local user_id=$1
+  local quick_mode=$2
+  
+  log "INFO" "Creating about profile for user: $user_id"
+  
+  # Find create_about.js script
+  local about_script=""
+  local possible_paths=(
+    "$CURRENT_DIR/libs/workflows/src/saar/scripts/setup/create_about.js"
+    "$CURRENT_DIR/tools/scripts/setup/create_about.js"
+  )
+  
+  for path in "${possible_paths[@]}"; do
+    if [ -f "$path" ]; then
+      about_script="$path"
+      break
+    fi
+  done
+  
+  if [ -n "$about_script" ]; then
+    mkdir -p "$CURRENT_DIR/configs/profiles"
+    
+    if [ "$quick_mode" = "true" ]; then
+      log "INFO" "Creating default about profile"
+      node "$about_script" --user="$user_id" --workdir="$CURRENT_DIR" --non-interactive
+    else
+      log "INFO" "Creating interactive about profile"
+      node "$about_script" --user="$user_id" --workdir="$CURRENT_DIR"
+    fi
+    
+    if [ $? -eq 0 ]; then
+      log "SUCCESS" "About profile created successfully"
+    else
+      log "ERROR" "Failed to create about profile"
+    fi
+  else
+    log "ERROR" "About profile script not found"
+    return 1
+  fi
+}
+
 # Main function
 main() {
   # Parse command line arguments
   local command=${1:-"start"}
+  shift
   
   case "$command" in
     start)
@@ -271,6 +346,35 @@ main() {
         log "WARN" "Memory Bank server is not configured"
       fi
       ;;
+
+    about)
+      show_banner
+      
+      # Parse about command arguments
+      local user_id="default"
+      local quick_mode="false"
+      
+      for arg in "$@"; do
+        case $arg in
+          --user=*)
+            user_id="${arg#*=}"
+            ;;
+          --quick)
+            quick_mode="true"
+            ;;
+        esac
+      done
+      
+      # Create about profile
+      create_about_profile "$user_id" "$quick_mode"
+      ;;
+      
+    saar)
+      show_banner
+      
+      # Run SAAR chain command
+      run_saar_chain "$@"
+      ;;
       
     help|*)
       show_banner
@@ -278,11 +382,15 @@ main() {
       echo "Usage: $0 [command]"
       echo
       echo "Commands:"
-      echo "  start    Start all MCP servers"
-      echo "  stop     Stop all MCP servers"
-      echo "  restart  Restart all MCP servers"
-      echo "  status   Check MCP servers status"
-      echo "  help     Show this help message"
+      echo "  start              Start all MCP servers"
+      echo "  stop               Stop all MCP servers"
+      echo "  restart            Restart all MCP servers"
+      echo "  status             Check MCP servers status"
+      echo "  about [options]    Create about profile"
+      echo "    --user=USER_ID   User ID for about profile"
+      echo "    --quick          Use default values without prompting"
+      echo "  saar [command]     Run SAAR chain command"
+      echo "  help               Show this help message"
       echo
       ;;
   esac

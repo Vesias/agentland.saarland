@@ -8,7 +8,7 @@
 
 # Base directory where the startup scripts are located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-STARTUP_DIR="$SCRIPT_DIR/startup"
+STARTUP_DIR="$SCRIPT_DIR/libs/workflows/src/saar/startup"
 
 # Source the common utilities first
 source "$STARTUP_DIR/00_common.sh"
@@ -287,6 +287,77 @@ case "$1" in
     fi
     ;;
     
+  about)
+    shift
+    
+    log "INFO" "Launching interactive about setup..."
+    
+    # Get user ID or use default
+    user_id="$DEFAULT_USER"
+    for arg in "$@"; do
+      case $arg in
+        --user=*)
+          user_id="${arg#*=}"
+          shift
+          ;;
+      esac
+    done
+    
+    # Use our simple, robust about script
+    about_script="$SCRIPT_DIR/libs/workflows/src/saar/scripts/setup/create_about_simple.js"
+    
+    # Export environment variables for script
+    export CONFIG_DIR="${CONFIG_DIR:-$SCRIPT_DIR/configs}"
+    export WORKSPACE_DIR="${WORKSPACE_DIR:-$SCRIPT_DIR}"
+    
+    log "INFO" "Running interactive about profile creation"
+    
+    # Run the script
+    if [ -f "$about_script" ]; then
+      chmod +x "$about_script"
+      node "$about_script" --user="$user_id" --workdir="$WORKSPACE_DIR"
+      
+      if [ $? -ne 0 ]; then
+        log "ERROR" "Interactive profile creation failed"
+        exit 1
+      else
+        log "INFO" "About profile successfully created"
+      fi
+    else
+      # Fallback to older script if available
+      log "WARN" "Preferred script not found, trying alternatives"
+      
+      possible_paths=(
+        "$SCRIPT_DIR/libs/workflows/src/saar/scripts/setup/create_about.js"
+        "$SCRIPT_DIR/scripts/setup/create_about.js"
+        "$SCRIPT_DIR/tools/scripts/setup/create_about.js"
+      )
+      
+      for path in "${possible_paths[@]}"; do
+        if [ -f "$path" ]; then
+          about_script="$path"
+          log "INFO" "Found about profile script at: $path"
+          break
+        fi
+      done
+      
+      if [ -n "$about_script" ]; then
+        node "$about_script" --user="$user_id" --workdir="$WORKSPACE_DIR"
+        
+        if [ $? -ne 0 ]; then
+          log "ERROR" "Interactive profile creation failed"
+          exit 1
+        else
+          log "INFO" "About profile successfully created"
+        fi
+      else
+        log "ERROR" "About profile creation script not found"
+        log "ERROR" "Cannot run interactive about profile creation"
+        exit 1
+      fi
+    fi
+    ;;
+    
   dashboard)
     shift
     
@@ -538,6 +609,74 @@ case "$1" in
     run_autonomy "$@"
     ;;
     
+  rag)
+    shift
+    
+    # RAG operations
+    operation=${1:-"help"}
+    
+    log "INFO" "RAG operation: $operation"
+    
+    case $operation in
+      setup)
+        # Run RAG setup script
+        if [ -f "$SCRIPT_DIR/setup_rag.sh" ]; then
+          log "INFO" "Running RAG setup script"
+          chmod +x "$SCRIPT_DIR/setup_rag.sh"
+          "$SCRIPT_DIR/setup_rag.sh" "$@"
+        else
+          log "ERROR" "RAG setup script not found: $SCRIPT_DIR/setup_rag.sh"
+          exit 1
+        fi
+        ;;
+        
+      run)
+        # Run RAG command
+        if [ -f "$SCRIPT_DIR/run_rag.sh" ]; then
+          log "INFO" "Running RAG command"
+          chmod +x "$SCRIPT_DIR/run_rag.sh"
+          shift
+          "$SCRIPT_DIR/run_rag.sh" "$@"
+        else
+          log "ERROR" "RAG runner script not found: $SCRIPT_DIR/run_rag.sh"
+          exit 1
+        fi
+        ;;
+        
+      update)
+        # Update vector database
+        if [ -f "$SCRIPT_DIR/run_rag.sh" ]; then
+          log "INFO" "Updating RAG vector database"
+          chmod +x "$SCRIPT_DIR/run_rag.sh"
+          "$SCRIPT_DIR/run_rag.sh" update "$@"
+        else
+          log "ERROR" "RAG runner script not found: $SCRIPT_DIR/run_rag.sh"
+          exit 1
+        fi
+        ;;
+        
+      query)
+        # Query RAG system
+        if [ -f "$SCRIPT_DIR/run_rag.sh" ]; then
+          log "INFO" "Querying RAG system"
+          chmod +x "$SCRIPT_DIR/run_rag.sh"
+          "$SCRIPT_DIR/run_rag.sh" query "$@"
+        else
+          log "ERROR" "RAG runner script not found: $SCRIPT_DIR/run_rag.sh"
+          exit 1
+        fi
+        ;;
+        
+      help|*)
+        echo "RAG System Usage:"
+        echo "  $0 rag setup     - Set up RAG environment and dependencies"
+        echo "  $0 rag run       - Run a RAG script directly"
+        echo "  $0 rag update    - Update the vector database with new documents"
+        echo "  $0 rag query     - Query the RAG system"
+        ;;
+    esac
+    ;;
+    
   status)
     # Source additional modules needed for status check
     source "$STARTUP_DIR/02_setup.sh"
@@ -554,6 +693,7 @@ case "$1" in
     echo "  setup       Full setup of the Agentic OS"
     echo "  start       Start MCP servers and services"
     echo "  agent       Launch Claude agent"
+    echo "  about       Launch interactive about profile setup"
     echo "  dashboard   Launch User Main Dashboard"
     echo "  status      Show system status"
     echo "  help        Show this help message"
@@ -563,6 +703,7 @@ case "$1" in
     echo "  debug       Neural Recursive Debugging tools"
     echo "  neural      Neural Framework operations"
     echo "  autonomy    DeepThink and autonomous execution"
+    echo "  rag         Retrieval Augmented Generation system"
     echo ""
     echo -e "${BOLD}Common Options:${NC}"
     echo "  --debug     Enable debug logging"
@@ -578,11 +719,13 @@ case "$1" in
     echo "  $0 setup                         # Full interactive setup"
     echo "  $0 setup --quick                 # Quick setup with defaults"
     echo "  $0 agent                         # Launch Claude agent interactively"
+    echo "  $0 about --user=jan              # Create about profile for specific user"
     echo "  $0 dashboard --user=john         # Launch Dashboard for specific user"
     echo "  $0 a2a start                     # Start Agent-to-Agent manager"
     echo "  $0 debug workflow quick file.js  # Run quick debug workflow on file.js"
     echo "  $0 neural install                # Install Neural Framework components"
     echo "  $0 autonomy think 'Create tests' # Generate execution plan through deep thinking"
+    echo "  $0 rag query 'How does RAG work' # Query the RAG system for information"
     echo ""
     ;;
     
