@@ -1,0 +1,25 @@
+{
+  "servers": {
+    "sequentialthinking": {
+      "enabled": true,
+      "command": "node",
+      "args": ["./mcp_servers/sequential_thinking.js"],
+      "autostart": true,
+      "description": "Rekursive Gedankengenerierung für komplexe Probleme"
+    },
+    "context7": {
+      "enabled": true,
+      "command": "node",
+      "args": ["./mcp_servers/context7.js"],
+      "autostart": true,
+      "description": "Kontextuelles Bewusstseinsframework"
+    },
+    "memory-bank": {
+      "enabled": true,
+      "command": "node",
+      "args": ["./mcp_servers/memory_bank.js"],
+      "autostart": true,
+      "description": "Langfristige Musterpersistenz"
+    }
+  }
+}
