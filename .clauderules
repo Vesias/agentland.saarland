@@ -1,25 +1,128 @@
-# Claude Rules File
-# This file contains project-specific rules for Claude AI
+# Claude Neural Framework – .clauderules
+# Location: /home/jan/Dokumente/agent.saarland/.clauderules
+# Version: 2.x
+# Enforces: Struktur, Konvention, Modularität, Doku, CI-Fähigkeit
 
-# Environment Rules
-ENVIRONMENT="python3-venv"
-PYTHON_PACKAGES_USE_VENV=true
-USE_VIRTUAL_ENV_FOR_PYTHON=true
+[project]
+name = "Claude Neural Framework"
+monorepo = true
+entry_point = "saar.sh"
+typed = true
+typed_language = "TypeScript"
+docs_base = "ai_docs/"
+enforce_module_boundaries = true
+readme = "README.md"
 
-# Script Conventions
-MAIN_STARTER_SCRIPT="saar.sh"
-USE_ABS_PATHS=true
+[folders.authoritative]
+ai_docs = true
+specs = true
+.claude = true
+configs = true
+tools = true
+libs = true
+apps = true
 
-# Directory Structure
-DOCS_DIR="ai_docs"
-SPECS_DIR="specs"
-CONFIG_DIR="configs"
-TOOLS_DIR="tools"
+[folders.enforce_structure.ai_docs]
+must_have = [
+  "analysis/",
+  "api/",
+  "architecture/",
+  "cleanup/",
+  "enterprise/",
+  "examples/",
+  "general/",
+  "guides/",
+  "integration/",
+  "migration/",
+  "models/",
+  "plans/",
+  "prompts/",
+  "recommendations/",
+  "reports/",
+  "security/",
+  "templates/",
+  "tutorials/"
+]
+readme_required = true
+central_docs = [
+  "CLAUDE.md",
+  "CLEANUP-LIST.md",
+  "FINAL_FILE_TREE.md",
+  "FINAL-POLISHING-STEPS.md",
+  "FINAL-STRUCTURE.md",
+  "PROJECT-STRUCTURE-AUDIT.md",
+  "STRUCTURE.md"
+]
 
-# Integration Standards
-USE_VENV_FOR_RAG=true
-RAG_RUNNER="run_rag.sh"
-NEURAL_STARTER="start_neural_framework.sh"
+[enforce.aliasing]
+tsconfig_paths = true
+aliases = [
+  { path = "@libs/*", mapsTo = "libs/*/src" },
+  { path = "@ai_docs/*", mapsTo = "ai_docs/*" },
+  { path = "@specs/*", mapsTo = "specs/*" },
+  { path = "@.claude/*", mapsTo = ".claude/*" }
+]
 
-# Knowledge Base Structure
-CONSOLIDATED_MDS_IN_AI_DOCS=true
+[enforce.scripts]
+only_root_script = ["saar.sh"]
+disallow_other_root_scripts = true
+scripts_allowed_in = [
+  "tools/",
+  ".claude/",
+  "libs/**/scripts/"
+]
+strict_bash_required = true
+no_debug_or_console_logs = true
+
+[enforce.docs]
+all_md_files = "ai_docs/"
+require_md_index = true
+disallow_duplicate_readmes = true
+must_link_from_root_readme = [
+  "FINAL-STRUCTURE.md",
+  "PROJECT-STRUCTURE-AUDIT.md",
+  "CLAUDE.md"
+]
+
+[enforce.testing]
+test_framework = "jest"
+enforce_test_dirs = ["__tests__", "test", "tests"]
+spec_suffix = ".spec.ts"
+test_required_for = [
+  "libs/*",
+  "apps/*"
+]
+isolate_test_data = true
+
+[enforce.typing]
+strict_typescript = true
+disallow_any = true
+require_interfaces = true
+validate_config_with = "zod"
+convert_all_js_to_ts = true
+typed_config_locations = ["configs/", "libs/core/config/"]
+
+[enforce.cleanup]
+ignore_patterns = [
+  "logs/",
+  ".venv/",
+  "node_modules/",
+  ".DS_Store",
+  "*.bak",
+  "*.refactored",
+  "*.enhanced"
+]
+must_be_gitignored = [
+  "logs/",
+  ".venv/"
+]
+
+[deployment]
+must_include = [
+  "saar.sh",
+  "package.json",
+  "tsconfig.base.json",
+  "nx.json",
+  ".claudeignore",
+  ".clauderules"
+]
