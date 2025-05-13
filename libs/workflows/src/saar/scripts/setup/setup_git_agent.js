@@ -228,7 +228,7 @@ if (scriptsUpdated) {
 }
 
 // Add to SAAR script
-const saarPath = path.resolve(__dirname, '../../saar.sh');
+const saarPath = path.resolve(__dirname, '../../saar_chain.sh');
 if (fs.existsSync(saarPath)) {
   let saarContent = fs.readFileSync(saarPath, 'utf8');
   
@@ -345,10 +345,10 @@ Git operations are integrated with the Agent-to-Agent protocol:
 
 \`\`\`bash
 # Using SAAR
-./saar.sh git status
-./saar.sh git commit "Commit message" --all
-./saar.sh git pull main
-./saar.sh git log 5
+./saar_chain.sh git status
+./saar_chain.sh git commit "Commit message" --all
+./saar_chain.sh git pull main
+./saar_chain.sh git log 5
 
 # Using npm scripts
 npm run git:status
@@ -381,6 +381,6 @@ node core/mcp/a2a_manager.js --to=git-agent --task=git-operation --params='{"ope
 
 console.log(chalk.green.bold('\n✓ Git agent setup complete!'));
 console.log('\nYou can now use the Git agent with the following commands:');
-console.log('  ./saar.sh git status');
+console.log('  ./saar_chain.sh git status');
 console.log('  npm run git:status');
 console.log('  node core/mcp/a2a_manager.js --to=git-agent --task=git-operation --params=\'{"operation": "status"}\'');

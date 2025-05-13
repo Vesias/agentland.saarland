@@ -24,8 +24,8 @@
     "packageManager": "npm"
   },
   "scripts": {
-    "setup": "saar.sh setup",
-    "start": "saar.sh start",
+    "setup": "saar_chain.sh setup",
+    "start": "saar_chain.sh start",
     "neural": "start_neural_framework.sh",
     "rag": {
       "setup": "setup_rag.sh",

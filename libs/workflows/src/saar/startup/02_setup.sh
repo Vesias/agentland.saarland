@@ -513,12 +513,12 @@ do_setup() {
   echo -e "${GREEN}${BOLD}Agentic OS setup complete!${NC}"
   echo -e "${CYAN}Your system is ready to use.${NC}"
   echo ""
-  echo -e "To start all services:    ${BOLD}./saar.sh start${NC}"
-  echo -e "To configure a project:   ${BOLD}./saar.sh project${NC}"
-  echo -e "To launch Claude agent:   ${BOLD}./saar.sh agent${NC}"
-  echo -e "To launch the dashboard:  ${BOLD}./saar.sh dashboard${NC}"
-  echo -e "To use RAG system:        ${BOLD}./saar.sh rag query \"your question\"${NC}"
-  echo -e "To check system status:   ${BOLD}./saar.sh status${NC}"
+  echo -e "To start all services:    ${BOLD}./saar_chain.sh start${NC}"
+  echo -e "To configure a project:   ${BOLD}./saar_chain.sh project${NC}"
+  echo -e "To launch Claude agent:   ${BOLD}./saar_chain.sh agent${NC}"
+  echo -e "To launch the dashboard:  ${BOLD}./saar_chain.sh dashboard${NC}"
+  echo -e "To use RAG system:        ${BOLD}./saar_chain.sh rag query \"your question\"${NC}"
+  echo -e "To check system status:   ${BOLD}./saar_chain.sh status${NC}"
   echo ""
   
   return 0

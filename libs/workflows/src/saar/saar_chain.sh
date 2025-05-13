@@ -667,12 +667,118 @@ case "$1" in
         fi
         ;;
         
+      status)
+        # Check RAG system status
+        log "INFO" "Checking RAG system status"
+        
+        # Check virtual environment
+        if [ -d "$SCRIPT_DIR/.venv" ]; then
+          log "SUCCESS" "Virtual environment found at $SCRIPT_DIR/.venv"
+          
+          # Check activation script
+          if [ -f "$SCRIPT_DIR/activate_venv.sh" ]; then
+            log "SUCCESS" "Activation script found"
+          else
+            log "WARN" "Activation script not found: $SCRIPT_DIR/activate_venv.sh"
+          fi
+          
+          # Check runner script
+          if [ -f "$SCRIPT_DIR/run_rag.sh" ]; then
+            log "SUCCESS" "Runner script found"
+          else
+            log "WARN" "Runner script not found: $SCRIPT_DIR/run_rag.sh"
+          fi
+          
+          # Check RAG scripts
+          if [ -d "$SCRIPT_DIR/libs/rag/src" ]; then
+            script_count=$(find "$SCRIPT_DIR/libs/rag/src" -name "*.py" | wc -l)
+            log "SUCCESS" "RAG scripts found: $script_count"
+          else
+            log "WARN" "RAG scripts directory not found: $SCRIPT_DIR/libs/rag/src"
+          fi
+          
+          # Check installed packages in virtual environment
+          if [ -f "$SCRIPT_DIR/.venv/bin/pip" ]; then
+            log "INFO" "Checking installed packages in virtual environment"
+            
+            echo -e "${BOLD}Installed Python Packages:${NC}"
+            if [ -f "$SCRIPT_DIR/.venv/bin/pip" ]; then
+              "$SCRIPT_DIR/.venv/bin/pip" list | grep -E 'anthropic|requests|lancedb|chromadb|voyage|sentence-transformers' || echo "No relevant packages found"
+            fi
+          else
+            log "WARN" "Pip not found in virtual environment"
+          fi
+          
+          # Check configs
+          if [ -f "$SCRIPT_DIR/configs/python/venv_config.json" ]; then
+            log "SUCCESS" "RAG configuration found"
+          else
+            log "WARN" "RAG configuration not found: $SCRIPT_DIR/configs/python/venv_config.json"
+          fi
+          
+          # Show status summary
+          echo -e "\n${BOLD}RAG System Status:${NC}"
+          echo -e "${GREEN}✓${NC} Virtual environment is set up"
+          echo -e "${GREEN}✓${NC} Helper scripts are available"
+          
+          # Check example data
+          if [ -d "$SCRIPT_DIR/data/vector_store" ]; then
+            echo -e "${GREEN}✓${NC} Vector database is initialized"
+          else
+            echo -e "${YELLOW}!${NC} Vector database not initialized (run '$0 rag update docs/')"
+          fi
+          
+          echo -e "\nRun '${BOLD}$0 rag query \"your question\"${NC}' to use the RAG system."
+        else
+          log "WARN" "Virtual environment not found. Run '$0 rag setup' to set up the RAG system."
+          
+          # Check if setup script exists
+          if [ -f "$SCRIPT_DIR/setup_rag.sh" ]; then
+            log "INFO" "Setup script found: $SCRIPT_DIR/setup_rag.sh"
+          else
+            log "WARN" "Setup script not found: $SCRIPT_DIR/setup_rag.sh"
+          fi
+          
+          echo -e "\n${BOLD}RAG System Status:${NC} ${RED}Not Set Up${NC}"
+          echo -e "Run '${BOLD}$0 rag setup${NC}' to set up the RAG system."
+        fi
+        ;;
+        
+      check-env)
+        # Check Python environment
+        log "INFO" "Checking Python environment status"
+        
+        # Check if environment checker script exists
+        check_script="$SCRIPT_DIR/libs/rag/src/check_env_status.py"
+        if [ ! -f "$check_script" ]; then
+          log "ERROR" "Environment checker script not found: $check_script"
+          exit 1
+        fi
+        
+        # Make the script executable
+        chmod +x "$check_script"
+        
+        # Run with system Python
+        log "INFO" "System Python environment:"
+        python3 "$check_script"
+        
+        # Run with virtual environment Python if it exists
+        if [ -f "$SCRIPT_DIR/.venv/bin/python" ]; then
+          log "INFO" "Virtual environment Python:"
+          "$SCRIPT_DIR/.venv/bin/python" "$check_script"
+        else
+          log "WARN" "Virtual environment not found"
+        fi
+        ;;
+        
       help|*)
         echo "RAG System Usage:"
         echo "  $0 rag setup     - Set up RAG environment and dependencies"
         echo "  $0 rag run       - Run a RAG script directly"
         echo "  $0 rag update    - Update the vector database with new documents"
         echo "  $0 rag query     - Query the RAG system"
+        echo "  $0 rag status    - Check RAG system status"
+        echo "  $0 rag check-env - Check Python environment configuration"
         ;;
     esac
     ;;

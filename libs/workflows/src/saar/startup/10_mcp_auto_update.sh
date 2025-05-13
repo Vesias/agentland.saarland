@@ -97,10 +97,10 @@ main() {
     # Set up scheduled updates
     ensure_scheduled_updates
     
-    # Add MCP tools update to saar.sh command list
+    # Add MCP tools update to saar_chain.sh command list
     print_success "MCP tools automatic update system is now ready"
-    print_info "You can manually update MCP tools with: saar.sh update-mcp"
-    print_info "You can configure update settings with: saar.sh configure-mcp-update"
+    print_info "You can manually update MCP tools with: saar_chain.sh update-mcp"
+    print_info "You can configure update settings with: saar_chain.sh configure-mcp-update"
 }
 
 # Execute main function
