@@ -1,0 +1,142 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Performance Benchmarks",
+  "type": "object",
+  "properties": {
+    "api_endpoints": {
+      "type": "object",
+      "properties": {
+        "response_time": {
+          "type": "object",
+          "properties": {
+            "p50": {
+              "type": "number",
+              "description": "50th percentile (median) response time in ms",
+              "maximum": 100
+            },
+            "p95": {
+              "type": "number",
+              "description": "95th percentile response time in ms",
+              "maximum": 300
+            },
+            "p99": {
+              "type": "number",
+              "description": "99th percentile response time in ms",
+              "maximum": 500
+            }
+          },
+          "required": ["p50", "p95", "p99"]
+        },
+        "throughput": {
+          "type": "number",
+          "description": "Minimum requests per second",
+          "minimum": 1000
+        },
+        "error_rate": {
+          "type": "number",
+          "description": "Maximum acceptable error rate",
+          "maximum": 0.001
+        }
+      }
+    },
+    "database": {
+      "type": "object",
+      "properties": {
+        "query_performance": {
+          "type": "object",
+          "properties": {
+            "read_latency": {
+              "type": "number",
+              "description": "Maximum read latency in ms",
+              "maximum": 20
+            },
+            "write_latency": {
+              "type": "number",
+              "description": "Maximum write latency in ms",
+              "maximum": 50
+            },
+            "index_efficiency": {
+              "type": "number",
+              "description": "Minimum index hit ratio",
+              "minimum": 0.95
+            }
+          }
+        },
+        "connection_pool": {
+          "type": "object",
+          "properties": {
+            "max_connections": {
+              "type": "number",
+              "minimum": 20
+            },
+            "timeout": {
+              "type": "number",
+              "description": "Connection timeout in ms",
+              "maximum": 5000
+            }
+          }
+        }
+      }
+    },
+    "frontend": {
+      "type": "object",
+      "properties": {
+        "load_time": {
+          "type": "object",
+          "properties": {
+            "first_contentful_paint": {
+              "type": "number",
+              "description": "Maximum FCP in ms",
+              "maximum": 1500
+            },
+            "largest_contentful_paint": {
+              "type": "number",
+              "description": "Maximum LCP in ms",
+              "maximum": 2500
+            },
+            "time_to_interactive": {
+              "type": "number",
+              "description": "Maximum TTI in ms",
+              "maximum": 3500
+            }
+          }
+        },
+        "bundle_size": {
+          "type": "object",
+          "properties": {
+            "javascript": {
+              "type": "number",
+              "description": "Maximum JS bundle size in KB",
+              "maximum": 250
+            },
+            "css": {
+              "type": "number",
+              "description": "Maximum CSS bundle size in KB",
+              "maximum": 100
+            },
+            "images": {
+              "type": "number",
+              "description": "Maximum image size per page in KB",
+              "maximum": 1000
+            }
+          }
+        }
+      }
+    },
+    "memory_usage": {
+      "type": "object",
+      "properties": {
+        "backend": {
+          "type": "number",
+          "description": "Maximum memory usage in MB",
+          "maximum": 512
+        },
+        "frontend": {
+          "type": "number",
+          "description": "Maximum memory usage in MB",
+          "maximum": 256
+        }
+      }
+    }
+  }
+}

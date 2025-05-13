@@ -2,17 +2,17 @@
   "processes": [
     {
       "name": "sequential_thinking",
-      "pid": 2369773,
+      "pid": 2404490,
       "type": "mcp"
     },
     {
       "name": "context7",
-      "pid": 2369784,
+      "pid": 2404501,
       "type": "mcp"
     },
     {
       "name": "memory_bank",
-      "pid": 2369796,
+      "pid": 2404512,
       "type": "mcp"
     }
   ]

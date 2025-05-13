@@ -335,7 +335,7 @@ run_debug_workflow() {
   if [ ! -f "$file_path" ]; then
     log "ERROR" "File not found: $file_path"
     return 1
-  }
+  fi
   
   # Run the debug workflow
   log "INFO" "Running $workflow debug workflow on $file_path"

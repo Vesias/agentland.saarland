@@ -14,16 +14,55 @@ const inquirer = require('inquirer');
 const chalk = require('chalk');
 const os = require('os');
 
-// Farbschema-Manager importieren
-const colorSchemaManager = require('../../../src/core/mcp/color_schema_manager');
+// Process arguments
+const args = process.argv.slice(2);
+const userArg = args.find(arg => arg.startsWith('--user='));
+const userId = userArg ? userArg.split('=')[1] : undefined;
+const workdirArg = args.find(arg => arg.startsWith('--workdir='));
+const customWorkdir = workdirArg ? workdirArg.split('=')[1] : undefined;
+
+// Determine the working directory - check for environment variable, argument, or use default
+const WORKSPACE_DIR = customWorkdir || process.env.WORKSPACE_DIR || process.cwd();
+console.log(chalk.blue(`Working directory: ${WORKSPACE_DIR}`));
+
+// Try to import color schema manager from various possible locations
+let colorSchemaManager;
+try {
+  // First try local import
+  colorSchemaManager = require('../../../src/core/mcp/color_schema_manager');
+} catch (e) {
+  try {
+    // Try absolute path import from workspace
+    colorSchemaManager = require(path.join(WORKSPACE_DIR, 'libs/core/src/mcp/color_schema_manager'));
+  } catch (e) {
+    // Fallback to mock
+    console.warn(chalk.yellow('Warning: Could not import color_schema_manager, using mock version'));
+    colorSchemaManager = {
+      getColorSchema: () => ({
+        colors: {
+          primary: '#3f51b5',
+          secondary: '#7986cb', 
+          accent: '#ff4081'
+        }
+      })
+    };
+  }
+}
 
 // Konfigurationspfade
-const CONFIG_DIR = path.join(os.homedir(), '.claude');
-const ABOUT_FILE = path.join(CONFIG_DIR, 'user.about.json');
+const CONFIG_DIR = process.env.CONFIG_DIR || path.join(WORKSPACE_DIR, 'configs');
+const PROFILES_DIR = path.join(CONFIG_DIR, 'profiles');
+const ABOUT_FILE = userId 
+  ? path.join(PROFILES_DIR, `${userId}.about.json`)
+  : path.join(CONFIG_DIR, 'user.about.json');
 
-// Sicherstellen, dass das Benutzerverzeichnis existiert
+// Sicherstellen, dass die benötigten Verzeichnisse existieren
 if (!fs.existsSync(CONFIG_DIR)) {
   fs.mkdirSync(CONFIG_DIR, { recursive: true });
+}
+
+if (!fs.existsSync(PROFILES_DIR)) {
+  fs.mkdirSync(PROFILES_DIR, { recursive: true });
 }
 
 /**
@@ -44,6 +83,14 @@ async function createAboutInteractive() {
     console.warn(`Konnte bestehendes Profil nicht laden: ${err.message}`);
   }
 
+  // Ensure arrays are properly handled
+  const getArrayDefault = (array) => {
+    if (!array) return '';
+    if (Array.isArray(array)) return array.join(', ');
+    if (typeof array === 'string') return array;
+    return '';
+  };
+
   // Benutzerinformationen
   const personalInfo = await inquirer.prompt([
     {
@@ -56,14 +103,14 @@ async function createAboutInteractive() {
       type: 'input',
       name: 'goals',
       message: 'Was sind Ihre Ziele? (Komma-getrennte Liste)',
-      default: currentProfile?.goals?.join(', ') || '',
+      default: getArrayDefault(currentProfile?.goals),
       filter: input => input.split(',').map(goal => goal.trim()).filter(Boolean)
     },
     {
       type: 'input',
       name: 'companies',
       message: 'Für welche Unternehmen arbeiten Sie? (Komma-getrennte Liste)',
-      default: currentProfile?.companies?.join(', ') || '',
+      default: getArrayDefault(currentProfile?.companies),
       filter: input => input.split(',').map(company => company.trim()).filter(Boolean)
     }
   ]);
@@ -74,7 +121,7 @@ async function createAboutInteractive() {
       type: 'input',
       name: 'expertise',
       message: 'In welchen Bereichen haben Sie Expertise? (Komma-getrennte Liste, z.B. javascript,python,algorithms)',
-      default: currentProfile?.expertise?.join(', ') || '',
+      default: getArrayDefault(currentProfile?.expertise),
       filter: input => input.split(',').map(area => area.trim()).filter(Boolean)
     }
   ]);
@@ -152,29 +199,147 @@ async function createAboutInteractive() {
   
   if (useColorSchemaManager) {
     // Benutzer möchte detaillierte Farbschema-Anpassungen
-    console.log(chalk.yellow('\nDer Farbschema-Manager wird geöffnet...\n'));
+    console.log(chalk.yellow('\nInteraktive Farbschema-Konfiguration\n'));
     
-    // Farbschema-Manager ausführen als separater Prozess
-    const { execSync } = require('child_process');
+    // Implementiere einen einfachen Farbschema-Manager direkt hier
     try {
-      execSync('node core/mcp/color_schema_manager.js', { stdio: 'inherit' });
+      // Lade Standard-Farbschema basierend auf dem ausgewählten Thema
+      let defaultColorScheme = {
+        primary: prefInfo.theme === 'light' ? '#2196f3' : '#3f51b5',
+        secondary: prefInfo.theme === 'light' ? '#64b5f6' : '#7986cb',
+        accent: '#ff4081'
+      };
+      
+      // Aktuelle Werte anzeigen
+      console.log(chalk.cyan('Aktuelles Farbschema:'));
+      console.log(chalk.blue(`Primärfarbe: ${defaultColorScheme.primary}`));
+      console.log(chalk.blue(`Sekundärfarbe: ${defaultColorScheme.secondary}`));
+      console.log(chalk.blue(`Akzentfarbe: ${defaultColorScheme.accent}`));
+      
+      // Interaktive Farbauswahl
+      const colorChoices = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'colorTemplate',
+          message: 'Welche Farbvorlage möchten Sie verwenden?',
+          choices: [
+            { name: 'Standard Blau (empfohlen)', value: 'blue' },
+            { name: 'Material Purple', value: 'purple' },
+            { name: 'Material Green', value: 'green' },
+            { name: 'Material Amber', value: 'amber' },
+            { name: 'Benutzerdefiniert', value: 'custom' }
+          ],
+          default: 'blue'
+        }
+      ]);
+      
+      // Vordefinierte Farbschemata
+      const templates = {
+        blue: {
+          primary: prefInfo.theme === 'light' ? '#2196f3' : '#3f51b5',
+          secondary: prefInfo.theme === 'light' ? '#64b5f6' : '#7986cb',
+          accent: '#ff4081'
+        },
+        purple: {
+          primary: '#9c27b0',
+          secondary: '#ba68c8',
+          accent: '#ffab00'
+        },
+        green: {
+          primary: '#4caf50',
+          secondary: '#81c784',
+          accent: '#ff4081'
+        },
+        amber: {
+          primary: '#ffc107',
+          secondary: '#ffd54f',
+          accent: '#ff5722'
+        }
+      };
+      
+      // Farbe basierend auf Vorlage oder benutzerdefiniert festlegen
+      if (colorChoices.colorTemplate === 'custom') {
+        // Benutzerdefinierte Eingabe für Farben
+        const customColors = await inquirer.prompt([
+          {
+            type: 'input',
+            name: 'primary',
+            message: 'Primärfarbe (hex, z.B. #3f51b5):',
+            default: defaultColorScheme.primary,
+            validate: input => /^#[0-9A-Fa-f]{6}$/.test(input) ? true : 'Bitte geben Sie einen gültigen Hex-Farbcode ein (z.B. #3f51b5)'
+          },
+          {
+            type: 'input',
+            name: 'secondary',
+            message: 'Sekundärfarbe (hex, z.B. #7986cb):',
+            default: defaultColorScheme.secondary,
+            validate: input => /^#[0-9A-Fa-f]{6}$/.test(input) ? true : 'Bitte geben Sie einen gültigen Hex-Farbcode ein (z.B. #7986cb)'
+          },
+          {
+            type: 'input',
+            name: 'accent',
+            message: 'Akzentfarbe (hex, z.B. #ff4081):',
+            default: defaultColorScheme.accent,
+            validate: input => /^#[0-9A-Fa-f]{6}$/.test(input) ? true : 'Bitte geben Sie einen gültigen Hex-Farbcode ein (z.B. #ff4081)'
+          }
+        ]);
+        
+        colorScheme = customColors;
+      } else {
+        colorScheme = templates[colorChoices.colorTemplate];
+      }
+      
+      // Zeige ausgewähltes Farbschema
       console.log(chalk.green('\nFarbschema erfolgreich konfiguriert!'));
+      console.log(chalk.cyan(`Primärfarbe: ${colorScheme.primary}`));
+      console.log(chalk.cyan(`Sekundärfarbe: ${colorScheme.secondary}`));
+      console.log(chalk.cyan(`Akzentfarbe: ${colorScheme.accent}`));
       
-      // Aktualisiertes Farbschema laden
-      colorScheme = colorSchemaManager.getColorSchema().colors;
     } catch (err) {
-      console.error(`Fehler beim Ausführen des Farbschema-Managers: ${err.message}`);
+      console.error(`Fehler bei der Farbschema-Konfiguration: ${err.message}`);
       
-      // Standardfarbschema basierend auf Thema verwenden
-      const themeName = prefInfo.theme;
-      const themeConfig = require('../../../src/core/config/color_schema_config.json');
-      colorScheme = themeConfig.themes[themeName].colors;
+      // Use default color scheme
+      colorScheme = {
+        primary: '#3f51b5',
+        secondary: '#7986cb',
+        accent: '#ff4081'
+      };
     }
   } else {
-    // Standardfarbschema basierend auf Thema verwenden
+    // Standard color scheme based on theme
     const themeName = prefInfo.theme;
-    const themeConfig = require('../../../src/core/config/color_schema_config.json');
-    colorScheme = themeConfig.themes[themeName].colors;
+    
+    // Try to load theme config from different possible paths
+    let themeConfig;
+    try {
+      themeConfig = require(path.join(WORKSPACE_DIR, 'configs/color-schema/config.json'));
+    } catch (e) {
+      try {
+        themeConfig = require(path.join(WORKSPACE_DIR, 'libs/core/src/config/color_schema_config.json'));
+      } catch (e) {
+        // Default theme config if none found
+        themeConfig = {
+          themes: {
+            light: {
+              colors: {
+                primary: '#2196f3',
+                secondary: '#64b5f6',
+                accent: '#ff4081'
+              }
+            },
+            dark: {
+              colors: {
+                primary: '#3f51b5',
+                secondary: '#7986cb',
+                accent: '#ff4081'
+              }
+            }
+          }
+        };
+      }
+    }
+    
+    colorScheme = themeConfig.themes[themeName]?.colors || themeConfig.themes.dark.colors;
     
     console.log(chalk.cyan('\nStandardfarbschema für das Thema wird verwendet.'));
     console.log(chalk.cyan(`Primärfarbe: ${colorScheme.primary}`));
@@ -235,12 +400,109 @@ async function createAboutInteractive() {
   }
 }
 
+// Parse command line arguments
+const parseArgs = () => {
+  const args = process.argv.slice(2);
+  const result = {
+    user: undefined,
+    workdir: undefined,
+    help: false,
+    nonInteractive: false
+  };
+  
+  args.forEach(arg => {
+    if (arg.startsWith('--user=')) {
+      result.user = arg.split('=')[1];
+    } else if (arg.startsWith('--workdir=')) {
+      result.workdir = arg.split('=')[1];
+    } else if (arg === '--help' || arg === '-h') {
+      result.help = true;
+    } else if (arg === '--non-interactive') {
+      result.nonInteractive = true;
+    }
+  });
+  
+  return result;
+};
+
+/**
+ * Create default about profile non-interactively
+ */
+const createDefaultAbout = (userId, theme = 'dark') => {
+  console.log(chalk.bold(`\nGenerating default .about profile for user ${userId}...\n`));
+  
+  const profile = {
+    user_id: userId || `user-${Date.now()}`,
+    name: "Default User",
+    goals: ["Setup Agentic OS", "Build advanced AI agents"],
+    companies: ["SAAR Framework"],
+    preferences: {
+      theme: theme,
+      lang: "de",
+      colorScheme: {
+        primary: '#3f51b5',
+        secondary: '#7986cb',
+        accent: '#ff4081'
+      }
+    },
+    expertise: ["JavaScript", "Python", "AI"],
+    debug_preferences: {
+      strategy: "bottom-up",
+      detail_level: "medium",
+      auto_fix: true
+    },
+    is_agent: false
+  };
+  
+  // Create directory if it doesn't exist
+  const aboutDir = path.dirname(ABOUT_FILE);
+  if (!fs.existsSync(aboutDir)) {
+    fs.mkdirSync(aboutDir, { recursive: true });
+  }
+  
+  // Save profile
+  try {
+    fs.writeFileSync(ABOUT_FILE, JSON.stringify(profile, null, 2));
+    console.log(chalk.green(`\n.about Profile saved to: ${ABOUT_FILE}`));
+    return profile;
+  } catch (err) {
+    console.error(`Error saving profile: ${err.message}`);
+    return null;
+  }
+};
+
+// Show help message
+const showHelp = () => {
+  console.log(`
+${chalk.bold('About Profile Generator')}
+${chalk.cyan('Usage:')} node create_about.js [options]
+
+${chalk.bold('Options:')}
+  --user=USER_ID     User ID to create profile for
+  --workdir=PATH     Custom workspace directory
+  --non-interactive  Use default values without prompting
+  --help, -h         Show this help message
+
+${chalk.bold('Example:')}
+  node create_about.js --user=jan --workdir=/home/jan/projects/saar
+  `);
+};
+
 // Direkter Aufruf
 if (require.main === module) {
-  createAboutInteractive().catch(console.error);
+  const args = parseArgs();
+  
+  if (args.help) {
+    showHelp();
+  } else if (args.nonInteractive && args.user) {
+    createDefaultAbout(args.user, 'dark');
+  } else {
+    createAboutInteractive().catch(console.error);
+  }
 }
 
 // Für Import
 module.exports = {
-  createAboutInteractive
+  createAboutInteractive,
+  createDefaultAbout
 };

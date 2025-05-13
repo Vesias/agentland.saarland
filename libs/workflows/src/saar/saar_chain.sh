@@ -8,7 +8,7 @@
 
 # Base directory where the startup scripts are located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-STARTUP_DIR="$SCRIPT_DIR/startup"
+STARTUP_DIR="$SCRIPT_DIR/libs/workflows/src/saar/startup"
 
 # Source the common utilities first
 source "$STARTUP_DIR/00_common.sh"
@@ -287,6 +287,77 @@ case "$1" in
     fi
     ;;
     
+  about)
+    shift
+    
+    log "INFO" "Launching interactive about setup..."
+    
+    # Get user ID or use default
+    user_id="$DEFAULT_USER"
+    for arg in "$@"; do
+      case $arg in
+        --user=*)
+          user_id="${arg#*=}"
+          shift
+          ;;
+      esac
+    done
+    
+    # Use our simple, robust about script
+    about_script="$SCRIPT_DIR/libs/workflows/src/saar/scripts/setup/create_about_simple.js"
+    
+    # Export environment variables for script
+    export CONFIG_DIR="${CONFIG_DIR:-$SCRIPT_DIR/configs}"
+    export WORKSPACE_DIR="${WORKSPACE_DIR:-$SCRIPT_DIR}"
+    
+    log "INFO" "Running interactive about profile creation"
+    
+    # Run the script
+    if [ -f "$about_script" ]; then
+      chmod +x "$about_script"
+      node "$about_script" --user="$user_id" --workdir="$WORKSPACE_DIR"
+      
+      if [ $? -ne 0 ]; then
+        log "ERROR" "Interactive profile creation failed"
+        exit 1
+      else
+        log "INFO" "About profile successfully created"
+      fi
+    else
+      # Fallback to older script if available
+      log "WARN" "Preferred script not found, trying alternatives"
+      
+      possible_paths=(
+        "$SCRIPT_DIR/libs/workflows/src/saar/scripts/setup/create_about.js"
+        "$SCRIPT_DIR/scripts/setup/create_about.js"
+        "$SCRIPT_DIR/tools/scripts/setup/create_about.js"
+      )
+      
+      for path in "${possible_paths[@]}"; do
+        if [ -f "$path" ]; then
+          about_script="$path"
+          log "INFO" "Found about profile script at: $path"
+          break
+        fi
+      done
+      
+      if [ -n "$about_script" ]; then
+        node "$about_script" --user="$user_id" --workdir="$WORKSPACE_DIR"
+        
+        if [ $? -ne 0 ]; then
+          log "ERROR" "Interactive profile creation failed"
+          exit 1
+        else
+          log "INFO" "About profile successfully created"
+        fi
+      else
+        log "ERROR" "About profile creation script not found"
+        log "ERROR" "Cannot run interactive about profile creation"
+        exit 1
+      fi
+    fi
+    ;;
+    
   dashboard)
     shift
     
@@ -538,6 +609,180 @@ case "$1" in
     run_autonomy "$@"
     ;;
     
+  rag)
+    shift
+    
+    # RAG operations
+    operation=${1:-"help"}
+    
+    log "INFO" "RAG operation: $operation"
+    
+    case $operation in
+      setup)
+        # Run RAG setup script
+        if [ -f "$SCRIPT_DIR/setup_rag.sh" ]; then
+          log "INFO" "Running RAG setup script"
+          chmod +x "$SCRIPT_DIR/setup_rag.sh"
+          "$SCRIPT_DIR/setup_rag.sh" "$@"
+        else
+          log "ERROR" "RAG setup script not found: $SCRIPT_DIR/setup_rag.sh"
+          exit 1
+        fi
+        ;;
+        
+      run)
+        # Run RAG command
+        if [ -f "$SCRIPT_DIR/run_rag.sh" ]; then
+          log "INFO" "Running RAG command"
+          chmod +x "$SCRIPT_DIR/run_rag.sh"
+          shift
+          "$SCRIPT_DIR/run_rag.sh" "$@"
+        else
+          log "ERROR" "RAG runner script not found: $SCRIPT_DIR/run_rag.sh"
+          exit 1
+        fi
+        ;;
+        
+      update)
+        # Update vector database
+        if [ -f "$SCRIPT_DIR/run_rag.sh" ]; then
+          log "INFO" "Updating RAG vector database"
+          chmod +x "$SCRIPT_DIR/run_rag.sh"
+          "$SCRIPT_DIR/run_rag.sh" update "$@"
+        else
+          log "ERROR" "RAG runner script not found: $SCRIPT_DIR/run_rag.sh"
+          exit 1
+        fi
+        ;;
+        
+      query)
+        # Query RAG system
+        if [ -f "$SCRIPT_DIR/run_rag.sh" ]; then
+          log "INFO" "Querying RAG system"
+          chmod +x "$SCRIPT_DIR/run_rag.sh"
+          "$SCRIPT_DIR/run_rag.sh" query "$@"
+        else
+          log "ERROR" "RAG runner script not found: $SCRIPT_DIR/run_rag.sh"
+          exit 1
+        fi
+        ;;
+        
+      status)
+        # Check RAG system status
+        log "INFO" "Checking RAG system status"
+        
+        # Check virtual environment
+        if [ -d "$SCRIPT_DIR/.venv" ]; then
+          log "SUCCESS" "Virtual environment found at $SCRIPT_DIR/.venv"
+          
+          # Check activation script
+          if [ -f "$SCRIPT_DIR/activate_venv.sh" ]; then
+            log "SUCCESS" "Activation script found"
+          else
+            log "WARN" "Activation script not found: $SCRIPT_DIR/activate_venv.sh"
+          fi
+          
+          # Check runner script
+          if [ -f "$SCRIPT_DIR/run_rag.sh" ]; then
+            log "SUCCESS" "Runner script found"
+          else
+            log "WARN" "Runner script not found: $SCRIPT_DIR/run_rag.sh"
+          fi
+          
+          # Check RAG scripts
+          if [ -d "$SCRIPT_DIR/libs/rag/src" ]; then
+            script_count=$(find "$SCRIPT_DIR/libs/rag/src" -name "*.py" | wc -l)
+            log "SUCCESS" "RAG scripts found: $script_count"
+          else
+            log "WARN" "RAG scripts directory not found: $SCRIPT_DIR/libs/rag/src"
+          fi
+          
+          # Check installed packages in virtual environment
+          if [ -f "$SCRIPT_DIR/.venv/bin/pip" ]; then
+            log "INFO" "Checking installed packages in virtual environment"
+            
+            echo -e "${BOLD}Installed Python Packages:${NC}"
+            if [ -f "$SCRIPT_DIR/.venv/bin/pip" ]; then
+              "$SCRIPT_DIR/.venv/bin/pip" list | grep -E 'anthropic|requests|lancedb|chromadb|voyage|sentence-transformers' || echo "No relevant packages found"
+            fi
+          else
+            log "WARN" "Pip not found in virtual environment"
+          fi
+          
+          # Check configs
+          if [ -f "$SCRIPT_DIR/configs/python/venv_config.json" ]; then
+            log "SUCCESS" "RAG configuration found"
+          else
+            log "WARN" "RAG configuration not found: $SCRIPT_DIR/configs/python/venv_config.json"
+          fi
+          
+          # Show status summary
+          echo -e "\n${BOLD}RAG System Status:${NC}"
+          echo -e "${GREEN}✓${NC} Virtual environment is set up"
+          echo -e "${GREEN}✓${NC} Helper scripts are available"
+          
+          # Check example data
+          if [ -d "$SCRIPT_DIR/data/vector_store" ]; then
+            echo -e "${GREEN}✓${NC} Vector database is initialized"
+          else
+            echo -e "${YELLOW}!${NC} Vector database not initialized (run '$0 rag update docs/')"
+          fi
+          
+          echo -e "\nRun '${BOLD}$0 rag query \"your question\"${NC}' to use the RAG system."
+        else
+          log "WARN" "Virtual environment not found. Run '$0 rag setup' to set up the RAG system."
+          
+          # Check if setup script exists
+          if [ -f "$SCRIPT_DIR/setup_rag.sh" ]; then
+            log "INFO" "Setup script found: $SCRIPT_DIR/setup_rag.sh"
+          else
+            log "WARN" "Setup script not found: $SCRIPT_DIR/setup_rag.sh"
+          fi
+          
+          echo -e "\n${BOLD}RAG System Status:${NC} ${RED}Not Set Up${NC}"
+          echo -e "Run '${BOLD}$0 rag setup${NC}' to set up the RAG system."
+        fi
+        ;;
+        
+      check-env)
+        # Check Python environment
+        log "INFO" "Checking Python environment status"
+        
+        # Check if environment checker script exists
+        check_script="$SCRIPT_DIR/libs/rag/src/check_env_status.py"
+        if [ ! -f "$check_script" ]; then
+          log "ERROR" "Environment checker script not found: $check_script"
+          exit 1
+        fi
+        
+        # Make the script executable
+        chmod +x "$check_script"
+        
+        # Run with system Python
+        log "INFO" "System Python environment:"
+        python3 "$check_script"
+        
+        # Run with virtual environment Python if it exists
+        if [ -f "$SCRIPT_DIR/.venv/bin/python" ]; then
+          log "INFO" "Virtual environment Python:"
+          "$SCRIPT_DIR/.venv/bin/python" "$check_script"
+        else
+          log "WARN" "Virtual environment not found"
+        fi
+        ;;
+        
+      help|*)
+        echo "RAG System Usage:"
+        echo "  $0 rag setup     - Set up RAG environment and dependencies"
+        echo "  $0 rag run       - Run a RAG script directly"
+        echo "  $0 rag update    - Update the vector database with new documents"
+        echo "  $0 rag query     - Query the RAG system"
+        echo "  $0 rag status    - Check RAG system status"
+        echo "  $0 rag check-env - Check Python environment configuration"
+        ;;
+    esac
+    ;;
+    
   status)
     # Source additional modules needed for status check
     source "$STARTUP_DIR/02_setup.sh"
@@ -554,6 +799,7 @@ case "$1" in
     echo "  setup       Full setup of the Agentic OS"
     echo "  start       Start MCP servers and services"
     echo "  agent       Launch Claude agent"
+    echo "  about       Launch interactive about profile setup"
     echo "  dashboard   Launch User Main Dashboard"
     echo "  status      Show system status"
     echo "  help        Show this help message"
@@ -563,6 +809,7 @@ case "$1" in
     echo "  debug       Neural Recursive Debugging tools"
     echo "  neural      Neural Framework operations"
     echo "  autonomy    DeepThink and autonomous execution"
+    echo "  rag         Retrieval Augmented Generation system"
     echo ""
     echo -e "${BOLD}Common Options:${NC}"
     echo "  --debug     Enable debug logging"
@@ -578,11 +825,13 @@ case "$1" in
     echo "  $0 setup                         # Full interactive setup"
     echo "  $0 setup --quick                 # Quick setup with defaults"
     echo "  $0 agent                         # Launch Claude agent interactively"
+    echo "  $0 about --user=jan              # Create about profile for specific user"
     echo "  $0 dashboard --user=john         # Launch Dashboard for specific user"
     echo "  $0 a2a start                     # Start Agent-to-Agent manager"
     echo "  $0 debug workflow quick file.js  # Run quick debug workflow on file.js"
     echo "  $0 neural install                # Install Neural Framework components"
     echo "  $0 autonomy think 'Create tests' # Generate execution plan through deep thinking"
+    echo "  $0 rag query 'How does RAG work' # Query the RAG system for information"
     echo ""
     ;;
     

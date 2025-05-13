@@ -17,3 +17,44 @@
 [2025-05-13 22:58:32] [INFO] - Context7: http://localhost:3021
 [2025-05-13 22:58:32] [INFO] - Memory Bank: http://localhost:3022
 [2025-05-13 22:58:32] [INFO] Press Ctrl+C to stop all servers
+[2025-05-13 23:03:46] [INFO] Local MCP servers status:
+[2025-05-13 23:03:46] [INFO] - MCP servers running: 3
+[2025-05-13 23:03:46] [WARN] Sequential Thinking server is not running
+[2025-05-13 23:03:46] [WARN] Context7 server is not running
+[2025-05-13 23:03:46] [WARN] Memory Bank server is not running
+[2025-05-13 23:04:03] [INFO] Starting MCP servers from local directory...
+[2025-05-13 23:04:03] [INFO] Starting Sequential Thinking MCP Server
+[2025-05-13 23:04:03] [SUCCESS] Sequential Thinking MCP Server started with PID: 2390193
+[2025-05-13 23:04:03] [INFO] Starting Context7 MCP Server
+[2025-05-13 23:04:03] [SUCCESS] Context7 MCP Server started with PID: 2390205
+[2025-05-13 23:04:03] [INFO] Starting Memory Bank MCP Server
+[2025-05-13 23:04:03] [SUCCESS] Memory Bank MCP Server started with PID: 2390223
+[2025-05-13 23:04:03] [INFO] MCP servers started
+[2025-05-13 23:04:03] [SUCCESS] Local MCP servers started successfully
+[2025-05-13 23:04:03] [INFO] MCP Servers are now available at:
+[2025-05-13 23:04:03] [INFO] - Sequential Thinking: http://localhost:3020
+[2025-05-13 23:04:03] [INFO] - Context7: http://localhost:3021
+[2025-05-13 23:04:03] [INFO] - Memory Bank: http://localhost:3022
+[2025-05-13 23:04:03] [INFO] Press Ctrl+C to stop all servers
+[2025-05-13 23:07:31] [INFO] Stopping all processes...
+[2025-05-13 23:07:31] [INFO] Stopping sequential_thinking (PID: 2390193)...
+[2025-05-13 23:07:31] [WARN] Failed to stop process sequential_thinking (PID: 2390193)
+[2025-05-13 23:07:31] [INFO] Stopping context7 (PID: 2390205)...
+[2025-05-13 23:07:31] [WARN] Failed to stop process context7 (PID: 2390205)
+[2025-05-13 23:07:31] [INFO] Stopping memory_bank (PID: 2390223)...
+[2025-05-13 23:07:31] [WARN] Failed to stop process memory_bank (PID: 2390223)
+[2025-05-13 23:07:31] [SUCCESS] All processes stopped
+[2025-05-13 23:07:31] [INFO] Starting MCP servers from local directory...
+[2025-05-13 23:07:31] [INFO] Starting Sequential Thinking MCP Server
+[2025-05-13 23:07:31] [SUCCESS] Sequential Thinking MCP Server started with PID: 2404490
+[2025-05-13 23:07:31] [INFO] Starting Context7 MCP Server
+[2025-05-13 23:07:31] [SUCCESS] Context7 MCP Server started with PID: 2404501
+[2025-05-13 23:07:31] [INFO] Starting Memory Bank MCP Server
+[2025-05-13 23:07:31] [SUCCESS] Memory Bank MCP Server started with PID: 2404512
+[2025-05-13 23:07:31] [INFO] MCP servers started
+[2025-05-13 23:07:31] [SUCCESS] Local MCP servers restarted successfully
+[2025-05-13 23:07:31] [INFO] MCP Servers are now available at:
+[2025-05-13 23:07:31] [INFO] - Sequential Thinking: http://localhost:3020
+[2025-05-13 23:07:31] [INFO] - Context7: http://localhost:3021
+[2025-05-13 23:07:31] [INFO] - Memory Bank: http://localhost:3022
+[2025-05-13 23:07:31] [INFO] Press Ctrl+C to stop all servers
