@@ -2,345 +2,351 @@
  * Tests for the Zod schemas in the Security module
  */
 
-import {
-  SecurityPolicyLevelSchema,
-  ApiRuleTypeSchema,
-  ApiAccessRuleSchema,
-  SecurityPolicySchema,
-  SecurityFindingSchema,
-  SecurityVulnerabilitySchema,
-  SecurityRecommendationSchema,
-  SecurityReportSummarySchema,
-  SecurityReportSchema,
-  SecureAPIOptionsSchema,
-  SecurityConfigSchema,
-  validateSecurityPolicy,
-  validateSecurityConfig,
-  validateApiAccessRule
-} from './schemas';
-
 import { z } from 'zod';
+import {
+  PolicyLevelSchema,
+  ApiAccessRuleSchema,
+  SecurityConfigSchema,
+  SecurityEventSchema,
+  SecurityReportSchema, // This is the interface-like schema from security.types.ts
+  SecurityFindingSchema,
+  RecommendationSchema,
+  SecurityReviewSummarySchema,
+  ValidatorResultsSchema,
+  SecurityReviewReportFileSchema, // Use this for the file structure
+  SecureApiOptionsSchema,
+  validateApiAccessRule,
+  validateSecurityConfig,
+  validateSecurityReviewReportFile,
+} from './schemas';
+import { PolicyLevel } from './security.types'; // Import enum directly for values
 
 describe('Security Schemas', () => {
-  describe('SecurityPolicyLevelSchema', () => {
+  describe('PolicyLevelSchema', () => {
     it('should validate valid policy levels', () => {
-      expect(SecurityPolicyLevelSchema.parse('strict')).toBe('strict');
-      expect(SecurityPolicyLevelSchema.parse('moderate')).toBe('moderate');
-      expect(SecurityPolicyLevelSchema.parse('open')).toBe('open');
+      expect(PolicyLevelSchema.parse('strict')).toBe(PolicyLevel.STRICT);
+      expect(PolicyLevelSchema.parse('moderate')).toBe(PolicyLevel.MODERATE);
+      expect(PolicyLevelSchema.parse('open')).toBe(PolicyLevel.OPEN);
     });
 
     it('should reject invalid policy levels', () => {
-      expect(() => SecurityPolicyLevelSchema.parse('invalid')).toThrow(z.ZodError);
-      expect(() => SecurityPolicyLevelSchema.parse('')).toThrow(z.ZodError);
-    });
-  });
-
-  describe('ApiRuleTypeSchema', () => {
-    it('should validate valid rule types', () => {
-      expect(ApiRuleTypeSchema.parse('rate_limit')).toBe('rate_limit');
-      expect(ApiRuleTypeSchema.parse('ip_restriction')).toBe('ip_restriction');
-      expect(ApiRuleTypeSchema.parse('auth_required')).toBe('auth_required');
-    });
-
-    it('should reject invalid rule types', () => {
-      expect(() => ApiRuleTypeSchema.parse('invalid')).toThrow(z.ZodError);
+      expect(() => PolicyLevelSchema.parse('invalid')).toThrow(z.ZodError);
+      expect(() => PolicyLevelSchema.parse('')).toThrow(z.ZodError);
     });
   });
 
   describe('ApiAccessRuleSchema', () => {
     it('should validate valid API access rules', () => {
       const validRule = {
-        id: 'rule-123',
-        type: 'rate_limit',
-        description: 'Limit API calls',
-        enabled: true,
-        parameters: { limit: 100, window: 60000 },
-        path: '/api/v1',
-        method: 'GET',
-        priority: 10
+        resource: '/users',
+        methods: ['GET', 'POST'],
+        allowedRoles: ['admin', 'user'],
+        policyLevel: PolicyLevel.STRICT,
       };
-      
       expect(ApiAccessRuleSchema.parse(validRule)).toEqual(validRule);
     });
 
-    it('should set default priority if not provided', () => {
-      const ruleWithoutPriority = {
-        id: 'rule-123',
-        type: 'rate_limit',
-        description: 'Limit API calls',
-        enabled: true
+    it('should reject invalid API access rules (e.g. empty resource)', () => {
+      const invalidRule = {
+        resource: '', // Empty resource
+        methods: ['GET'],
+        allowedRoles: ['user'],
       };
-      
-      const parsed = ApiAccessRuleSchema.parse(ruleWithoutPriority);
-      expect(parsed.priority).toBe(10);
+      expect(() => ApiAccessRuleSchema.parse(invalidRule)).toThrow(z.ZodError);
     });
 
-    it('should reject invalid API access rules', () => {
-      // Missing required fields
-      expect(() => ApiAccessRuleSchema.parse({})).toThrow(z.ZodError);
-      
-      // Invalid type
-      expect(() => ApiAccessRuleSchema.parse({
-        id: 'rule-123',
-        type: 'invalid_type',
-        description: 'Limit API calls',
-        enabled: true
-      })).toThrow(z.ZodError);
+     it('should reject invalid API access rules (e.g. empty methods array)', () => {
+      const invalidRule = {
+        resource: '/test',
+        methods: [], // Empty methods
+        allowedRoles: ['user'],
+      };
+      expect(() => ApiAccessRuleSchema.parse(invalidRule)).toThrow(z.ZodError);
     });
   });
 
-  describe('SecurityPolicySchema', () => {
-    it('should validate valid security policies', () => {
-      const validPolicy = {
-        id: 'policy-123',
-        name: 'Default Policy',
-        description: 'Default security policy',
-        level: 'strict',
-        rules: [
+  describe('SecurityConfigSchema', () => {
+    it('should validate valid security configurations', () => {
+      const validConfig = {
+        defaultPolicyLevel: PolicyLevel.MODERATE,
+        apiAccessRules: [
           {
-            id: 'rule-123',
-            type: 'rate_limit',
-            description: 'Limit API calls',
-            enabled: true
-          }
+            resource: '/admin',
+            methods: ['GET', 'PUT', 'DELETE'],
+            allowedRoles: ['admin'],
+            policyLevel: PolicyLevel.STRICT,
+          },
         ],
-        default: true
+        enableAuditLog: true,
+        auditLogPath: '/var/log/audit.log',
       };
-      
-      expect(SecurityPolicySchema.parse(validPolicy)).toEqual(validPolicy);
+      expect(SecurityConfigSchema.parse(validConfig)).toEqual(validConfig);
     });
 
-    it('should set default value for default property', () => {
-      const policyWithoutDefault = {
-        id: 'policy-123',
-        name: 'Default Policy',
-        description: 'Default security policy',
-        level: 'strict',
-        rules: []
+    it('should reject invalid security configurations (e.g. missing defaultPolicyLevel)', () => {
+      const invalidConfig = {
+        // defaultPolicyLevel: PolicyLevel.MODERATE, // Missing
+        apiAccessRules: [],
+        enableAuditLog: false,
       };
-      
-      const parsed = SecurityPolicySchema.parse(policyWithoutDefault);
-      expect(parsed.default).toBe(false);
-    });
-
-    it('should reject invalid security policies', () => {
-      // Missing required fields
-      expect(() => SecurityPolicySchema.parse({})).toThrow(z.ZodError);
-      
-      // Invalid level
-      expect(() => SecurityPolicySchema.parse({
-        id: 'policy-123',
-        name: 'Default Policy',
-        description: 'Default security policy',
-        level: 'invalid',
-        rules: []
-      })).toThrow(z.ZodError);
+      expect(() => SecurityConfigSchema.parse(invalidConfig)).toThrow(z.ZodError);
     });
   });
+
+  describe('SecurityEventSchema', () => {
+    it('should validate valid security events', () => {
+      const validEvent = {
+        timestamp: new Date(),
+        severity: 'info',
+        message: 'User logged in',
+        details: { userId: 'user123' },
+      };
+      expect(SecurityEventSchema.parse(validEvent)).toEqual(validEvent);
+    });
+
+    it('should reject invalid security events (e.g. invalid severity)', () => {
+      const invalidEvent = {
+        timestamp: new Date(),
+        severity: 'super-critical', // Invalid
+        message: 'Something happened',
+      };
+      expect(() => SecurityEventSchema.parse(invalidEvent)).toThrow(z.ZodError);
+    });
+  });
+
+  describe('SecurityReportSchema (Interface-like)', () => {
+    it('should validate valid security reports', () => {
+      const validReport = {
+        generatedAt: new Date(),
+        summary: 'Security scan completed.',
+        events: [
+          {
+            timestamp: new Date(),
+            severity: 'warning',
+            message: 'Weak password detected for user X.',
+          },
+        ],
+        recommendations: ['Enforce strong password policy.'],
+      };
+      expect(SecurityReportSchema.parse(validReport)).toEqual(validReport);
+    });
+  });
+
 
   describe('SecurityFindingSchema', () => {
-    it('should validate valid security findings', () => {
+    it('should validate valid security findings (vulnerability type)', () => {
       const validFinding = {
-        id: 'finding-123',
-        validator: 'api-key-exposure',
-        type: 'api-key',
-        title: 'API Key Exposure',
-        description: 'API key found in code',
-        location: 'src/api.js',
-        timestamp: '2023-01-01T00:00:00.000Z'
+        id: 'vuln-001',
+        validator: 'dependency-checker',
+        type: 'vulnerability',
+        title: 'Outdated Library',
+        description: 'The library X is outdated and has known vulnerabilities.',
+        location: 'package.json',
+        severity: 'high',
+        recommendation: 'Update library X to version 2.0.0.',
+        timestamp: new Date().toISOString(),
       };
-      
       expect(SecurityFindingSchema.parse(validFinding)).toEqual(validFinding);
     });
 
-    it('should reject invalid security findings', () => {
-      // Missing required fields
-      expect(() => SecurityFindingSchema.parse({})).toThrow(z.ZodError);
-      
-      // Invalid timestamp
-      expect(() => SecurityFindingSchema.parse({
-        id: 'finding-123',
-        validator: 'api-key-exposure',
-        type: 'api-key',
-        title: 'API Key Exposure',
-        description: 'API key found in code',
-        location: 'src/api.js',
-        timestamp: 'invalid-date'
-      })).toThrow(z.ZodError);
-    });
-  });
-
-  describe('SecurityVulnerabilitySchema', () => {
-    it('should validate valid security vulnerabilities', () => {
-      const validVulnerability = {
-        id: 'vuln-123',
-        validator: 'dependency-check',
-        type: 'dependency',
-        title: 'Vulnerable Dependency',
-        description: 'Using vulnerable package',
-        severity: 'high',
-        location: 'package.json',
-        recommendation: 'Update to latest version',
-        timestamp: '2023-01-01T00:00:00.000Z'
+     it('should validate valid security findings (finding type)', () => {
+      const validFinding = {
+        validator: 'config-linter',
+        type: 'finding',
+        title: 'Insecure Default Setting',
+        description: 'Default setting for Y is insecure.',
+        location: 'config.yaml',
+        severity: 'medium', // Severity is required
+        timestamp: new Date().toISOString(),
       };
-      
-      expect(SecurityVulnerabilitySchema.parse(validVulnerability)).toEqual(validVulnerability);
+      expect(SecurityFindingSchema.parse(validFinding)).toEqual(validFinding);
     });
 
-    it('should reject invalid security vulnerabilities', () => {
-      // Missing required fields
-      expect(() => SecurityVulnerabilitySchema.parse({})).toThrow(z.ZodError);
-      
-      // Invalid severity
-      expect(() => SecurityVulnerabilitySchema.parse({
-        id: 'vuln-123',
-        validator: 'dependency-check',
-        type: 'dependency',
-        title: 'Vulnerable Dependency',
-        description: 'Using vulnerable package',
-        severity: 'invalid',
-        location: 'package.json',
-        timestamp: '2023-01-01T00:00:00.000Z'
-      })).toThrow(z.ZodError);
+    it('should reject invalid security findings (missing title)', () => {
+      const invalidFinding = {
+        description: 'A finding without a title.',
+        location: 'some/file.js',
+        severity: 'low',
+      };
+      expect(() => SecurityFindingSchema.parse(invalidFinding)).toThrow(z.ZodError);
     });
   });
 
-  describe('SecurityReportSchema', () => {
-    it('should validate valid security reports', () => {
-      const validReport = {
-        id: 'report-123',
-        timestamp: '2023-01-01T00:00:00.000Z',
+  describe('RecommendationSchema', () => {
+    it('should validate valid recommendations', () => {
+      const validRecommendation = {
+        title: 'Enable MFA',
+        description: 'Multi-factor authentication should be enabled for all admin accounts.',
+        type: 'general',
+        severity: 'high',
+      };
+      expect(RecommendationSchema.parse(validRecommendation)).toEqual(validRecommendation);
+    });
+  });
+
+  describe('SecurityReviewSummarySchema', () => {
+    it('should validate valid review summaries', () => {
+      const validSummary = {
+        securityScore: 95,
+        passedValidators: 10,
+        totalValidators: 12,
+        vulnerabilitiesCount: 1,
+        findingsCount: 3,
+      };
+      expect(SecurityReviewSummarySchema.parse(validSummary)).toEqual(validSummary);
+    });
+  });
+
+  describe('ValidatorResultsSchema', () => {
+     it('should validate valid validator results', () => {
+      const validResult = {
+        summary: {
+          securityScore: 90,
+          passedValidators: 8,
+          totalValidators: 10,
+          vulnerabilitiesCount: 1,
+          findingsCount: 2,
+        },
+        vulnerabilities: [{
+            title: 'SQL Injection',
+            description: 'Possible SQL injection vector.',
+            location: 'userController.ts:42',
+            severity: 'critical',
+        }],
+        findings: [{
+            title: 'Missing CSRF token',
+            description: 'Form X is missing CSRF protection.',
+            location: 'views/formX.ejs',
+            severity: 'medium',
+        }],
+        recommendations: [{
+            title: 'Use ORM',
+            description: 'Use an ORM to prevent SQL injection.',
+            type: 'vulnerability',
+            severity: 'critical',
+        }],
+        reportPath: '/reports/security-scan-123.json',
+      };
+      expect(ValidatorResultsSchema.parse(validResult)).toEqual(validResult);
+    });
+  });
+
+  describe('SecurityReviewReportFileSchema', () => {
+    it('should validate valid security review report file structures', () => {
+      const validReportFile = {
+        id: 'report-xyz-789',
+        timestamp: new Date().toISOString(),
         framework: {
           name: 'Claude Neural Framework',
-          version: '1.0.0'
+          version: '2.1.0',
         },
         summary: {
-          securityScore: 85,
-          findingsCount: 2,
-          vulnerabilitiesCount: 1,
-          passedValidators: 7,
-          totalValidators: 8
+          securityScore: 75,
+          passedValidators: 5,
+          totalValidators: 10,
+          vulnerabilitiesCount: 3,
+          findingsCount: 5,
         },
         findings: [
           {
-            id: 'finding-123',
-            validator: 'api-key-exposure',
-            type: 'api-key',
-            title: 'API Key Exposure',
-            description: 'API key found in code',
-            location: 'src/api.js',
-            timestamp: '2023-01-01T00:00:00.000Z'
-          }
+            title: 'Verbose error messages',
+            description: 'Error messages might reveal sensitive information.',
+            location: 'errorHandler.ts',
+            severity: 'low',
+            type: 'finding',
+          },
         ],
         vulnerabilities: [
-          {
-            id: 'vuln-123',
-            validator: 'dependency-check',
-            type: 'dependency',
-            title: 'Vulnerable Dependency',
-            description: 'Using vulnerable package',
+           {
+            title: 'XSS in user profile',
+            description: 'User input in profile page is not properly sanitized.',
+            location: 'profile.js:101',
             severity: 'high',
-            location: 'package.json',
-            timestamp: '2023-01-01T00:00:00.000Z'
-          }
+            type: 'vulnerability',
+          },
         ],
         recommendations: [
           {
-            type: 'api-key',
-            findings: 1,
-            title: 'Secure API Keys',
-            description: 'Secure API keys by using environment variables'
-          }
-        ]
+            title: 'Sanitize all user inputs',
+            description: 'Ensure all user-provided data is sanitized before rendering.',
+            type: 'vulnerability',
+            severity: 'high',
+          },
+        ],
       };
-      
-      expect(SecurityReportSchema.parse(validReport)).toEqual(validReport);
+      expect(SecurityReviewReportFileSchema.parse(validReportFile)).toEqual(validReportFile);
+    });
+  });
+
+  describe('SecureApiOptionsSchema', () => {
+    it('should validate valid secure API options', () => {
+      const validOptions = {
+        rateLimitRequests: 200,
+        rateLimitWindowMs: 60000,
+        requireHTTPS: true,
+      };
+      expect(SecureApiOptionsSchema.parse(validOptions)).toEqual(validOptions);
     });
 
-    it('should reject invalid security reports', () => {
-      // Missing required fields
-      expect(() => SecurityReportSchema.parse({})).toThrow(z.ZodError);
-      
-      // Invalid summary
-      expect(() => SecurityReportSchema.parse({
-        id: 'report-123',
-        timestamp: '2023-01-01T00:00:00.000Z',
-        framework: {
-          name: 'Claude Neural Framework',
-          version: '1.0.0'
-        },
+     it('should reject options with unknown keys due to .strict()', () => {
+      const invalidOptions = {
+        rateLimitRequests: 100,
+        unknownOption: 'test', // Strict mode will reject this
+      };
+      expect(() => SecureApiOptionsSchema.parse(invalidOptions)).toThrow(z.ZodError);
+    });
+  });
+
+
+  describe('validateApiAccessRule function', () => {
+    it('should correctly validate using the standalone function', () => {
+      const validRule = {
+        resource: '/data',
+        methods: ['POST'],
+        allowedRoles: ['editor'],
+      };
+      expect(validateApiAccessRule(validRule)).toEqual(validRule);
+    });
+    it('should throw for invalid data using the standalone function', () => {
+      expect(() => validateApiAccessRule({ resource: '/test', methods: [], allowedRoles:[] })).toThrow(z.ZodError);
+    });
+  });
+
+  describe('validateSecurityConfig function', () => {
+    it('should correctly validate using the standalone function', () => {
+      const validConfig = {
+        defaultPolicyLevel: PolicyLevel.STRICT,
+        apiAccessRules: [],
+        enableAuditLog: false,
+      };
+      expect(validateSecurityConfig(validConfig)).toEqual(validConfig);
+    });
+     it('should throw for invalid data using the standalone function', () => {
+      expect(() => validateSecurityConfig({ apiAccessRules: [], enableAuditLog: 'yes' })).toThrow(z.ZodError);
+    });
+  });
+
+  describe('validateSecurityReviewReportFile function', () => {
+    it('should correctly validate using the standalone function', () => {
+      const validReportFile = {
+        id: 'test-report',
+        timestamp: new Date().toISOString(),
+        framework: { name: 'TestFW', version: '1.0' },
         summary: {
-          securityScore: 'invalid', // should be number
-          findingsCount: 2,
-          vulnerabilitiesCount: 1,
-          passedValidators: 7,
-          totalValidators: 8
+          securityScore: 100,
+          passedValidators: 1,
+          totalValidators: 1,
+          vulnerabilitiesCount: 0,
+          findingsCount: 0,
         },
         findings: [],
         vulnerabilities: [],
-        recommendations: []
-      })).toThrow(z.ZodError);
-    });
-  });
-
-  describe('validateSecurityPolicy', () => {
-    it('should validate security policies correctly', () => {
-      const validPolicy = {
-        id: 'policy-123',
-        name: 'Default Policy',
-        description: 'Default security policy',
-        level: 'strict',
-        rules: [],
-        default: true
+        recommendations: [],
       };
-      
-      expect(validateSecurityPolicy(validPolicy)).toEqual(validPolicy);
+      expect(validateSecurityReviewReportFile(validReportFile)).toEqual(validReportFile);
     });
-
-    it('should throw for invalid policies', () => {
-      expect(() => validateSecurityPolicy({})).toThrow();
-    });
-  });
-
-  describe('validateSecurityConfig', () => {
-    it('should validate security configs correctly', () => {
-      const validConfig = {
-        version: '1.0.0',
-        mcp: {
-          allowed_servers: ['sequentialthinking', 'brave-search'],
-          allow_server_autostart: true,
-          allow_remote_servers: false
-        },
-        filesystem: {
-          allowed_directories: ['/home/user/projects']
-        }
-      };
-      
-      expect(validateSecurityConfig(validConfig)).toEqual(validConfig);
-    });
-
-    it('should throw for invalid configs', () => {
-      expect(() => validateSecurityConfig({})).toThrow();
-    });
-  });
-
-  describe('validateApiAccessRule', () => {
-    it('should validate API access rules correctly', () => {
-      const validRule = {
-        id: 'rule-123',
-        type: 'rate_limit',
-        description: 'Limit API calls',
-        enabled: true
-      };
-      
-      expect(validateApiAccessRule(validRule)).toEqual({
-        ...validRule,
-        priority: 10
-      });
-    });
-
-    it('should throw for invalid rules', () => {
-      expect(() => validateApiAccessRule({})).toThrow();
+    it('should throw for invalid data using the standalone function', () => {
+      expect(() => validateSecurityReviewReportFile({ id: 'bad-report' })).toThrow(z.ZodError);
     });
   });
 });

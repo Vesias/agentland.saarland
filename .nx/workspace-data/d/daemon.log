@@ -1,0 +1,16 @@
+Debugger listening on ws://127.0.0.1:38361/2d752c3f-5d80-4798-ab4f-ba78fdd6b2fc
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
+[NX v21.0.3 Daemon Server] - 2025-05-13T23:13:30.693Z - Started listening on: /tmp/3639a8bfc94db1c395c1/d.sock
+[NX v21.0.3 Daemon Server] - 2025-05-13T23:13:30.693Z - [WATCHER]: Subscribed to changes within: /home/jan/Dokumente/agent.saarland (native)
+[NX v21.0.3 Daemon Server] - 2025-05-13T23:13:30.700Z - Established a connection. Number of open connections: 1
+[NX v21.0.3 Daemon Server] - 2025-05-13T23:13:30.700Z - Established a connection. Number of open connections: 2
+[NX v21.0.3 Daemon Server] - 2025-05-13T23:13:30.701Z - Closed a connection. Number of open connections: 1
+[NX v21.0.3 Daemon Server] - 2025-05-13T23:13:30.702Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX v21.0.3 Daemon Server] - 2025-05-13T23:13:30.702Z - Done responding to the client Shutdown initiated
+[NX v21.0.3 Daemon Server] - 2025-05-13T23:13:30.702Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 0.
+[NX v21.0.3 Daemon Server] - 2025-05-13T23:13:30.703Z - [WATCHER]: Stopping the watcher for /home/jan/Dokumente/agent.saarland (sources)
+[NX v21.0.3 Daemon Server] - 2025-05-13T23:13:30.704Z - Closed a connection. Number of open connections: 0
+[NX v21.0.3 Daemon Server] - 2025-05-13T23:13:30.704Z - [WATCHER]: Stopping the watcher for /home/jan/Dokumente/agent.saarland (outputs)
+[NX v21.0.3 Daemon Server] - 2025-05-13T23:13:30.704Z - Server stopped because: "Request to shutdown"
+Waiting for the debugger to disconnect...

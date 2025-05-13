@@ -1,0 +1,2146 @@
+{
+  "version": "6.0",
+  "nxVersion": "21.0.3",
+  "pathMappings": {
+    "@claude-framework/agents": [
+      "libs/agents/src/index.ts"
+    ],
+    "@claude-framework/core": [
+      "libs/core/src/index.ts"
+    ],
+    "@claude-framework/mcp": [
+      "libs/mcp/src/index.ts"
+    ],
+    "@claude-framework/rag": [
+      "libs/rag/src/index.ts"
+    ],
+    "@claude-framework/shared": [
+      "libs/shared/src/index.ts"
+    ],
+    "@claude-framework/workflows": [
+      "libs/workflows/src/index.ts"
+    ],
+    "@core/*": [
+      "libs/core/src/*"
+    ],
+    "@mcp/*": [
+      "libs/mcp/src/*"
+    ],
+    "@agents/*": [
+      "libs/agents/src/*"
+    ],
+    "@rag/*": [
+      "libs/rag/src/*"
+    ],
+    "@workflows/*": [
+      "libs/workflows/src/*"
+    ],
+    "@shared/*": [
+      "libs/shared/src/*"
+    ],
+    "@apps/*": [
+      "apps/*"
+    ],
+    "@configs/*": [
+      "configs/*"
+    ],
+    "@tools/*": [
+      "tools/*"
+    ]
+  },
+  "nxJsonPlugins": [],
+  "pluginsConfig": {
+    "@nx/js": {
+      "analyzeSourceFiles": false
+    }
+  },
+  "fileMap": {
+    "projectFileMap": {
+      "@claude-framework/core": [
+        {
+          "file": "libs/core/package.json",
+          "hash": "18439765279536863602"
+        },
+        {
+          "file": "libs/core/src/config/config-manager.ts",
+          "hash": "13502142066801687802"
+        },
+        {
+          "file": "libs/core/src/config/config_manager.js",
+          "hash": "1799874423805849899"
+        },
+        {
+          "file": "libs/core/src/config/framework-config.ts",
+          "hash": "2148897475448297872"
+        },
+        {
+          "file": "libs/core/src/dashboard/recursive_dashboard.js",
+          "hash": "12257414968851519857"
+        },
+        {
+          "file": "libs/core/src/error/error-handler.ts",
+          "hash": "7082121384248513695"
+        },
+        {
+          "file": "libs/core/src/error/error_handler.js",
+          "hash": "9854113536899385884"
+        },
+        {
+          "file": "libs/core/src/i18n/i18n.js",
+          "hash": "8648845083969414011"
+        },
+        {
+          "file": "libs/core/src/i18n/i18n.ts",
+          "hash": "10620567036561728784"
+        },
+        {
+          "file": "libs/core/src/i18n/index.ts",
+          "hash": "9499766045480458882"
+        },
+        {
+          "file": "libs/core/src/i18n/locales/en.json",
+          "hash": "3581257935574219238"
+        },
+        {
+          "file": "libs/core/src/i18n/locales/fr.json",
+          "hash": "9516794489675859083"
+        },
+        {
+          "file": "libs/core/src/index.ts",
+          "hash": "2456865319925604523"
+        },
+        {
+          "file": "libs/core/src/logging/logger.js",
+          "hash": "7531872182076457306"
+        },
+        {
+          "file": "libs/core/src/logging/logger.ts",
+          "hash": "11683457949482063407"
+        },
+        {
+          "file": "libs/core/src/schemas/README.md",
+          "hash": "17399939764353861566"
+        },
+        {
+          "file": "libs/core/src/schemas/enterprise/enterprise-schema.json",
+          "hash": "8095465497960844730"
+        },
+        {
+          "file": "libs/core/src/schemas/profile/about-schema.json",
+          "hash": "2177758882904748379"
+        },
+        {
+          "file": "libs/core/src/security/index.ts",
+          "hash": "5488980435354028292"
+        },
+        {
+          "file": "libs/core/src/security/schemas.spec.ts",
+          "hash": "14551096673305254384"
+        },
+        {
+          "file": "libs/core/src/security/schemas.ts",
+          "hash": "7545845360625701177"
+        },
+        {
+          "file": "libs/core/src/security/secure-api.spec.ts",
+          "hash": "4539872519709266304"
+        },
+        {
+          "file": "libs/core/src/security/secure-api.ts",
+          "hash": "14588070723624340424"
+        },
+        {
+          "file": "libs/core/src/security/secure_api.js",
+          "hash": "13589328799503485958"
+        },
+        {
+          "file": "libs/core/src/security/security-check.ts",
+          "hash": "1640600591479410413"
+        },
+        {
+          "file": "libs/core/src/security/security-review.spec.ts",
+          "hash": "15775760072470025586"
+        },
+        {
+          "file": "libs/core/src/security/security-review.ts",
+          "hash": "6085055912738400072"
+        },
+        {
+          "file": "libs/core/src/security/security_check.js",
+          "hash": "3828543401662610309"
+        },
+        {
+          "file": "libs/core/src/security/security_review.js",
+          "hash": "5796802328069975978"
+        },
+        {
+          "file": "libs/core/src/utils/schema_loader.js",
+          "hash": "6581192478604013743"
+        }
+      ],
+      "@claude-framework/cli": [
+        {
+          "file": "apps/cli/package.json",
+          "hash": "6115715486529195969",
+          "deps": [
+            "@claude-framework/core"
+          ]
+        },
+        {
+          "file": "apps/cli/src/commands/sequential-execute.js",
+          "hash": "1595115288359396598"
+        },
+        {
+          "file": "apps/cli/src/commands/sequential-execute.ts",
+          "hash": "7961720193335026006"
+        },
+        {
+          "file": "apps/cli/src/index.ts",
+          "hash": "1612465840193380644"
+        }
+      ]
+    },
+    "nonProjectFiles": [
+      {
+        "file": ".claude/commands/analyze-dependencies.md",
+        "hash": "8726460597194057190"
+      },
+      {
+        "file": ".claude/commands/generate-docs.md",
+        "hash": "15916615473496490179"
+      },
+      {
+        "file": ".claude/commands/modernize-code.md",
+        "hash": "12165186414391542166"
+      },
+      {
+        "file": ".claude/commands/security-scan.md",
+        "hash": "1906575601521637651"
+      },
+      {
+        "file": ".claude/environment.json",
+        "hash": "1588757860861484412"
+      },
+      {
+        "file": ".claude/venv-commands.md",
+        "hash": "10161828759190520935"
+      },
+      {
+        "file": ".claude/venv-tools/activate_venv.sh",
+        "hash": "15126194595717946917"
+      },
+      {
+        "file": ".claude/workspace.json",
+        "hash": "8097917712416007343"
+      },
+      {
+        "file": ".claudeignore",
+        "hash": "7805352692497005949"
+      },
+      {
+        "file": ".clauderules",
+        "hash": "17677631935957611085"
+      },
+      {
+        "file": ".github/ISSUE_TEMPLATE/bug_report.md",
+        "hash": "15424388660508099364"
+      },
+      {
+        "file": ".github/ISSUE_TEMPLATE/custom.md",
+        "hash": "9370321909087569854"
+      },
+      {
+        "file": ".github/ISSUE_TEMPLATE/feature_request.md",
+        "hash": "12003031272452156761"
+      },
+      {
+        "file": ".github/workflows/codeql.yml",
+        "hash": "525787780756097004"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "17620214715973859175"
+      },
+      {
+        "file": "README.md",
+        "hash": "11906329081604292895"
+      },
+      {
+        "file": "about-schema-de.json",
+        "hash": "10150333834939742976"
+      },
+      {
+        "file": "ai_docs/CLAUDE.md",
+        "hash": "2993055807844714456"
+      },
+      {
+        "file": "ai_docs/CLEANUP-LIST.md",
+        "hash": "14933008119256467913"
+      },
+      {
+        "file": "ai_docs/FINAL-POLISHING-STEPS.md",
+        "hash": "8779461861948444293"
+      },
+      {
+        "file": "ai_docs/FINAL-STRUCTURE.md",
+        "hash": "12828382173266074205"
+      },
+      {
+        "file": "ai_docs/FINAL_FILE_TREE.md",
+        "hash": "15644778962311370682"
+      },
+      {
+        "file": "ai_docs/PROJECT-STRUCTURE-AUDIT.md",
+        "hash": "12674350888112451128"
+      },
+      {
+        "file": "ai_docs/PROJECT_STRUCTURE_AUDIT_PLAN.md",
+        "hash": "16885509053515236637"
+      },
+      {
+        "file": "ai_docs/README.md",
+        "hash": "17128643043216840586"
+      },
+      {
+        "file": "ai_docs/STRUCTURE.md",
+        "hash": "14741377581564640045"
+      },
+      {
+        "file": "ai_docs/a2a_protocol_guide.md",
+        "hash": "7786978263628638305"
+      },
+      {
+        "file": "ai_docs/analysis/OPTIMIZATION-RECOMMENDATIONS.md",
+        "hash": "1034418063480958195"
+      },
+      {
+        "file": "ai_docs/analysis/PROJECT-PURPOSE-ANALYSIS.md",
+        "hash": "9473112006023319866"
+      },
+      {
+        "file": "ai_docs/analysis/REFACTORING-SUMMARY.md",
+        "hash": "8085491756199155604"
+      },
+      {
+        "file": "ai_docs/api/README.md",
+        "hash": "7249107521664218264"
+      },
+      {
+        "file": "ai_docs/api/configuration.md",
+        "hash": "6244674122291446761"
+      },
+      {
+        "file": "ai_docs/api/core.md",
+        "hash": "4313765551907703113"
+      },
+      {
+        "file": "ai_docs/api/error.md",
+        "hash": "16669201534888269000"
+      },
+      {
+        "file": "ai_docs/api/i18n.md",
+        "hash": "9599048269322070386"
+      },
+      {
+        "file": "ai_docs/api/logging.md",
+        "hash": "1180137655536917685"
+      },
+      {
+        "file": "ai_docs/api/mcp.md",
+        "hash": "14284566577699680053"
+      },
+      {
+        "file": "ai_docs/api/rag.md",
+        "hash": "9143518484670118702"
+      },
+      {
+        "file": "ai_docs/api/security.md",
+        "hash": "11041553280825166997"
+      },
+      {
+        "file": "ai_docs/api/v1/claude-api.yaml",
+        "hash": "5308425662909091234"
+      },
+      {
+        "file": "ai_docs/architecture/advanced_framework_architecture.md",
+        "hash": "1429399827200536625"
+      },
+      {
+        "file": "ai_docs/architecture/framework_architecture.md",
+        "hash": "12452802824803903367"
+      },
+      {
+        "file": "ai_docs/architecture/integration_framework.md",
+        "hash": "9465455175413269176"
+      },
+      {
+        "file": "ai_docs/architecture/neural_framework_overview.md",
+        "hash": "17381925038695856370"
+      },
+      {
+        "file": "ai_docs/architecture/pentagonal_architecture.md",
+        "hash": "5845105688841708939"
+      },
+      {
+        "file": "ai_docs/architecture/rag_neural_architecture.pdf",
+        "hash": "16954554093562767789"
+      },
+      {
+        "file": "ai_docs/cleanup/component_removal_report.md",
+        "hash": "9046115132556319667"
+      },
+      {
+        "file": "ai_docs/enterprise/README.md",
+        "hash": "14203886176395823144"
+      },
+      {
+        "file": "ai_docs/enterprise/quick_start.md",
+        "hash": "11468281101609814162"
+      },
+      {
+        "file": "ai_docs/examples/agent-to-agent-integration.md",
+        "hash": "15869183253520373547"
+      },
+      {
+        "file": "ai_docs/examples/code-analysis-example.md",
+        "hash": "13030303465540594372"
+      },
+      {
+        "file": "ai_docs/examples/dependency_graph_analyzer.md",
+        "hash": "6888893327586710878"
+      },
+      {
+        "file": "ai_docs/examples/mcp_hooks_comprehensive_example.md",
+        "hash": "1076370914759424609"
+      },
+      {
+        "file": "ai_docs/examples/rag-venv-usage.md",
+        "hash": "9091199102006726812"
+      },
+      {
+        "file": "ai_docs/examples/recursive_debugging/buggy_fibonacci.js",
+        "hash": "13767738807479066611"
+      },
+      {
+        "file": "ai_docs/examples/recursive_debugging/buggy_tree_traversal.py",
+        "hash": "12750903866109840360"
+      },
+      {
+        "file": "ai_docs/examples/recursive_debugging/debug_examples.md",
+        "hash": "17777958132865049470"
+      },
+      {
+        "file": "ai_docs/examples/sequential_execution_example.js",
+        "hash": "9292677287778249087"
+      },
+      {
+        "file": "ai_docs/general/CLAUDE.md",
+        "hash": "9754347417488869274"
+      },
+      {
+        "file": "ai_docs/general/CLEANUP-LIST.md",
+        "hash": "14933008119256467913"
+      },
+      {
+        "file": "ai_docs/general/FINAL-POLISHING-STEPS.md",
+        "hash": "8779461861948444293"
+      },
+      {
+        "file": "ai_docs/general/FINAL_FILE_TREE.md",
+        "hash": "15644778962311370682"
+      },
+      {
+        "file": "ai_docs/git_agent_documentation.md",
+        "hash": "4828106258699106415"
+      },
+      {
+        "file": "ai_docs/guides/about_profile_integration.md",
+        "hash": "2786533619039995243"
+      },
+      {
+        "file": "ai_docs/guides/about_profile_mcp_integration_de.md",
+        "hash": "11480961491564602184"
+      },
+      {
+        "file": "ai_docs/guides/advanced_system_requirements.md",
+        "hash": "2580902586027880044"
+      },
+      {
+        "file": "ai_docs/guides/architecture.md",
+        "hash": "3842358228980686622"
+      },
+      {
+        "file": "ai_docs/guides/backup_recovery_guide.md",
+        "hash": "13557909918944989156"
+      },
+      {
+        "file": "ai_docs/guides/ci_cd_guide.md",
+        "hash": "1058419995197252554"
+      },
+      {
+        "file": "ai_docs/guides/ci_cd_integration.md",
+        "hash": "6511804739695978125"
+      },
+      {
+        "file": "ai_docs/guides/claude_integration_guide.md",
+        "hash": "15064236538096644300"
+      },
+      {
+        "file": "ai_docs/guides/color_schema_guide.md",
+        "hash": "7546465640331015346"
+      },
+      {
+        "file": "ai_docs/guides/configuration_guide.md",
+        "hash": "3312012983242913018"
+      },
+      {
+        "file": "ai_docs/guides/documentation_generator.md",
+        "hash": "1377486023115852485"
+      },
+      {
+        "file": "ai_docs/guides/enterprise_integration_guide.md",
+        "hash": "12934451258582107952"
+      },
+      {
+        "file": "ai_docs/guides/enterprise_workflow.md",
+        "hash": "18238522594185654768"
+      },
+      {
+        "file": "ai_docs/guides/error_handling_guide.md",
+        "hash": "15451421761584109343"
+      },
+      {
+        "file": "ai_docs/guides/framework_setup_guide.md",
+        "hash": "11149441781835435744"
+      },
+      {
+        "file": "ai_docs/guides/i18n_guide.md",
+        "hash": "11386567646557515473"
+      },
+      {
+        "file": "ai_docs/guides/introduction.md",
+        "hash": "3475057577945947408"
+      },
+      {
+        "file": "ai_docs/guides/logging_guide.md",
+        "hash": "5987559121946176836"
+      },
+      {
+        "file": "ai_docs/guides/mcp_automatic_updates.md",
+        "hash": "17486203965451813289"
+      },
+      {
+        "file": "ai_docs/guides/mcp_frontend_integration.md",
+        "hash": "1007902846035734539"
+      },
+      {
+        "file": "ai_docs/guides/mcp_frontend_integration_summary.md",
+        "hash": "4173620727260416208"
+      },
+      {
+        "file": "ai_docs/guides/mcp_hooks_usage.md",
+        "hash": "14313738715014301544"
+      },
+      {
+        "file": "ai_docs/guides/mcp_integration_guide.md",
+        "hash": "6347389376626024483"
+      },
+      {
+        "file": "ai_docs/guides/neural_framework_guide.md",
+        "hash": "9320714281225343095"
+      },
+      {
+        "file": "ai_docs/guides/quick_start_guide.md",
+        "hash": "13388511282110621368"
+      },
+      {
+        "file": "ai_docs/guides/rag_system_guide.md",
+        "hash": "17699082731692333486"
+      },
+      {
+        "file": "ai_docs/guides/recovery_runbook.md",
+        "hash": "4247969963894376672"
+      },
+      {
+        "file": "ai_docs/guides/recursive_debugging_guide.md",
+        "hash": "16436539471956467632"
+      },
+      {
+        "file": "ai_docs/guides/saar_guide.md",
+        "hash": "11946629042377486069"
+      },
+      {
+        "file": "ai_docs/guides/saar_mcp_user_manual.md",
+        "hash": "676312090243306788"
+      },
+      {
+        "file": "ai_docs/guides/security_checklist.md",
+        "hash": "17024680800225879102"
+      },
+      {
+        "file": "ai_docs/guides/security_policy.md",
+        "hash": "9363116729475938343"
+      },
+      {
+        "file": "ai_docs/guides/sequential-execution-manager.md",
+        "hash": "388240688525845391"
+      },
+      {
+        "file": "ai_docs/guides/sequential_execution_manager.md",
+        "hash": "14442367748573479968"
+      },
+      {
+        "file": "ai_docs/guides/sequential_execution_manager_integration.md",
+        "hash": "7755441360565540854"
+      },
+      {
+        "file": "ai_docs/guides/sequential_planner.md",
+        "hash": "17803222444713449158"
+      },
+      {
+        "file": "ai_docs/guides/system_requirements.md",
+        "hash": "2623081941102889580"
+      },
+      {
+        "file": "ai_docs/guides/testing_guide.md",
+        "hash": "2941022683037791237"
+      },
+      {
+        "file": "ai_docs/guides/version_control_guide.md",
+        "hash": "15440261055068949339"
+      },
+      {
+        "file": "ai_docs/integration/INTEGRATION-PLAN.md",
+        "hash": "14183394551447355890"
+      },
+      {
+        "file": "ai_docs/integration/INTEGRATION-REPORT.md",
+        "hash": "2236095524087569844"
+      },
+      {
+        "file": "ai_docs/integration/INTEGRATION_SUMMARY.md",
+        "hash": "14979519284844292378"
+      },
+      {
+        "file": "ai_docs/integration/RAG-SAAR-INTEGRATION.md",
+        "hash": "9603450188139553965"
+      },
+      {
+        "file": "ai_docs/integration/VENV-SAAR-INTEGRATION.md",
+        "hash": "2472493955814583861"
+      },
+      {
+        "file": "ai_docs/integration/VIRTUAL-ENV-RAG-INTEGRATION.md",
+        "hash": "5606965835538668905"
+      },
+      {
+        "file": "ai_docs/migration/EXTERNALLY-MANAGED-ENV-MIGRATION.md",
+        "hash": "8709521854411000995"
+      },
+      {
+        "file": "ai_docs/migration/EXTERNALLY-MANAGED-ENV-PROGRESS.md",
+        "hash": "9474928095177033365"
+      },
+      {
+        "file": "ai_docs/migration/MIGRATION-PLAN.md",
+        "hash": "6055104232444894471"
+      },
+      {
+        "file": "ai_docs/migration/PYTHON-MODULES-ORGANIZATION.md",
+        "hash": "1187674124849494487"
+      },
+      {
+        "file": "ai_docs/migration/PYTHON-VENV-QUICK-REFERENCE.md",
+        "hash": "346091769462565492"
+      },
+      {
+        "file": "ai_docs/migration/SECURITY-MIGRATION-CHECKLIST.md",
+        "hash": "1332729483330156851"
+      },
+      {
+        "file": "ai_docs/migration/SECURITY-MODULE-MIGRATION-SUMMARY.md",
+        "hash": "12883866232310925193"
+      },
+      {
+        "file": "ai_docs/migration/TYPESCRIPT-MIGRATION-PROGRESS.md",
+        "hash": "16497678953193520322"
+      },
+      {
+        "file": "ai_docs/models/VIRTUAL-ENV-DESIGN.md",
+        "hash": "12665659261275264347"
+      },
+      {
+        "file": "ai_docs/plans/FINAL-STRUCTURE.md",
+        "hash": "12828382173266074205"
+      },
+      {
+        "file": "ai_docs/plans/INTEGRATION-PLAN.md",
+        "hash": "14183394551447355890"
+      },
+      {
+        "file": "ai_docs/plans/MIGRATION-PLAN.md",
+        "hash": "6055104232444894471"
+      },
+      {
+        "file": "ai_docs/prompts/CODE-ANALYSIS-PROMPT.md",
+        "hash": "9660788610589025047"
+      },
+      {
+        "file": "ai_docs/prompts/classification/sentiment-analysis.md",
+        "hash": "15993742256274090583"
+      },
+      {
+        "file": "ai_docs/prompts/claude_prompt_templates.md",
+        "hash": "18248161562108319296"
+      },
+      {
+        "file": "ai_docs/prompts/code-complexity-analyzer.md",
+        "hash": "7168718246232959052"
+      },
+      {
+        "file": "ai_docs/prompts/code-dependency-analyzer.md",
+        "hash": "13858552825561810017"
+      },
+      {
+        "file": "ai_docs/prompts/coding/refactoring-assistant.md",
+        "hash": "1122723394124487201"
+      },
+      {
+        "file": "ai_docs/prompts/complex_bug_hunt.md",
+        "hash": "17494094608342175783"
+      },
+      {
+        "file": "ai_docs/prompts/file-hierarchy-visualizer.md",
+        "hash": "1324586933191101872"
+      },
+      {
+        "file": "ai_docs/prompts/file-path-extractor.md",
+        "hash": "14715623075062066561"
+      },
+      {
+        "file": "ai_docs/prompts/generation/code-generator.md",
+        "hash": "124265590631673737"
+      },
+      {
+        "file": "ai_docs/prompts/recursive_bug_analysis.md",
+        "hash": "12655103681982908598"
+      },
+      {
+        "file": "ai_docs/prompts/recursive_optimization.md",
+        "hash": "17004012337312596154"
+      },
+      {
+        "file": "ai_docs/prompts/stack_overflow_debugging.md",
+        "hash": "108801063585881260"
+      },
+      {
+        "file": "ai_docs/prompts/systematic_debugging_workflow.md",
+        "hash": "4821810481825293763"
+      },
+      {
+        "file": "ai_docs/recommendations/frontend_mcp_optimization.md",
+        "hash": "13716752967999617677"
+      },
+      {
+        "file": "ai_docs/reports/INTEGRATION-REPORT.md",
+        "hash": "2236095524087569844"
+      },
+      {
+        "file": "ai_docs/reports/INTEGRATION_SUMMARY.md",
+        "hash": "14979519284844292378"
+      },
+      {
+        "file": "ai_docs/reports/OPTIMIZATION-RECOMMENDATIONS.md",
+        "hash": "1034418063480958195"
+      },
+      {
+        "file": "ai_docs/reports/PROJECT-PURPOSE-ANALYSIS.md",
+        "hash": "9473112006023319866"
+      },
+      {
+        "file": "ai_docs/reports/REFACTORING-SUMMARY.md",
+        "hash": "8085491756199155604"
+      },
+      {
+        "file": "ai_docs/reports/SECURITY-MODULE-MIGRATION-SUMMARY.md",
+        "hash": "12883866232310925193"
+      },
+      {
+        "file": "ai_docs/reports/TYPESCRIPT-MIGRATION-PROGRESS.md",
+        "hash": "16497678953193520322"
+      },
+      {
+        "file": "ai_docs/security/SECURITY-MIGRATION-CHECKLIST.md",
+        "hash": "1332729483330156851"
+      },
+      {
+        "file": "ai_docs/security/SECURITY.md",
+        "hash": "16303909172738556757"
+      },
+      {
+        "file": "ai_docs/security/security_config.example.json",
+        "hash": "13670361378642902749"
+      },
+      {
+        "file": "ai_docs/templates/architecture-design.md",
+        "hash": "8090977897655301654"
+      },
+      {
+        "file": "ai_docs/templates/code-review.md",
+        "hash": "18056580280614619280"
+      },
+      {
+        "file": "ai_docs/templates/performance-optimization.md",
+        "hash": "10364491477431595364"
+      },
+      {
+        "file": "ai_docs/templates/python-venv-project.md",
+        "hash": "9678354415657869774"
+      },
+      {
+        "file": "ai_docs/templates/security-review.md",
+        "hash": "16538248803406395542"
+      },
+      {
+        "file": "ai_docs/templates/testing-strategy.md",
+        "hash": "6428122495395015463"
+      },
+      {
+        "file": "ai_docs/tutorials/saar_mcp_quickstart.md",
+        "hash": "17344217186344389720"
+      },
+      {
+        "file": "apps/web/src/components/dashboard/color-schema-integration.js",
+        "hash": "5923962713289460401"
+      },
+      {
+        "file": "apps/web/src/components/dashboard/color-schema.css",
+        "hash": "12262474170558723497"
+      },
+      {
+        "file": "apps/web/src/components/dashboard/index.html",
+        "hash": "1461396442669553751"
+      },
+      {
+        "file": "apps/web/src/components/dashboard/styles.css",
+        "hash": "9818271734184493313"
+      },
+      {
+        "file": "apps/web/src/components/enterprise/EnterpriseBanner.jsx",
+        "hash": "6825739757213013019"
+      },
+      {
+        "file": "apps/web/src/components/enterprise/EnterpriseStyles.css",
+        "hash": "7906904654341580363"
+      },
+      {
+        "file": "apps/web/src/components/enterprise/index.js",
+        "hash": "1175737939812584769"
+      },
+      {
+        "file": "apps/web/src/components/form/ArrayField.jsx",
+        "hash": "18292640409384859007"
+      },
+      {
+        "file": "apps/web/src/components/form/BooleanField.jsx",
+        "hash": "6095732159814709746"
+      },
+      {
+        "file": "apps/web/src/components/form/ColorField.jsx",
+        "hash": "12344141899794578520"
+      },
+      {
+        "file": "apps/web/src/components/form/ColorSchemaForm.jsx",
+        "hash": "1575440167543795471"
+      },
+      {
+        "file": "apps/web/src/components/form/Form.jsx",
+        "hash": "9615075747868118454"
+      },
+      {
+        "file": "apps/web/src/components/form/FormField.jsx",
+        "hash": "11078930611522684733"
+      },
+      {
+        "file": "apps/web/src/components/form/NumberField.jsx",
+        "hash": "3835541927094744738"
+      },
+      {
+        "file": "apps/web/src/components/form/README.md",
+        "hash": "10261428604073706350"
+      },
+      {
+        "file": "apps/web/src/components/form/SchemaForm.jsx",
+        "hash": "1339113756257044723"
+      },
+      {
+        "file": "apps/web/src/components/form/SchemaFormGenerator.jsx",
+        "hash": "5859051071829835830"
+      },
+      {
+        "file": "apps/web/src/components/form/SelectField.jsx",
+        "hash": "6435785805225308947"
+      },
+      {
+        "file": "apps/web/src/components/form/StringField.jsx",
+        "hash": "5451938496780107228"
+      },
+      {
+        "file": "apps/web/src/components/form/index.js",
+        "hash": "1308635945729711910"
+      },
+      {
+        "file": "apps/web/src/components/layout/Header.jsx",
+        "hash": "1973497174527477148"
+      },
+      {
+        "file": "apps/web/src/components/mcp/McpDashboard.jsx",
+        "hash": "8180816912649754477"
+      },
+      {
+        "file": "apps/web/src/components/mcp/McpDocumentationGenerator.jsx",
+        "hash": "18294550343459297625"
+      },
+      {
+        "file": "apps/web/src/components/mcp/McpImageDemo.jsx",
+        "hash": "14679165809974360433"
+      },
+      {
+        "file": "apps/web/src/components/mcp/McpSearchDemo.jsx",
+        "hash": "4454952034823891333"
+      },
+      {
+        "file": "apps/web/src/components/mcp/McpSequentialPlannerDemo.jsx",
+        "hash": "8339651410593395007"
+      },
+      {
+        "file": "apps/web/src/components/mcp/McpThinkingDemo.jsx",
+        "hash": "5167034356886262340"
+      },
+      {
+        "file": "apps/web/src/components/profile/AboutProfileForm.jsx",
+        "hash": "285775941953247995"
+      },
+      {
+        "file": "apps/web/src/components/profile/ProfileClient.js",
+        "hash": "2017295291293397139"
+      },
+      {
+        "file": "apps/web/src/components/profile/ProfileContext.jsx",
+        "hash": "10538163069238398855"
+      },
+      {
+        "file": "apps/web/src/components/profile/ProfilePage.jsx",
+        "hash": "16671431795932528095"
+      },
+      {
+        "file": "apps/web/src/components/profile/README.md",
+        "hash": "17048137908728432976"
+      },
+      {
+        "file": "apps/web/src/components/profile/index.js",
+        "hash": "15570736966743619190"
+      },
+      {
+        "file": "apps/web/src/components/rewards/DailyRewardIndicator.jsx",
+        "hash": "15684268255253673860"
+      },
+      {
+        "file": "apps/web/src/components/rewards/DailyRewardModal.jsx",
+        "hash": "10156665155545487407"
+      },
+      {
+        "file": "apps/web/src/components/rewards/RewardsCalendar.jsx",
+        "hash": "537131467538558879"
+      },
+      {
+        "file": "apps/web/src/components/rewards/RewardsPage.jsx",
+        "hash": "4919852479013064401"
+      },
+      {
+        "file": "apps/web/src/contexts/DailyRewardsContext.jsx",
+        "hash": "15270713464417752026"
+      },
+      {
+        "file": "apps/web/src/contexts/DailyRewardsContext.jsx.bak",
+        "hash": "2594844684039683067"
+      },
+      {
+        "file": "apps/web/src/contexts/GameStateContext.jsx",
+        "hash": "16737989420442657311"
+      },
+      {
+        "file": "apps/web/src/contexts/GameStateContext.jsx.bak",
+        "hash": "13231395660113645926"
+      },
+      {
+        "file": "apps/web/src/hooks/mcp/README.md",
+        "hash": "11377749750939072405"
+      },
+      {
+        "file": "apps/web/src/hooks/mcp/index.js",
+        "hash": "2714447201677889638"
+      },
+      {
+        "file": "apps/web/src/hooks/mcp/useBraveSearch.js",
+        "hash": "1744251049804149263"
+      },
+      {
+        "file": "apps/web/src/hooks/mcp/useDailyRewards.js",
+        "hash": "5083736813011973493"
+      },
+      {
+        "file": "apps/web/src/hooks/mcp/useGameState.js",
+        "hash": "8998684743929561753"
+      },
+      {
+        "file": "apps/web/src/hooks/mcp/useImageGeneration.js",
+        "hash": "9357316542514066700"
+      },
+      {
+        "file": "apps/web/src/hooks/mcp/useSequentialPlanner.js",
+        "hash": "12438535650923107205"
+      },
+      {
+        "file": "apps/web/src/hooks/mcp/useSequentialThinking.js",
+        "hash": "10239976715120643"
+      },
+      {
+        "file": "apps/web/src/hooks/useGameState.js",
+        "hash": "8031383700372243063"
+      },
+      {
+        "file": "configs/api/index.js",
+        "hash": "12605688375899020326"
+      },
+      {
+        "file": "configs/api/schema.json",
+        "hash": "10245473595811760690"
+      },
+      {
+        "file": "configs/backup/config.json",
+        "hash": "11728174575538583407"
+      },
+      {
+        "file": "configs/backup/index.js",
+        "hash": "3111427583970141450"
+      },
+      {
+        "file": "configs/color-schema/config.json",
+        "hash": "16694424017092012273"
+      },
+      {
+        "file": "configs/color-schema/index.js",
+        "hash": "1520811823891369149"
+      },
+      {
+        "file": "configs/debug/index.js",
+        "hash": "11869496301590728294"
+      },
+      {
+        "file": "configs/debug/workflow-config.json",
+        "hash": "5679203722488996759"
+      },
+      {
+        "file": "configs/enterprise/config.json",
+        "hash": "3510671891560088845"
+      },
+      {
+        "file": "configs/enterprise/index.js",
+        "hash": "14541742237545918338"
+      },
+      {
+        "file": "configs/enterprise/workflow.json",
+        "hash": "2562295022478042556"
+      },
+      {
+        "file": "configs/global.json",
+        "hash": "8179306109285529897"
+      },
+      {
+        "file": "configs/i18n/config.json",
+        "hash": "4539065443869469935"
+      },
+      {
+        "file": "configs/i18n/index.js",
+        "hash": "8878688477723171943"
+      },
+      {
+        "file": "configs/index.js",
+        "hash": "85638246488212446"
+      },
+      {
+        "file": "configs/mcp/config.json",
+        "hash": "6694504412893117117"
+      },
+      {
+        "file": "configs/mcp/index.js",
+        "hash": "16244468734234606752"
+      },
+      {
+        "file": "configs/mcp/server_config.json",
+        "hash": "10460241589362812122"
+      },
+      {
+        "file": "configs/mcp/servers.json",
+        "hash": "10460241589362812122"
+      },
+      {
+        "file": "configs/profiles/test_user.about.json",
+        "hash": "6286256143636797722"
+      },
+      {
+        "file": "configs/profiles/testuser.about.json",
+        "hash": "11133428015555718485"
+      },
+      {
+        "file": "configs/python/venv_config.json",
+        "hash": "17108783633493149666"
+      },
+      {
+        "file": "configs/rag/config.json",
+        "hash": "3030838064610575849"
+      },
+      {
+        "file": "configs/rag/index.js",
+        "hash": "14877873096592367963"
+      },
+      {
+        "file": "configs/saar/config.json",
+        "hash": "14375897678648482786"
+      },
+      {
+        "file": "configs/saar/index.js",
+        "hash": "10374855507461882860"
+      },
+      {
+        "file": "configs/security/constraints.json",
+        "hash": "12544893975372185388"
+      },
+      {
+        "file": "configs/security/constraints.md",
+        "hash": "17206453045466112444"
+      },
+      {
+        "file": "configs/security/index.js",
+        "hash": "9401937173061892"
+      },
+      {
+        "file": "configs/workflows/index.js",
+        "hash": "473220581525732307"
+      },
+      {
+        "file": "libs/agents/agent_communication_framework.md",
+        "hash": "2394104288598746035"
+      },
+      {
+        "file": "libs/agents/src/a2a-manager.ts",
+        "hash": "938389740487479403"
+      },
+      {
+        "file": "libs/agents/src/agent-base/base-agent.ts",
+        "hash": "1195200771296583874"
+      },
+      {
+        "file": "libs/agents/src/agent_communication_framework.md",
+        "hash": "2394104288598746035"
+      },
+      {
+        "file": "libs/agents/src/commands/agent-to-agent.md",
+        "hash": "2101392485782063855"
+      },
+      {
+        "file": "libs/agents/src/commands/analyze-complexity.md",
+        "hash": "12235775524097204693"
+      },
+      {
+        "file": "libs/agents/src/commands/analyze_project.md",
+        "hash": "1856010229351807396"
+      },
+      {
+        "file": "libs/agents/src/commands/bug_hunt.md",
+        "hash": "7328272958846479477"
+      },
+      {
+        "file": "libs/agents/src/commands/create_about.md",
+        "hash": "14653568793156211218"
+      },
+      {
+        "file": "libs/agents/src/commands/debug_recursive.md",
+        "hash": "11064985475131598001"
+      },
+      {
+        "file": "libs/agents/src/commands/generate-documentation.md",
+        "hash": "637320315279825397"
+      },
+      {
+        "file": "libs/agents/src/commands/git_agent.md",
+        "hash": "5122923231782669548"
+      },
+      {
+        "file": "libs/agents/src/commands/optimize_recursive.md",
+        "hash": "7069221743837219124"
+      },
+      {
+        "file": "libs/agents/src/commands/set_color_schema.md",
+        "hash": "257677272511212312"
+      },
+      {
+        "file": "libs/agents/src/commands/setup_project.md",
+        "hash": "7542138102163333782"
+      },
+      {
+        "file": "libs/agents/src/index.ts",
+        "hash": "16449424887428163071"
+      },
+      {
+        "file": "libs/mcp/src/a2a_manager.js",
+        "hash": "938389740487479403"
+      },
+      {
+        "file": "libs/mcp/src/api.js",
+        "hash": "1680445671492532769"
+      },
+      {
+        "file": "libs/mcp/src/claude_integration.js",
+        "hash": "7425442281198857521"
+      },
+      {
+        "file": "libs/mcp/src/claude_mcp_client.js",
+        "hash": "3832971999117285825"
+      },
+      {
+        "file": "libs/mcp/src/client/claude-mcp-client.ts",
+        "hash": "5806258640650392135"
+      },
+      {
+        "file": "libs/mcp/src/client/claude_integration.js",
+        "hash": "7425442281198857521"
+      },
+      {
+        "file": "libs/mcp/src/client/claude_mcp_client.js",
+        "hash": "3832971999117285825"
+      },
+      {
+        "file": "libs/mcp/src/client/index.ts",
+        "hash": "18304464160487673126"
+      },
+      {
+        "file": "libs/mcp/src/color_schema_manager.js",
+        "hash": "15722745961797499817"
+      },
+      {
+        "file": "libs/mcp/src/enterprise/enterprise_integration.js",
+        "hash": "15047762263988452069"
+      },
+      {
+        "file": "libs/mcp/src/enterprise/enterprise_mcp.js",
+        "hash": "8443682465597484235"
+      },
+      {
+        "file": "libs/mcp/src/enterprise_integration.js",
+        "hash": "15047762263988452069"
+      },
+      {
+        "file": "libs/mcp/src/fallbacks/sequential-planner-fallback.js",
+        "hash": "16873377530497564903"
+      },
+      {
+        "file": "libs/mcp/src/fallbacks/sequential-planner.js",
+        "hash": "288020441660360186"
+      },
+      {
+        "file": "libs/mcp/src/git_agent.js",
+        "hash": "15985446775033283494"
+      },
+      {
+        "file": "libs/mcp/src/index.ts",
+        "hash": "5990447590282902418"
+      },
+      {
+        "file": "libs/mcp/src/memory_server.js",
+        "hash": "17070557386440296130"
+      },
+      {
+        "file": "libs/mcp/src/routes/brave-search.js",
+        "hash": "2970266460104409761"
+      },
+      {
+        "file": "libs/mcp/src/routes/imagen.js",
+        "hash": "14028845474917477174"
+      },
+      {
+        "file": "libs/mcp/src/routes/sequential-planner.js",
+        "hash": "998535475273370849"
+      },
+      {
+        "file": "libs/mcp/src/routes/sequential-thinking.js",
+        "hash": "16106050118326560922"
+      },
+      {
+        "file": "libs/mcp/src/server/api.js",
+        "hash": "1680445671492532769"
+      },
+      {
+        "file": "libs/mcp/src/server/memory_server.js",
+        "hash": "17070557386440296130"
+      },
+      {
+        "file": "libs/mcp/src/server/start_server.js",
+        "hash": "2384067972343101537"
+      },
+      {
+        "file": "libs/mcp/src/server_config.json",
+        "hash": "10460241589362812122"
+      },
+      {
+        "file": "libs/mcp/src/services/a2a_manager.js",
+        "hash": "938389740487479403"
+      },
+      {
+        "file": "libs/mcp/src/services/color_schema_manager.js",
+        "hash": "15722745961797499817"
+      },
+      {
+        "file": "libs/mcp/src/services/git_agent.js",
+        "hash": "15985446775033283494"
+      },
+      {
+        "file": "libs/mcp/src/setup_mcp.js",
+        "hash": "8993881002220520956"
+      },
+      {
+        "file": "libs/mcp/src/start_server.js",
+        "hash": "2384067972343101537"
+      },
+      {
+        "file": "libs/rag/scripts/setup_rag.sh",
+        "hash": "802223394643377319"
+      },
+      {
+        "file": "libs/rag/setup/check_python_env.sh",
+        "hash": "17059959375664837870"
+      },
+      {
+        "file": "libs/rag/src/__init__.py",
+        "hash": "12972962621564715636"
+      },
+      {
+        "file": "libs/rag/src/check_env_status.py",
+        "hash": "2088292752304956016"
+      },
+      {
+        "file": "libs/rag/src/claude_rag.py",
+        "hash": "714218971034842916"
+      },
+      {
+        "file": "libs/rag/src/database/setup_database.py",
+        "hash": "625149833537983549"
+      },
+      {
+        "file": "libs/rag/src/query_rag.py",
+        "hash": "10989030492125249789"
+      },
+      {
+        "file": "libs/rag/src/rag_framework.py",
+        "hash": "17794238855030168038"
+      },
+      {
+        "file": "libs/rag/src/rag_test.py",
+        "hash": "5845326302217754613"
+      },
+      {
+        "file": "libs/rag/src/recursive_watcher.py",
+        "hash": "312796219919760939"
+      },
+      {
+        "file": "libs/rag/src/setup_database.py",
+        "hash": "625149833537983549"
+      },
+      {
+        "file": "libs/rag/src/update_vector_db.py",
+        "hash": "12664163529552445624"
+      },
+      {
+        "file": "libs/rag/test/__init__.py",
+        "hash": "8796480915035113185"
+      },
+      {
+        "file": "libs/rag/test/test_rag_framework.py",
+        "hash": "6491694284430485778"
+      },
+      {
+        "file": "libs/shared/src/index.ts",
+        "hash": "10458677951606528841"
+      },
+      {
+        "file": "libs/shared/src/utils/index.ts",
+        "hash": "11086023333878996130"
+      },
+      {
+        "file": "libs/shared/src/utils/schema-loader.ts",
+        "hash": "13645454106562798788"
+      },
+      {
+        "file": "libs/shared/src/utils/schema_loader.js",
+        "hash": "6581192478604013743"
+      },
+      {
+        "file": "libs/workflows/src/index.ts",
+        "hash": "17081127226535063543"
+      },
+      {
+        "file": "libs/workflows/src/saar/.claude/commands/analyze-dependencies.md",
+        "hash": "8726460597194057190"
+      },
+      {
+        "file": "libs/workflows/src/saar/.claude/commands/generate-docs.md",
+        "hash": "15916615473496490179"
+      },
+      {
+        "file": "libs/workflows/src/saar/.claude/commands/modernize-code.md",
+        "hash": "12165186414391542166"
+      },
+      {
+        "file": "libs/workflows/src/saar/.claude/commands/security-scan.md",
+        "hash": "1906575601521637651"
+      },
+      {
+        "file": "libs/workflows/src/saar/.claude/tools/debug/auto_debug.py",
+        "hash": "10864393787470446415"
+      },
+      {
+        "file": "libs/workflows/src/saar/.claude/tools/debug/debug_workflow_engine.js",
+        "hash": "1909026853366246770"
+      },
+      {
+        "file": "libs/workflows/src/saar/.claude/tools/debug/error_trigger.js",
+        "hash": "3274869699824224555"
+      },
+      {
+        "file": "libs/workflows/src/saar/.claude/workspace.json",
+        "hash": "8097917712416007343"
+      },
+      {
+        "file": "libs/workflows/src/saar/README.md",
+        "hash": "4131947917857925472"
+      },
+      {
+        "file": "libs/workflows/src/saar/REFACTORING.md",
+        "hash": "9304847381851587672"
+      },
+      {
+        "file": "libs/workflows/src/saar/ai_docs/templates/architecture-design.md",
+        "hash": "8090977897655301654"
+      },
+      {
+        "file": "libs/workflows/src/saar/ai_docs/templates/performance-optimization.md",
+        "hash": "10364491477431595364"
+      },
+      {
+        "file": "libs/workflows/src/saar/ai_docs/templates/security-review.md",
+        "hash": "16538248803406395542"
+      },
+      {
+        "file": "libs/workflows/src/saar/ai_docs/templates/testing-strategy.md",
+        "hash": "6428122495395015463"
+      },
+      {
+        "file": "libs/workflows/src/saar/saar_chain.sh",
+        "hash": "10131634117809241066"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/auto_debug.py",
+        "hash": "10864393787470446415"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/backup/backup.js",
+        "hash": "2435994885762724750"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/backup/restore.js",
+        "hash": "2688198149505278802"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/backup/setup_cron.js",
+        "hash": "3789688352809403597"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/backup/system_verification.js",
+        "hash": "13638080055653660408"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/backup/test_backup_recovery.js",
+        "hash": "6144986574129564023"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/backup/verify.js",
+        "hash": "3166199501118350"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/cleanup/activate_mcp_hooks.js",
+        "hash": "17433651293161046284"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/cleanup/integrate_frontend_mcp.js",
+        "hash": "9868887458520274811"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/cleanup/remove_redundant_frontend.sh",
+        "hash": "18346527060387144369"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/cleanup/remove_redundant_frontend_components.js",
+        "hash": "10371968645110528201"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/dashboard/dashboard.html",
+        "hash": "15685482474853828871"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/dashboard/server.js",
+        "hash": "17679531840701438813"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/dashboard/start-dashboard.sh",
+        "hash": "4447626794387968091"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/debug_workflow_engine.js",
+        "hash": "1909026853366246770"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/enterprise/enterprise-workflow.js",
+        "hash": "9642633831621843488"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/error_trigger.js",
+        "hash": "3274869699824224555"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git-workflow.js",
+        "hash": "1944053104120302276"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/README.md",
+        "hash": "11623925582947301243"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/commit-lint.js",
+        "hash": "9262577002358170797"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/enterprise-workflow.js",
+        "hash": "15920707326026885655"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/feature-finish.js",
+        "hash": "1743911238286995115"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/feature-start.js",
+        "hash": "11134570296299089678"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/git-helper.js",
+        "hash": "13869759159792379432"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/hotfix-finish.js",
+        "hash": "11969014420070619466"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/hotfix-start.js",
+        "hash": "4191297414636270861"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/install-aliases.sh",
+        "hash": "17146681755369245577"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/issue-cherry-pick.js",
+        "hash": "7387441359497129154"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/pr-manager.js",
+        "hash": "17121418375307942163"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/project-stats.js",
+        "hash": "7051043650745672052"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/release-finish.js",
+        "hash": "9446417554863064604"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/release-start.js",
+        "hash": "16509071231010241227"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/staged-split-features.js",
+        "hash": "17447586744891350308"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/utils/README.md",
+        "hash": "11419278350279432151"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/utils/code-analyzer.js",
+        "hash": "7803899218735372365"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/git/utils/commit-message-generator.js",
+        "hash": "5428264658407443240"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/installation/install.sh",
+        "hash": "11231779513161018098"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/language_support/cpp_recursion_monitor.h",
+        "hash": "14804848416041976373"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/language_support/java_agent.java",
+        "hash": "3215964325240853662"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/language_support/rust_recursion/Cargo.toml",
+        "hash": "128083012648676644"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/prepare_release.js",
+        "hash": "3346842396007336527"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/run_ci_locally.js",
+        "hash": "13319423090743088279"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/setup/cicd_integration.js",
+        "hash": "16488088822897852427"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/setup/color_schema_wrapper.js",
+        "hash": "18308909832281769943"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/setup/create_about.js",
+        "hash": "17704324056981357671"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/setup/create_about_simple.js",
+        "hash": "10928152689217709907"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/setup/git_feature_manager.sh",
+        "hash": "12574444605487322952"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/setup/install_core.sh",
+        "hash": "12584539168270798507"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/setup/install_recursive_debugging.sh",
+        "hash": "11566753665786938534"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/setup/setup_all.sh",
+        "hash": "1293127203867393387"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/setup/setup_chain.js",
+        "hash": "15442795107164704881"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/setup/setup_git_agent.js",
+        "hash": "14282995243130731399"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/setup/setup_neural_framework.sh",
+        "hash": "7989702883486621794"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/setup/setup_neural_framework.sh.enhanced",
+        "hash": "14927981703754397353"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/setup/setup_project.js",
+        "hash": "18215865456890671041"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/setup/setup_user_colorschema.js",
+        "hash": "3215556438514749231"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/test_demo.js",
+        "hash": "7951826556500626599"
+      },
+      {
+        "file": "libs/workflows/src/saar/scripts/update_vector_db.js",
+        "hash": "9144804729979528076"
+      },
+      {
+        "file": "libs/workflows/src/saar/specs/ci-cd-configuration.yml",
+        "hash": "3042828201955719271"
+      },
+      {
+        "file": "libs/workflows/src/saar/specs/coding-standards.md",
+        "hash": "3505059164726906740"
+      },
+      {
+        "file": "libs/workflows/src/saar/specs/schemas/performance-benchmarks.json",
+        "hash": "2402757462169804342"
+      },
+      {
+        "file": "libs/workflows/src/saar/specs/security-requirements.md",
+        "hash": "15434272682807127944"
+      },
+      {
+        "file": "libs/workflows/src/saar/start_neural_framework.sh",
+        "hash": "2318902396437352798"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/00_common.sh",
+        "hash": "5528333004641061378"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/01_dependency_check.sh",
+        "hash": "11978789368093835818"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/02_setup.sh",
+        "hash": "8414035315060141578"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/03_specialized_components.sh",
+        "hash": "14437869768885492930"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/04_debug_components.sh",
+        "hash": "17118159218148446308"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/05_neural_framework.sh",
+        "hash": "12664869391933792172"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/06_autonomy.sh",
+        "hash": "26432435402303086"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/07_mcp_integration.sh",
+        "hash": "15171961754017658679"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/08_dashboard.sh",
+        "hash": "8177882952568199774"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/09_memory_integration.sh",
+        "hash": "9798976155536485136"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/10_mcp_auto_update.sh",
+        "hash": "5173045850367410383"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/PLAN-SAAR-MCP-COMPLETED.md",
+        "hash": "9988490425806922738"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/mcp_tools_integration.js",
+        "hash": "14353666972817777580"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/mcp_tools_updater.js",
+        "hash": "17699831774441851215"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/memory-persistence-backend.js",
+        "hash": "15671076622165957194"
+      },
+      {
+        "file": "libs/workflows/src/saar/startup/memory_persistence.js",
+        "hash": "5867243168053722718"
+      },
+      {
+        "file": "libs/workflows/src/sequential/documentation/sequential-doc-generator.ts",
+        "hash": "1227919200518048264"
+      },
+      {
+        "file": "libs/workflows/src/sequential/executors/base-executor.ts",
+        "hash": "12659170284786923134"
+      },
+      {
+        "file": "libs/workflows/src/sequential/executors/cicd-executor.ts",
+        "hash": "12587490516837377838"
+      },
+      {
+        "file": "libs/workflows/src/sequential/executors/data-executor.ts",
+        "hash": "2124022111040141975"
+      },
+      {
+        "file": "libs/workflows/src/sequential/executors/documentation-executor.ts",
+        "hash": "2946698029343271513"
+      },
+      {
+        "file": "libs/workflows/src/sequential/executors/index.ts",
+        "hash": "10857169969880693061"
+      },
+      {
+        "file": "libs/workflows/src/sequential/index.ts",
+        "hash": "4854170836604096467"
+      },
+      {
+        "file": "libs/workflows/src/sequential/integration/sequential-execution-manager.ts",
+        "hash": "18120629579176587967"
+      },
+      {
+        "file": "libs/workflows/src/sequential/planners/base-planner.ts",
+        "hash": "1647850302137717671"
+      },
+      {
+        "file": "libs/workflows/src/sequential/planners/cicd-planner.ts",
+        "hash": "17339736086584088095"
+      },
+      {
+        "file": "libs/workflows/src/sequential/planners/data-planner.ts",
+        "hash": "3283329590761454804"
+      },
+      {
+        "file": "libs/workflows/src/sequential/planners/documentation-planner.ts",
+        "hash": "837714702123806274"
+      },
+      {
+        "file": "libs/workflows/src/sequential/planners/index.ts",
+        "hash": "11610108080671247015"
+      },
+      {
+        "file": "libs/workflows/src/sequential/sequential-execution-manager.ts",
+        "hash": "10831408892109981653"
+      },
+      {
+        "file": "libs/workflows/src/sequential/services/sequential-planner-fallback.ts",
+        "hash": "17267538467153860479"
+      },
+      {
+        "file": "libs/workflows/src/sequential/services/sequential-planner.ts",
+        "hash": "3344629301013964941"
+      },
+      {
+        "file": "libs/workflows/src/sequential/types.ts",
+        "hash": "9898812587389107696"
+      },
+      {
+        "file": "logs/context7.log",
+        "hash": "8483565307937880066"
+      },
+      {
+        "file": "logs/memory_bank.log",
+        "hash": "11292773486273833932"
+      },
+      {
+        "file": "logs/neural_framework.log",
+        "hash": "7648325113931961623"
+      },
+      {
+        "file": "logs/sequential_thinking.log",
+        "hash": "11928786455407642715"
+      },
+      {
+        "file": "mcp_config.json",
+        "hash": "10041676687397527062"
+      },
+      {
+        "file": "mcp_servers_backup.tar.gz",
+        "hash": "18095987885963899980"
+      },
+      {
+        "file": "nx.json",
+        "hash": "6925359191760529283"
+      },
+      {
+        "file": "package.json",
+        "hash": "4157079210927646655"
+      },
+      {
+        "file": "processes.json",
+        "hash": "14042003415074927280"
+      },
+      {
+        "file": "run_rag.sh",
+        "hash": "7235051152522514156"
+      },
+      {
+        "file": "saar.sh",
+        "hash": "10131634117809241066"
+      },
+      {
+        "file": "saar_chain.sh",
+        "hash": "10131634117809241066"
+      },
+      {
+        "file": "specs/ci-cd-configuration.yml",
+        "hash": "3042828201955719271"
+      },
+      {
+        "file": "specs/coding-standards.md",
+        "hash": "3505059164726906740"
+      },
+      {
+        "file": "specs/migrations/001_initial_schema.sql",
+        "hash": "17375626439387309722"
+      },
+      {
+        "file": "specs/openapi/v1/claude-api.yaml",
+        "hash": "5308425662909091234"
+      },
+      {
+        "file": "specs/schemas/api-schema.json",
+        "hash": "6147826528821207844"
+      },
+      {
+        "file": "specs/schemas/performance-benchmarks.json",
+        "hash": "2402757462169804342"
+      },
+      {
+        "file": "specs/security-requirements.md",
+        "hash": "15434272682807127944"
+      },
+      {
+        "file": "specs/virtual-env-requirements.md",
+        "hash": "9521268913130553789"
+      },
+      {
+        "file": "tools/documentation/sequential_doc_generator.js",
+        "hash": "14366751340660169975"
+      },
+      {
+        "file": "tools/examples/sequential-execution-example.js",
+        "hash": "14735067127949550982"
+      },
+      {
+        "file": "tools/examples/sequential-execution-manager-example.js",
+        "hash": "14734673646185491065"
+      },
+      {
+        "file": "tools/examples/sequential-execution-manager-example.ts",
+        "hash": "5466754030664254589"
+      },
+      {
+        "file": "tools/mcp/integration/sequential_execution_manager.js",
+        "hash": "5526953688199105432"
+      },
+      {
+        "file": "tools/mcp/integration/sequential_execution_manager.js.original",
+        "hash": "5526953688199105432"
+      },
+      {
+        "file": "tools/mcp/integration/sequential_execution_manager.js.proxy",
+        "hash": "4344271158057655700"
+      },
+      {
+        "file": "tools/scripts/backup/backup.js",
+        "hash": "2435994885762724750"
+      },
+      {
+        "file": "tools/scripts/backup/restore.js",
+        "hash": "2688198149505278802"
+      },
+      {
+        "file": "tools/scripts/backup/setup_cron.js",
+        "hash": "3789688352809403597"
+      },
+      {
+        "file": "tools/scripts/backup/system_verification.js",
+        "hash": "13638080055653660408"
+      },
+      {
+        "file": "tools/scripts/backup/test_backup_recovery.js",
+        "hash": "6144986574129564023"
+      },
+      {
+        "file": "tools/scripts/backup/verify.js",
+        "hash": "3166199501118350"
+      },
+      {
+        "file": "tools/scripts/examples/sequential-execution-example.js",
+        "hash": "7108656734466053215"
+      },
+      {
+        "file": "tools/scripts/git/README.md",
+        "hash": "11623925582947301243"
+      },
+      {
+        "file": "tools/scripts/git/commit-lint.js",
+        "hash": "9262577002358170797"
+      },
+      {
+        "file": "tools/scripts/git/enterprise-workflow.js",
+        "hash": "15920707326026885655"
+      },
+      {
+        "file": "tools/scripts/git/feature-finish.js",
+        "hash": "1743911238286995115"
+      },
+      {
+        "file": "tools/scripts/git/feature-start.js",
+        "hash": "11134570296299089678"
+      },
+      {
+        "file": "tools/scripts/git/git-helper.js",
+        "hash": "13869759159792379432"
+      },
+      {
+        "file": "tools/scripts/git/hotfix-finish.js",
+        "hash": "11969014420070619466"
+      },
+      {
+        "file": "tools/scripts/git/hotfix-start.js",
+        "hash": "4191297414636270861"
+      },
+      {
+        "file": "tools/scripts/git/install-aliases.sh",
+        "hash": "17146681755369245577"
+      },
+      {
+        "file": "tools/scripts/git/issue-cherry-pick.js",
+        "hash": "7387441359497129154"
+      },
+      {
+        "file": "tools/scripts/git/pr-manager.js",
+        "hash": "17121418375307942163"
+      },
+      {
+        "file": "tools/scripts/git/project-stats.js",
+        "hash": "7051043650745672052"
+      },
+      {
+        "file": "tools/scripts/git/release-finish.js",
+        "hash": "9446417554863064604"
+      },
+      {
+        "file": "tools/scripts/git/release-start.js",
+        "hash": "16509071231010241227"
+      },
+      {
+        "file": "tools/scripts/git/staged-split-features.js",
+        "hash": "17447586744891350308"
+      },
+      {
+        "file": "tools/scripts/git/utils/README.md",
+        "hash": "11419278350279432151"
+      },
+      {
+        "file": "tools/scripts/git/utils/code-analyzer.js",
+        "hash": "7803899218735372365"
+      },
+      {
+        "file": "tools/scripts/git/utils/commit-message-generator.js",
+        "hash": "5428264658407443240"
+      },
+      {
+        "file": "tools/scripts/migration/README.md",
+        "hash": "11930060954963172371"
+      },
+      {
+        "file": "tools/scripts/migration/cleanup-configs.sh",
+        "hash": "10177486348708037450"
+      },
+      {
+        "file": "tools/scripts/migration/js-to-ts-converter.sh",
+        "hash": "15039148176922227307"
+      },
+      {
+        "file": "tools/scripts/migration/migrate.sh",
+        "hash": "14321037765382286441"
+      },
+      {
+        "file": "tools/scripts/migration/update-imports.js",
+        "hash": "14514916267856277065"
+      },
+      {
+        "file": "tools/scripts/migration/update-imports.sh",
+        "hash": "11665131112993511854"
+      },
+      {
+        "file": "tools/scripts/setup/cicd_integration.js",
+        "hash": "16488088822897852427"
+      },
+      {
+        "file": "tools/scripts/setup/color_schema_wrapper.js",
+        "hash": "18308909832281769943"
+      },
+      {
+        "file": "tools/scripts/setup/create_about.js",
+        "hash": "14235123676297906782"
+      },
+      {
+        "file": "tools/scripts/setup/create_about_launcher.sh",
+        "hash": "4617674130932436644"
+      },
+      {
+        "file": "tools/scripts/setup/create_about_simple.js",
+        "hash": "10928152689217709907"
+      },
+      {
+        "file": "tools/scripts/setup/git_feature_manager.sh",
+        "hash": "12574444605487322952"
+      },
+      {
+        "file": "tools/scripts/setup/install_core.sh",
+        "hash": "12584539168270798507"
+      },
+      {
+        "file": "tools/scripts/setup/install_recursive_debugging.sh",
+        "hash": "11566753665786938534"
+      },
+      {
+        "file": "tools/scripts/setup/setup_all.sh",
+        "hash": "1293127203867393387"
+      },
+      {
+        "file": "tools/scripts/setup/setup_chain.js",
+        "hash": "15442795107164704881"
+      },
+      {
+        "file": "tools/scripts/setup/setup_git_agent.js",
+        "hash": "14282995243130731399"
+      },
+      {
+        "file": "tools/scripts/setup/setup_neural_framework.sh",
+        "hash": "7989702883486621794"
+      },
+      {
+        "file": "tools/scripts/setup/setup_neural_framework.sh.enhanced",
+        "hash": "14927981703754397353"
+      },
+      {
+        "file": "tools/scripts/setup/setup_project.js",
+        "hash": "18215865456890671041"
+      },
+      {
+        "file": "tools/scripts/setup/setup_user_colorschema.js",
+        "hash": "3215556438514749231"
+      },
+      {
+        "file": "tools/scripts/start_local.sh",
+        "hash": "552794789672426706"
+      },
+      {
+        "file": "tools/validators/README.md",
+        "hash": "17209072838170538286"
+      },
+      {
+        "file": "tools/validators/clauderules-validator.js",
+        "hash": "14022566752609229891"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "5380512565537654966"
+      }
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "defaultPolicyLevel": "moderate",
+  "apiAccessRules": [
+    {
+      "resource": "/admin/*",
+      "methods": ["GET", "POST", "PUT", "DELETE"],
+      "allowedRoles": ["admin"],
+      "policyLevel": "strict"
+    },
+    {
+      "resource": "/data/public/*",
+      "methods": ["GET"],
+      "allowedRoles": ["guest", "user", "admin"],
+      "policyLevel": "open"
+    }
+  ],
+  "enableAuditLog": true,
+  "auditLogPath": "logs/security_audit.log"
+}
