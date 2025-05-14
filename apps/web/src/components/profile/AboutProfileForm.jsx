@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { SchemaForm } from "./form";
+import { SchemaForm } from '../form';
 import ProfileClient from './ProfileClient';
-
-// Import from core framework
-import { I18n } from "./../core/i18n/i18n";
-const logger = require('../../core/logging/logger').createLogger('about-profile-form');
-const errorHandler = require('../../core/error/error_handler');
-const configManager = require('../../core/config/config_manager');
+import { I18n } from "../../core/i18n/i18n";
+import logger from '../../core/logging/logger';
+import errorHandler from '../../core/error/error_handler';
+import configManager from '../../core/config/config_manager';
 const { CONFIG_TYPES } = configManager;
 
 /**
@@ -43,16 +41,16 @@ const AboutProfileForm = ({ initialData = {}, onSave, loading = false }) => {
         // Set up UI schema with customizations
         setUiSchema({
           // UI schema customizations based on theme
-          person: {
+          personal: {
             classNames: {
               container: 'person-section',
             },
-            firstName: {
+            name: {
               classNames: {
                 input: 'primary-input',
               },
             },
-            lastName: {
+            email: {
               classNames: {
                 input: 'primary-input',
               },

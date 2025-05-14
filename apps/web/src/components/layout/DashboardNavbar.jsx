@@ -138,11 +138,31 @@ const DashboardNavbar = ({ onSearch }) => {
     </svg>
   );
   
+  // Function to navigate to a page
+  const navigateTo = (path) => {
+    // In a production app, this would use a router
+    // For now, we'll just log the navigation
+    console.log(`Navigating to: ${path}`);
+    
+    // For profile page, let's toggle a class on the body to show the profile form
+    if (path === '/profile') {
+      // Add a class to the body that the component can detect
+      document.body.classList.add('show-profile-page');
+      document.body.classList.remove('show-dashboard-page');
+      
+      // Close the profile menu
+      setShowProfileMenu(false);
+    } else if (path === '/') {
+      document.body.classList.add('show-dashboard-page');
+      document.body.classList.remove('show-profile-page');
+    }
+  };
+  
   return (
     <nav className="dashboard-navbar">
       <div className="navbar-container">
         {/* Logo and brand */}
-        <div className="navbar-brand">
+        <div className="navbar-brand" onClick={() => navigateTo('/')}>
           <div className="brand-logo">
             <SaarlandEmblem />
             <FaRobot className="robot-icon" />
@@ -287,25 +307,47 @@ const DashboardNavbar = ({ onSearch }) => {
                 </div>
                 
                 <div className="profile-options">
-                  <a href="#profile" className="profile-option">
+                  <button 
+                    className="profile-option" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigateTo('/profile');
+                    }}
+                  >
                     <FaUserCircle className="option-icon" />
                     <span>Mein Profil</span>
-                  </a>
-                  <a href="#settings" className="profile-option">
+                  </button>
+                  <button 
+                    className="profile-option"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigateTo('/settings');
+                    }}
+                  >
                     <FaCog className="option-icon" />
                     <span>Einstellungen</span>
-                  </a>
-                  <button className="profile-option theme-toggle" onClick={(e) => {
-                    e.stopPropagation();
-                    toggleTheme();
-                  }}>
+                  </button>
+                  <button 
+                    className="profile-option theme-toggle" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleTheme();
+                    }}
+                  >
                     <FaCog className="option-icon" />
                     <span>Theme umschalten</span>
                   </button>
-                  <a href="#logout" className="profile-option logout">
+                  <button 
+                    className="profile-option logout"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // In a real app, this would trigger a logout action
+                      alert('Abmelden wurde geklickt');
+                    }}
+                  >
                     <FaSignOutAlt className="option-icon" />
                     <span>Abmelden</span>
-                  </a>
+                  </button>
                 </div>
               </div>
             )}
@@ -336,6 +378,7 @@ const DashboardNavbar = ({ onSearch }) => {
         .navbar-brand {
           display: flex;
           align-items: center;
+          cursor: pointer;
         }
         
         .brand-logo {
