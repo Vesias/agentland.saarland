@@ -2,19 +2,25 @@
  * Tests for the SecureAPI module
  */
 
-import { SecureAPI, SecurityPolicyLevel, isClaudeError } from './secure-api';
+import { SecureAPI, isClaudeError } from './secure-api';
+import { PolicyLevel } from './security.types'; // PolicyLevel hier importieren
 import { ValidationError } from '../error/error-handler';
 import { Request, Response } from 'express';
 
 // Mock dependencies
-jest.mock('../logging/logger', () => ({
-  Logger: jest.fn().mockImplementation(() => ({
+jest.mock('../logging/logger', () => {
+  const mockLoggerInstance = {
     debug: jest.fn(),
     info: jest.fn(),
     warn: jest.fn(),
     error: jest.fn()
-  }))
-}));
+  };
+  return {
+    Logger: jest.fn().mockImplementation(() => mockLoggerInstance),
+    createLogger: jest.fn().mockImplementation(() => mockLoggerInstance),
+    default: mockLoggerInstance // Falls der Default-Export auch verwendet wird
+  };
+});
 
 jest.mock('../config/config-manager', () => ({
   __esModule: true,
@@ -44,7 +50,7 @@ describe('SecureAPI', () => {
       secure: true,
       socket: {
         remoteAddress: '127.0.0.1'
-      },
+      } as Request['socket'], // Spezifischerer Cast für das Socket-Objekt
       body: {},
       query: {}
     };
@@ -72,7 +78,7 @@ describe('SecureAPI', () => {
       const customApi = new SecureAPI({
         rateLimitRequests: 50,
         requireHTTPS: false,
-        policyLevel: SecurityPolicyLevel.MODERATE
+        policyLevel: PolicyLevel.MODERATE // SecurityPolicyLevel zu PolicyLevel geändert
       });
       expect(customApi).toBeInstanceOf(SecureAPI);
     });
@@ -154,6 +160,80 @@ describe('SecureAPI', () => {
       
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalled();
+    });
+  });
+
+  describe('validateCSRF', () => {
+    it('should return true for safe methods (GET, HEAD, OPTIONS)', () => {
+      const api = new SecureAPI();
+      const reqGet = { method: 'GET', session: { csrfToken: 'test-token' } } as unknown as Request;
+      const reqHead = { method: 'HEAD', session: { csrfToken: 'test-token' } } as unknown as Request;
+      const reqOptions = { method: 'OPTIONS', session: { csrfToken: 'test-token' } } as unknown as Request;
+      expect(api['validateCSRF'](reqGet)).toBe(true);
+      expect(api['validateCSRF'](reqHead)).toBe(true);
+      expect(api['validateCSRF'](reqOptions)).toBe(true);
+    });
+
+    it('should return true if request token matches session token (POST)', () => {
+      const api = new SecureAPI();
+      const req = {
+        method: 'POST',
+        headers: { 'x-csrf-token': 'test-token' },
+        session: { csrfToken: 'test-token' }
+      } as unknown as Request;
+      expect(api['validateCSRF'](req)).toBe(true);
+    });
+
+    it('should return true if request token from body matches session token (POST)', () => {
+      const api = new SecureAPI();
+      const req = {
+        method: 'POST',
+        headers: {}, // Hinzugefügt
+        body: { _csrf: 'test-token' },
+        session: { csrfToken: 'test-token' }
+      } as unknown as Request;
+      expect(api['validateCSRF'](req)).toBe(true);
+    });
+
+    it('should return true if request token from query matches session token (POST)', () => {
+      const api = new SecureAPI();
+      const req = {
+        method: 'POST',
+        headers: {}, // Hinzugefügt
+        query: { _csrf: 'test-token' },
+        session: { csrfToken: 'test-token' }
+      } as unknown as Request;
+      expect(api['validateCSRF'](req)).toBe(true);
+    });
+
+    it('should return false if request token does not match session token', () => {
+      const api = new SecureAPI();
+      const req = {
+        method: 'POST',
+        headers: { 'x-csrf-token': 'wrong-token' },
+        session: { csrfToken: 'test-token' }
+      } as unknown as Request;
+      expect(api['validateCSRF'](req)).toBe(false);
+    });
+
+    it('should return false if request token is missing', () => {
+      const api = new SecureAPI();
+      const req = {
+        method: 'POST',
+        headers: {},
+        session: { csrfToken: 'test-token' }
+      } as unknown as Request;
+      expect(api['validateCSRF'](req)).toBe(false);
+    });
+
+    it('should return false if session token is missing', () => {
+      const api = new SecureAPI();
+      const req = {
+        method: 'POST',
+        headers: { 'x-csrf-token': 'test-token' },
+        session: {} // No csrfToken in session
+      } as unknown as Request;
+      expect(api['validateCSRF'](req)).toBe(false);
     });
   });
 

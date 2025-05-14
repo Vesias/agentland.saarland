@@ -60,7 +60,7 @@ export interface ExecutionResult {
  * Execution options
  */
 export interface ExecutionOptions {
-  [key: string]: any;
+  [key: string]: unknown;
   timeout?: number;
   fallbackMode?: boolean;
   maxSteps?: number;
@@ -68,15 +68,15 @@ export interface ExecutionOptions {
   depth?: 'shallow' | 'medium' | 'deep';
   planningDepth?: 'shallow' | 'medium' | 'deep';
   searchTerm?: string;
-  componentSpec?: any;
-  result?: any;
+  componentSpec?: unknown;
+  result?: unknown;
   summary?: string;
-  executeFunction?: (step: PlanStep) => Promise<any>;
-  fileContent?: any;
+  executeFunction?: (step: PlanStep) => Promise<unknown>;
+  fileContent?: unknown;
   path?: string;
   outputPath?: string;
   content?: string;
-  testResults?: any;
+  testResults?: unknown;
   testCount?: number;
   failCount?: number;
   artifacts?: string[];
@@ -97,7 +97,7 @@ export type StepHandler = (step: PlanStep, options?: ExecutionOptions) => Promis
 /**
  * Execution observer callback type
  */
-export type ExecutionObserver = (event: string, data: any) => void;
+export type ExecutionObserver = (event: string, data: unknown) => void;
 
 /**
  * Sequential Execution Manager Options
@@ -107,7 +107,7 @@ export interface SequentialExecutionManagerOptions {
   maxSteps?: number;
   stepTimeout?: number;
   planningDepth?: 'shallow' | 'medium' | 'deep';
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -116,7 +116,7 @@ export interface SequentialExecutionManagerOptions {
 export interface ExecutorOptions {
   fallbackMode?: boolean;
   timeout?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**

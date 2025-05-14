@@ -1,0 +1,44 @@
+{
+  "spf": {
+    "type": "TXT",
+    "name": "@",
+    "value": "v=spf1 mx a include:_spf.agentland.saarland ~all",
+    "ttl": 3600
+  },
+  "dkim": {
+    "type": "TXT",
+    "name": "default._domainkey",
+    "value": "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz5B6CYPlKPKRlfi4DBB83xmEZahu8wd1FmUZrlGdSr5FUBIFEPWTrCRh03y94mkJ6OJlBV40MRgFQUS3Sx71CI+MSHm9Dz1+cSKTGoyFXlbGQR/YAviZuJW1NKo+W9hRhW9OCdf5RugdkW90JQdRN/R6QJbxhrKuMEypzv8d28CsfH+ADkLGaSH3VzM+Xpkhin/ZtjidAP1Lq29Zwgc/DhIYCPzCycDtjEWU4JgZFAXb31v2GSOOFE2A8gPIyIML5pEO5jqjzlZcjMAOk+UdJbBdlUWmBYeIHiL4JKczSrU+i4V4Oj8/Kn4yIQyMNiEMgDzPWUFGKKzDdvRQDvJCnNIIBCgKCAQEAz5B6CYPlKPKRlfi4DBB83xmEZahu8wd1FmUZrlGdSr5FUBIFEPWTrCRh03y94mkJ6OJlBV40MRgFQUS3Sx71CI+MSHm9Dz1+cSKTGoyFXlbGQR/YAviZuJW1NKo+W9hRhW9OCdf5RugdkW90JQdRN/R6QJbxhrKuMEypzv8d28CsfH+ADkLGaSH3VzM+Xpkhin",
+    "ttl": 3600
+  },
+  "dmarc": {
+    "type": "TXT",
+    "name": "_dmarc",
+    "value": "v=DMARC1; p=quarantine; rua=mailto:dmarc@agentland.saarland",
+    "ttl": 3600
+  },
+  "agentAuth": {
+    "type": "TXT",
+    "name": "_a2a-auth",
+    "value": "v=A2A1; t=d7e9f6c5b4a3d2c1b7a8f9e6d5c4b3a2d1c7b8a9f6e5d4c3b2a1f7e8d9c6b5a4; d=agentland.saarland",
+    "ttl": 3600
+  },
+  "securityChallenge": {
+    "type": "TXT",
+    "name": "_security-challenge",
+    "value": "challenge=f9e8d7c6b5a4f3e2d1c0; domain=agentland.saarland",
+    "ttl": 3600
+  },
+  "domainVerification": {
+    "type": "TXT",
+    "name": "@",
+    "value": "agentland-verification=a15e28f9c33e8c4d1a8b4c9f6e3d2a1b5c7d9e8f6a3b2c1d7e8f9a2b3c4d5e6f",
+    "ttl": 3600
+  },
+  "caa": {
+    "type": "CAA",
+    "name": "@",
+    "value": "0 issue \"letsencrypt.org\"",
+    "ttl": 3600
+  }
+}

@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  agent-saarland-tests:
+    # Build context is the current directory
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: agent-saarland-tests:latest
+    container_name: agent-saarland-tests-runner
+    # Set environment variables if needed for tests
+    # environment:
+    #   - NODE_ENV=test
+    #   - API_KEY=your_test_api_key
+
+    # Mount volumes if tests need to write reports or access specific host directories
+    # volumes:
+    #   - ./coverage:/usr/src/app/coverage
+    #   - ./test-reports:/usr/src/app/test-reports
+
+    # The default command from the Dockerfile (npm run test) will be executed.
+    # You can override it here if needed for specific compose scenarios:
+    # command: ["npm", "run", "test:specific-suite"]
+
+    # Ensure the container exits after tests are done,
+    # so 'docker-compose up' doesn't hang indefinitely.
+    # This is usually handled by the test runner exiting.
+    # If not, you might need a wrapper script or adjust the CMD in Dockerfile.

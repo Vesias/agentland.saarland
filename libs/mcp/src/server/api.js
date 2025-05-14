@@ -15,6 +15,7 @@ const sequentialPlannerRoutes = require('./routes/sequential-planner');
 const braveSearchRoutes = require('./routes/brave-search');
 const imagenRoutes = require('./routes/imagen');
 const memoryPersistenceRouter = require('../../saar/startup/memory-persistence-backend');
+const a2aSecurityRoutes = require('./routes/a2a-security');
 
 // Create Express app
 const app = express();
@@ -40,6 +41,7 @@ app.use('/api/mcp/sequential-planner', sequentialPlannerRoutes);
 app.use('/api/mcp/brave-search', braveSearchRoutes);
 app.use('/api/mcp/imagen', imagenRoutes);
 app.use('/api/mcp/memory', memoryPersistenceRouter);
+app.use('/api/a2a/security', a2aSecurityRoutes);
 
 // Status endpoint
 app.get('/status', (req, res) => {
@@ -51,7 +53,8 @@ app.get('/status', (req, res) => {
       '/api/mcp/sequential-planner',
       '/api/mcp/brave-search',
       '/api/mcp/imagen',
-      '/api/mcp/memory'
+      '/api/mcp/memory',
+      '/api/a2a/security'
     ]
   });
 });

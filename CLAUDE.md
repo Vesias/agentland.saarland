@@ -28,6 +28,13 @@ The framework follows a monorepo structure with clear modularization:
 
 ## Development Commands
 
+### Dashboard Startup
+
+```bash
+# Start the AGENT_LAND.SAARLAND dashboard (empfohlen)
+./start-dashboard.sh
+```
+
 ### Basic Commands
 
 ```bash
@@ -47,11 +54,36 @@ npm run lint
 npm run build
 ```
 
+### Web Application
+
+To start the web application specifically:
+
+```bash
+# Navigate to the web application directory
+cd apps/web
+
+# Install web app dependencies if needed
+npm install
+
+# Start web development server
+npm run dev
+```
+
+The web application will be available at http://localhost:5000 with hot reload enabled.
+
+Alternatively, you can use the enhanced start script:
+
+```bash
+# Run the improved start script from the web app directory
+cd apps/web
+./start-dashboard.sh
+```
+
 ### Nx-specific Commands
 
 ```bash
-# Run a specific project
-nx serve [project-name]
+# Run the web app specifically
+nx serve web
 
 # Test a specific project
 nx test [project-name]
@@ -156,45 +188,3 @@ SAAR (Simplified Agent Architecture and Routing) provides a streamlined workflow
 - Documentation is available in the `docs/` directory with subdirectories for different aspects
 - Tools and scripts for development are in the `tools/` directory
 - Examples are provided in `docs/examples/` and `tools/examples/`
-
-## Memory Notes
-
-- You always use @ai_docs/, @specs/, @.clauderules, @.claudeignore, @.claude/ as knowledge bases
-- Special attention is paid to creating .md scripts correctly and avoiding multiple redundant directories or homeless scripts
-- The only exception is the saar.sh starter script in the root directory
-
-## Knowledge Base and Rules
-
-📘 WISSENSBASIS – diese Verzeichnisse & Dateien gelten als primäre Autorität:
-
-    @ai_docs/ → Hauptquelle für technische Guides, Prompt-Templates, Architekturen
-
-    @specs/ → Struktur-, API-, Migrations- und Schemaspezifikationen
-
-    @.clauderules → Regelwerk für Benennung, Ordnung, Architektur
-
-    @.claudeignore → Ausschlüsse für Build, Docs, Deployment
-
-    @.claude/ → interne Tools, Konfigs & Integrationstemplates für Agentic OS
-
-🚨 Wichtige Regeln, die ich ab jetzt strikt einhalte:
-
-    🔁 Keine doppelten Verzeichnisse: z. B. docs/ vs. ai_docs/ ➜ wird vereinheitlicht in ai_docs/
-
-    🧼 Keine „heimatlosen" Skripte:
-
-        Jedes Shell-, JS- oder Python-Skript wird genau einem Modul zugeordnet
-
-        Befindet es sich nicht in tools/, libs/, apps/ oder .claude/, wird es migriert oder gelöscht
-
-    🧠 .md-Dateien:
-
-        Dürfen nicht mehrfach in verschiedenen Ordnern vorkommen (z. B. README.md)
-
-        Inhalt wird zentralisiert in ai_docs/, mit Verlinkung aus README.md
-
-    📦 Nur ein zentrales Starter-Skript erlaubt:
-
-        saar.sh bleibt im Root → alle anderen Start-Skripte (z. B. start.sh, setup.sh, bootstrap.sh) werden integriert oder entfernt
-
-🔧 Alle Entscheidungen zur Struktur, Platzierung und Dokumentation basieren ab jetzt ausschließlich auf dieser Wissensbasis.

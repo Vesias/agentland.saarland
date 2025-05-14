@@ -1,4 +1,5 @@
-import { createLogger } from "./logging/logger";
+import { createLogger } from "../logging/logger";
+import { Request, Response, NextFunction } from 'express';
 
 const logger = createLogger('error-handler');
 
@@ -65,8 +66,8 @@ export class ClaudeError extends Error {
  * Validation error
  */
 export class ValidationError extends ClaudeError {
-  constructor(message: string, details: Record<string, any> = {}) {
-    super(message, ErrorType.VALIDATION, details, 400);
+  constructor(message: string, details: Record<string, any> = {}, statusCode: number = 400) {
+    super(message, ErrorType.VALIDATION, details, statusCode);
     this.name = 'ValidationError';
   }
 }
@@ -173,7 +174,7 @@ export function handleError(error: unknown): Record<string, any> {
 /**
  * Error handler for Express/Connect middleware
  */
-export function errorMiddleware(err: unknown, req: any, res: any, next: any): void {
+export function errorMiddleware(err: unknown, req: Request, res: Response, next: NextFunction): void {
   const { status, body } = handleError(err);
   res.status(status).json(body);
 }

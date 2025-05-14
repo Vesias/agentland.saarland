@@ -20,7 +20,7 @@
       "inputs": ["default", "{workspaceRoot}/.eslintrc.json"]
     },
     "test": {
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
+      "inputs": ["default", "{workspaceRoot}/jest.preset.js"]
     }
   },
   "generators": {

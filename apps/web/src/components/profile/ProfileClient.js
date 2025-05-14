@@ -59,19 +59,26 @@ async function loadProfile(profileId) {
       userId: profileId,
       personal: {
         name: "Example User",
+        email: "user@example.com",
+        location: "Saarland, Germany",
+        bio: "Ein Beispielbenutzer für das AGENT_LAND.SAARLAND Dashboard",
         skills: ["JavaScript", "React"]
       },
       preferences: {
         uiTheme: "dark",
-        colorScheme: configManager.getConfig(CONFIG_TYPES.COLOR_SCHEMA).themes.dark.colors
+        colorScheme: configManager.getConfig(CONFIG_TYPES.COLOR_SCHEMA).themes.dark.colors,
+        language: "de",
+        notifications: true
       },
       agentSettings: {
-        isActive: true
+        isActive: true,
+        missionPreferences: ["local", "regional"],
+        skillLevel: "beginner"
       }
     };
   } catch (error) {
     logger.error('Error loading profile from MCP', { profileId, error });
-    return errorHandler.handleError('PROFILE_LOAD_ERROR', error);
+    throw errorHandler.handleError('PROFILE_LOAD_ERROR', error);
   }
 }
 
@@ -99,7 +106,7 @@ async function saveProfile(profileId, profileData) {
     return true;
   } catch (error) {
     logger.error('Error saving profile to MCP', { profileId, error });
-    return errorHandler.handleError('PROFILE_SAVE_ERROR', error);
+    throw errorHandler.handleError('PROFILE_SAVE_ERROR', error);
   }
 }
 

@@ -29,8 +29,10 @@ build/
 
 # Node modules
 node_modules/
+apps/cli/node_modules/
 
 # System files
 .DS_Store
 .vscode/
 .idea/
+mcp_servers_backup.tar.gz

@@ -6,125 +6,180 @@
  */
 
 import { z } from 'zod';
+import {
+  PolicyLevel as PolicyLevelEnum,
+} from './security.types';
+import type {
+  ApiAccessRule as ApiAccessRuleInterface,
+  SecurityConfig as SecurityConfigInterface,
+  SecurityEvent as SecurityEventInterface,
+  SecurityReport as SecurityReportInterface,
+  SecurityCheckOptions as SecurityCheckOptionsInterface,
+  ValidationContext as ValidationContextInterface,
+  SecurityReviewSummary as SecurityReviewSummaryInterface,
+  SecurityFinding as SecurityFindingInterface,
+  Recommendation as RecommendationInterface,
+  ValidatorResults as ValidatorResultsInterface,
+  SecurityReviewOptions as SecurityReviewOptionsInterface,
+  SecurityReviewReport as SecurityReviewReportInterface,
+  SecureApiOptions as SecureApiOptionsInterface,
+} from './security.types';
 
 /**
- * Security policy level schema
+ * Zod schema for the {@link PolicyLevelEnum}.
  */
-export const SecurityPolicyLevelSchema = z.enum(['strict', 'moderate', 'open']);
+export const PolicyLevelSchema = z.nativeEnum(PolicyLevelEnum);
 
 /**
- * API Rule Type Schema
- */
-export const ApiRuleTypeSchema = z.enum([
-  'rate_limit',
-  'ip_restriction',
-  'auth_required',
-  'cors',
-  'content_type',
-  'request_size'
-]);
-
-/**
- * API Access Rule Schema
+ * Zod schema for the {@link ApiAccessRuleInterface}.
+ * Corresponds to `ApiAccessRule` in `security.types.ts`.
  */
 export const ApiAccessRuleSchema = z.object({
-  id: z.string(),
-  type: ApiRuleTypeSchema,
-  description: z.string(),
-  enabled: z.boolean(),
-  parameters: z.record(z.string(), z.any()).optional(),
-  path: z.string().optional(),
-  method: z.string().optional(),
-  priority: z.number().int().default(10)
+  resource: z.string().min(1),
+  methods: z.array(z.string().min(1)).min(1).readonly(), // Sicherstellen, dass das Array nicht leer ist
+  allowedRoles: z.array(z.string().min(1)).min(1).readonly(), // Auch für allowedRoles sinnvoll
+  policyLevel: PolicyLevelSchema.optional(),
 });
 
 /**
- * Security Policy Schema
+ * Zod schema for the {@link SecurityConfigInterface}.
+ * Corresponds to `SecurityConfig` in `security.types.ts`.
  */
-export const SecurityPolicySchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
-  level: SecurityPolicyLevelSchema,
-  rules: z.array(ApiAccessRuleSchema),
-  default: z.boolean().default(false),
-  created: z.string().datetime().optional(),
-  modified: z.string().datetime().optional()
+export const SecurityConfigSchema = z.object({
+  defaultPolicyLevel: PolicyLevelSchema,
+  apiAccessRules: z.array(ApiAccessRuleSchema).readonly(),
+  enableAuditLog: z.boolean(),
+  auditLogPath: z.string().optional(),
 });
 
 /**
- * Security Finding Schema
+ * Zod schema for the {@link SecurityEventInterface}.
+ * Corresponds to `SecurityEvent` in `security.types.ts`.
  */
-export const SecurityFindingSchema = z.object({
-  id: z.string(),
-  validator: z.string(),
-  type: z.string(),
-  title: z.string(),
-  description: z.string(),
-  location: z.string(),
-  timestamp: z.string().datetime(),
-  // Additional properties can be added with extend()
+export const SecurityEventSchema = z.object({
+  timestamp: z.date(),
+  severity: z.enum(['info', 'warning', 'error', 'critical']),
+  message: z.string().min(1),
+  // z.any() für details erlaubt maximale Flexibilität.
+  // Falls eine spezifischere Struktur für details bekannt ist oder erzwungen werden soll,
+  // könnte hier ein spezifischeres z.object({...}) Schema verwendet werden.
+  details: z.record(z.unknown()).optional(),
 });
 
 /**
- * Security Vulnerability Schema with severity
- */
-export const SecurityVulnerabilitySchema = z.object({
-  id: z.string(),
-  validator: z.string(),
-  type: z.string(),
-  title: z.string(),
-  description: z.string(),
-  severity: z.enum(['critical', 'high', 'medium', 'low']),
-  location: z.string(),
-  recommendation: z.string().optional(),
-  timestamp: z.string().datetime(),
-  // Additional properties can be added with extend()
-});
-
-/**
- * Security Recommendation Schema
- */
-export const SecurityRecommendationSchema = z.object({
-  type: z.string(),
-  findings: z.number().int().optional(),
-  severity: z.enum(['critical', 'high', 'medium', 'low']).optional(),
-  title: z.string(),
-  description: z.string()
-});
-
-/**
- * Security Report Summary Schema
- */
-export const SecurityReportSummarySchema = z.object({
-  securityScore: z.number().int().min(0).max(100),
-  findingsCount: z.number().int().min(0),
-  vulnerabilitiesCount: z.number().int().min(0),
-  passedValidators: z.number().int().min(0),
-  totalValidators: z.number().int().min(0)
-});
-
-/**
- * Security Report Schema
+ * Zod schema for the {@link SecurityReportInterface}.
+ * Corresponds to `SecurityReport` in `security.types.ts`.
  */
 export const SecurityReportSchema = z.object({
-  id: z.string(),
-  timestamp: z.string().datetime(),
-  framework: z.object({
-    name: z.string(),
-    version: z.string()
-  }),
-  summary: SecurityReportSummarySchema,
-  findings: z.array(SecurityFindingSchema),
-  vulnerabilities: z.array(SecurityVulnerabilitySchema),
-  recommendations: z.array(SecurityRecommendationSchema),
-  reportPath: z.string().optional()
+  generatedAt: z.date(),
+  summary: z.string().min(1),
+  events: z.array(SecurityEventSchema).readonly(),
+  recommendations: z.array(z.string().min(1)).optional(),
 });
 
 /**
- * Secure API Options Schema
+ * Zod schema for {@link SecurityCheckOptionsInterface}.
  */
-export const SecureAPIOptionsSchema = z.object({
+export const SecurityCheckOptionsSchema = z.object({
+  autofix: z.boolean().optional(),
+  relaxed: z.boolean().optional(),
+  output: z.string().optional(),
+  dir: z.string().optional(),
+  files: z.string().optional(), // Komma-separierte Liste
+  exclude: z.string().optional(), // Komma-separierte Liste
+  verbose: z.boolean().optional(),
+});
+
+/**
+ * Zod schema for {@link ValidationContextInterface}.
+ */
+export const ValidationContextSchema = z.object({
+  targetDir: z.string(),
+  targetFiles: z.array(z.string()).readonly().optional(),
+  excludePatterns: z.array(z.string()).readonly().optional(),
+});
+
+/**
+ * Zod schema for {@link SecurityReviewSummaryInterface}.
+ */
+export const SecurityReviewSummarySchema = z.object({
+  securityScore: z.number().int().min(0).max(100),
+  passedValidators: z.number().int().min(0),
+  totalValidators: z.number().int().min(0),
+  vulnerabilitiesCount: z.number().int().min(0),
+  findingsCount: z.number().int().min(0),
+});
+
+/**
+ * Zod schema for {@link SecurityFindingInterface}.
+ * This schema represents both vulnerabilities and general findings,
+ * differentiated by the `type` and `severity` fields.
+ */
+export const SecurityFindingSchema = z.object({
+  id: z.string(), // ID ist jetzt obligatorisch
+  validator: z.string().optional(),
+  type: z.enum(['vulnerability', 'finding', 'general']).optional(), // 'general' hinzugefügt
+  title: z.string().min(1),
+  description: z.string().min(1),
+  location: z.string().min(1),
+  severity: z.enum(['critical', 'high', 'medium', 'low', 'info']),
+  recommendation: z.string().optional(),
+  timestamp: z.string().datetime(), // Timestamp ist jetzt obligatorisch (ISO-String)
+});
+
+/**
+ * Zod schema for {@link RecommendationInterface}.
+ */
+export const RecommendationSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().min(1),
+  type: z.enum(['vulnerability', 'finding', 'general']),
+  severity: z.enum(['critical', 'high', 'medium', 'low']).optional(),
+});
+
+/**
+ * Zod schema for {@link ValidatorResultsInterface}.
+ * This is typically the output of `SecurityReview.runValidators`.
+ */
+export const ValidatorResultsSchema = z.object({
+  summary: SecurityReviewSummarySchema,
+  vulnerabilities: z.array(SecurityFindingSchema).readonly().optional(),
+  findings: z.array(SecurityFindingSchema).readonly().optional(),
+  recommendations: z.array(RecommendationSchema).readonly().optional(),
+  reportPath: z.string().optional(),
+});
+
+/**
+ * Zod schema for {@link SecurityReviewOptionsInterface}.
+ */
+export const SecurityReviewOptionsSchema = z.object({
+  autoFix: z.boolean().optional(),
+  strictMode: z.boolean().optional(),
+  reportPath: z.string().optional(),
+});
+
+/**
+ * Zod schema for {@link SecurityReviewReportInterface}.
+ * This is the structure of the final JSON report.
+ */
+export const SecurityReviewReportFileSchema = z.object({
+  id: z.string(),
+  timestamp: z.string().datetime(), // ISO Date String for JSON
+  framework: z.object({
+    name: z.string(),
+    version: z.string(),
+  }),
+  summary: SecurityReviewSummarySchema,
+  findings: z.array(SecurityFindingSchema).readonly(),
+  vulnerabilities: z.array(SecurityFindingSchema).readonly(), // Vulnerabilities are also findings
+  recommendations: z.array(RecommendationSchema).readonly(),
+});
+
+
+/**
+ * Zod schema for {@link SecureApiOptionsInterface}.
+ */
+export const SecureApiOptionsSchema = z.object({
   rateLimitRequests: z.number().int().positive().optional(),
   rateLimitWindowMs: z.number().int().positive().optional(),
   sessionTimeoutMs: z.number().int().positive().optional(),
@@ -132,54 +187,70 @@ export const SecureAPIOptionsSchema = z.object({
   csrfProtection: z.boolean().optional(),
   secureHeaders: z.boolean().optional(),
   inputValidation: z.boolean().optional(),
-  policyLevel: SecurityPolicyLevelSchema.optional()
-}).strict().passthrough();
+  policyLevel: PolicyLevelSchema.optional(), // Hinzugefügt für Konsistenz mit SecureApiOptions Interface und SecureAPI Klasse
+}).strict(); // Use strict to prevent unknown keys if these are the exact options.
 
+// Define types from Zod schemas to be used in the application
+export type ZodApiAccessRule = z.infer<typeof ApiAccessRuleSchema>;
+export type ZodSecurityConfig = z.infer<typeof SecurityConfigSchema>;
+export type ZodSecurityEvent = z.infer<typeof SecurityEventSchema>;
+export type ZodSecurityReport = z.infer<typeof SecurityReportSchema>;
+export type ZodSecurityFinding = z.infer<typeof SecurityFindingSchema>;
+export type ZodRecommendation = z.infer<typeof RecommendationSchema>;
+export type ZodSecurityReviewSummary = z.infer<typeof SecurityReviewSummarySchema>;
+export type ZodValidatorResults = z.infer<typeof ValidatorResultsSchema>;
+export type ZodSecurityReviewReportFile = z.infer<typeof SecurityReviewReportFileSchema>;
+export type ZodSecureApiOptions = z.infer<typeof SecureApiOptionsSchema>;
+
+
+// Export validation functions for convenience
 /**
- * Security Config Schema
+ * Validates data against the {@link ApiAccessRuleSchema}.
+ * @param data - The data to validate.
+ * @returns The validated data as {@link ZodApiAccessRule}.
+ * @throws ZodError if validation fails.
  */
-export const SecurityConfigSchema = z.object({
-  version: z.string(),
-  mcp: z.object({
-    allowed_servers: z.array(z.string()),
-    allow_server_autostart: z.boolean(),
-    allow_remote_servers: z.boolean()
-  }),
-  filesystem: z.object({
-    allowed_directories: z.array(z.string())
-  }),
-  api: z.object({
-    require_https: z.boolean(),
-    rate_limit: z.object({
-      enabled: z.boolean(),
-      requests_per_window: z.number().int().positive(),
-      window_ms: z.number().int().positive()
-    }),
-    policies: z.array(SecurityPolicySchema)
-  }).optional()
-});
-
-// Define types from schemas
-export type SecurityPolicy = z.infer<typeof SecurityPolicySchema>;
-export type ApiAccessRule = z.infer<typeof ApiAccessRuleSchema>;
-export type SecurityConfig = z.infer<typeof SecurityConfigSchema>;
-
-// Export validation functions
-export function validateSecurityPolicy(data: unknown): SecurityPolicy {
-  return SecurityPolicySchema.parse(data);
-}
-
-export function validateSecurityConfig(data: unknown): SecurityConfig {
-  return SecurityConfigSchema.parse(data);
-}
-
-export function validateApiAccessRule(data: unknown): ApiAccessRule {
+export function validateApiAccessRule(data: unknown): ZodApiAccessRule {
   return ApiAccessRuleSchema.parse(data);
 }
 
-// Export default validators
+/**
+ * Validates data against the {@link SecurityConfigSchema}.
+ * @param data - The data to validate.
+ * @returns The validated data as {@link ZodSecurityConfig}.
+ * @throws ZodError if validation fails.
+ */
+export function validateSecurityConfig(data: unknown): ZodSecurityConfig {
+  return SecurityConfigSchema.parse(data);
+}
+
+/**
+ * Validates data against the {@link SecurityReportFileSchema}.
+ * @param data - The data to validate, typically from a JSON report file.
+ * @returns The validated data as {@link ZodSecurityReviewReportFile}.
+ * @throws ZodError if validation fails.
+ */
+export function validateSecurityReviewReportFile(data: unknown): ZodSecurityReviewReportFile {
+  return SecurityReviewReportFileSchema.parse(data);
+}
+
+// Export all schemas and validation functions
 export default {
-  validateSecurityPolicy,
+  PolicyLevelSchema,
+  ApiAccessRuleSchema,
+  SecurityConfigSchema,
+  SecurityEventSchema,
+  SecurityReportSchema,
+  SecurityCheckOptionsSchema,
+  ValidationContextSchema,
+  SecurityReviewSummarySchema,
+  SecurityFindingSchema,
+  RecommendationSchema,
+  ValidatorResultsSchema,
+  SecurityReviewOptionsSchema,
+  SecurityReviewReportFileSchema,
+  SecureApiOptionsSchema,
+  validateApiAccessRule,
   validateSecurityConfig,
-  validateApiAccessRule
+  validateSecurityReviewReportFile,
 };

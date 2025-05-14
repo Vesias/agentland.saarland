@@ -7,7 +7,7 @@ export interface AgentConfig {
   name: string;
   description?: string;
   capabilities?: string[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**

@@ -1,0 +1,13 @@
+node_modules
+npm-debug.log
+.DS_Store
+.env
+.env.*
+*.local
+dist
+coverage
+.nx/cache
+build
+# Ggf. weitere Verzeichnisse/Dateien, die nicht im Image benötigt werden
+ai_docs/.gitbook
+*.log

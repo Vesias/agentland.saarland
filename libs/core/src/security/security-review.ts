@@ -19,6 +19,25 @@ import { Logger } from '../logging/logger';
 // Import internationalization
 import { I18n } from '../i18n/i18n';
 
+// Importiere Typen aus security.types.ts
+import type {
+  SecurityErrorOptions as SecurityErrorOptionsType,
+  SecurityReviewOptions as SecurityReviewOptionsType,
+  ValidationContext as ValidationContextType,
+  SecurityFinding as SecurityFindingType,
+  // SecurityVulnerability wird nicht direkt importiert, da SecurityFindingType es abdeckt
+  Recommendation as RecommendationType,
+  ValidatorResults as ValidatorResultsType,
+  SecurityReviewSummary as SecurityReviewSummaryType,
+  SecurityReviewReport as SecurityReviewReportType,
+} from './security.types';
+
+// Importiere ZodSecurityConfig für die Typisierung von this.config
+// und validateSecurityConfig für die Laufzeitvalidierung
+import type { ZodSecurityConfig } from './schemas';
+import { validateSecurityConfig } from './schemas';
+
+
 /**
  * Error types for security operations
  */
@@ -26,10 +45,10 @@ export class SecurityError extends Error {
   public readonly code: string;
   public readonly component: string;
   public readonly status: number;
-  public readonly metadata: Record<string, any>;
+  public readonly metadata: Record<string, unknown>; // Geändert von any zu unknown
   public readonly timestamp: Date;
 
-  constructor(message: string, options: SecurityErrorOptions = {}) {
+  constructor(message: string, options: SecurityErrorOptionsType = {}) { // Verwendung des importierten Typs
     super(message);
     this.name = 'SecurityError';
     this.code = options.code || 'ERR_SECURITY';
@@ -42,7 +61,7 @@ export class SecurityError extends Error {
 }
 
 export class SecurityViolationError extends SecurityError {
-  constructor(message: string, options: SecurityErrorOptions = {}) {
+  constructor(message: string, options: SecurityErrorOptionsType = {}) { // Verwendung des importierten Typs
     super(message, {
       ...options,
       code: options.code || 'ERR_SECURITY_VIOLATION',
@@ -53,7 +72,7 @@ export class SecurityViolationError extends SecurityError {
 }
 
 export class SecurityConfigError extends SecurityError {
-  constructor(message: string, options: SecurityErrorOptions = {}) {
+  constructor(message: string, options: SecurityErrorOptionsType = {}) { // Verwendung des importierten Typs
     super(message, {
       ...options,
       code: options.code || 'ERR_SECURITY_CONFIG',
@@ -63,127 +82,27 @@ export class SecurityConfigError extends SecurityError {
   }
 }
 
-/**
- * Interface for security error options
- */
-export interface SecurityErrorOptions {
-  code?: string;
-  status?: number;
-  metadata?: Record<string, any>;
-}
-
-/**
- * Interface for security review options
- */
-export interface SecurityReviewOptions {
-  autoFix?: boolean;
-  strictMode?: boolean;
-  reportPath?: string;
-  [key: string]: any;
-}
-
-/**
- * Interface for validation context
- */
-export interface ValidationContext {
-  targetDir?: string;
-  targetFiles?: string[];
-  excludePatterns?: string[];
-  [key: string]: any;
-}
-
-/**
- * Interface for a security finding
- */
-export interface SecurityFinding {
-  id: string;
-  validator: string;
-  type: string;
-  title: string;
-  description: string;
-  location: string;
-  timestamp: string;
-  [key: string]: any;
-}
-
-/**
- * Interface for a security vulnerability
- */
-export interface SecurityVulnerability {
-  id: string;
-  validator: string;
-  type: string;
-  title: string;
-  description: string;
-  severity: 'critical' | 'high' | 'medium' | 'low';
-  location: string;
-  recommendation?: string;
-  timestamp: string;
-  [key: string]: any;
-}
-
-/**
- * Interface for a security recommendation
- */
-export interface SecurityRecommendation {
-  type: string;
-  findings?: number;
-  severity?: 'critical' | 'high' | 'medium' | 'low';
-  title: string;
-  description: string;
-}
-
-/**
- * Interface for validation results
- */
-export interface ValidationResult {
-  findings: SecurityFinding[];
-  vulnerabilities: SecurityVulnerability[];
-  [key: string]: any;
-}
-
-/**
- * Interface for security report summary
- */
-export interface SecurityReportSummary {
-  securityScore: number;
-  findingsCount: number;
-  vulnerabilitiesCount: number;
-  passedValidators: number;
-  totalValidators: number;
-}
-
-/**
- * Interface for security report
- */
-export interface SecurityReport {
-  id: string;
-  timestamp: string;
-  framework: {
-    name: string;
-    version: string;
-  };
-  summary: SecurityReportSummary;
-  findings: SecurityFinding[];
-  vulnerabilities: SecurityVulnerability[];
-  recommendations: SecurityRecommendation[];
-  reportPath?: string;
-}
+// Lokale Interfaces, die spezifisch für die Implementierung hier sind oder noch nicht vollständig
+// mit security.types.ts harmonisiert wurden, bleiben vorerst erhalten, werden aber geprüft.
+// SecurityFinding, SecurityVulnerability, SecurityRecommendation, ValidationResult, SecurityReportSummary, SecurityReport
+// werden durch die importierten Typen ersetzt oder angepasst.
 
 /**
  * Type for validator function
  */
-export type ValidatorFunction = (context: ValidationContext) => Promise<ValidationResult>;
+export type ValidatorFunction = (context: ValidationContextType) => Promise<ValidatorResultsType>; // Angepasst an importierte Typen
 
 /**
  * Security review system for Claude Neural Framework
  */
 export class SecurityReview {
   private i18n: I18n;
-  private config: any;
-  private options: SecurityReviewOptions;
-  private findings: SecurityFinding[];
-  private vulnerabilities: SecurityVulnerability[];
+  // TODO: Define a specific type for the security configuration
+  // once its structure is clearly defined and stable.
+  private config: ZodSecurityConfig; // Typisiert mit ZodSecurityConfig
+  private options: SecurityReviewOptionsType; // Verwendung des importierten Typs
+  private findings: SecurityFindingType[]; // Verwendung des importierten Typs
+  private vulnerabilities: SecurityFindingType[]; // Vulnerabilities sind auch Findings
   private securityScore: number;
   private validators: Map<string, ValidatorFunction>;
   private logger: Logger;
@@ -193,7 +112,7 @@ export class SecurityReview {
    * 
    * @param options - Configuration options
    */
-  constructor(options: SecurityReviewOptions = {}) {
+  constructor(options: SecurityReviewOptionsType = {}) { // Verwendung des importierten Typs
     // Initialize logger
     this.logger = new Logger('security-review');
     
@@ -202,7 +121,8 @@ export class SecurityReview {
     
     // Load security configuration
     try {
-      this.config = configManager.getConfig(ConfigType.SECURITY);
+      const rawConfig = configManager.getConfig(ConfigType.SECURITY);
+      this.config = validateSecurityConfig(rawConfig); // Validieren und Zuweisen
       
       // Set default options
       this.options = {
@@ -283,7 +203,7 @@ export class SecurityReview {
    * @param context - Context data for validation
    * @returns Validation results
    */
-  public async runValidators(context: ValidationContext = {}): Promise<SecurityReport> {
+  public async runValidators(context: ValidationContextType = {}): Promise<ValidatorResultsType> { // Rückgabetyp angepasst
     this.logger.info(this.i18n.translate('security.startingValidation'), {
       validatorCount: this.validators.size
     });
@@ -294,38 +214,40 @@ export class SecurityReview {
     this.securityScore = 100;
     
     // Run all validators
-    const validationPromises: Promise<{name: string} & Partial<ValidationResult>>[] = [];
+    const validationPromises: Promise<{name: string} & Partial<ValidatorResultsType>>[] = []; // Angepasst an importierten Typ
     
     for (const [name, validator] of this.validators.entries()) {
       this.logger.debug(this.i18n.translate('security.runningValidator'), { name });
       
       try {
-        const validatorPromise = Promise.resolve(validator(context))
+        const validatorPromise = validator(context) // Direkter Aufruf, da ValidatorFunction bereits Promise<ValidatorResultsType> zurückgibt
           .then(result => {
-            this.logger.debug(this.i18n.translate('security.validatorCompleted'), { 
-              name, 
-              issuesFound: result.findings.length 
+            this.logger.debug(this.i18n.translate('security.validatorCompleted'), {
+              name,
+              issuesFound: (result.findings?.length || 0) + (result.vulnerabilities?.length || 0)
             });
             return { name, ...result };
           })
           .catch(error => {
-            this.logger.error(this.i18n.translate('security.validatorFailed'), { 
-              name, 
-              error 
+            this.logger.error(this.i18n.translate('security.validatorFailed'), {
+              name,
+              error
             });
-            return { 
-              name, 
-              error: (error as Error).message, 
+            // Sicherstellen, dass die Struktur von ValidatorResultsType entspricht
+            return {
+              name,
+              summary: { // Minimales Summary für Fehlerfall
+                securityScore: 0, passedValidators: 0, totalValidators: 1, vulnerabilitiesCount: 0, findingsCount: 0
+              },
               findings: [],
               vulnerabilities: []
             };
           });
-        
         validationPromises.push(validatorPromise);
       } catch (error) {
-        this.logger.error(this.i18n.translate('security.validatorError'), { 
-          name, 
-          error 
+        this.logger.error(this.i18n.translate('security.validatorError'), {
+          name,
+          error
         });
       }
     }
@@ -345,24 +267,37 @@ export class SecurityReview {
     }
     
     // Calculate security score
-    this.calculateSecurityScore();
-    
-    // Generate report
-    const report = this.generateReport();
+    this.calculateSecurityScore(); // Stellt sicher, dass this.securityScore, this.findings, this.vulnerabilities aktuell sind
+
+    const summary: SecurityReviewSummaryType = {
+      securityScore: this.securityScore,
+      findingsCount: this.findings.filter(f => f.type === 'finding' || f.type === 'general').length,
+      vulnerabilitiesCount: this.vulnerabilities.filter(f => f.type === 'vulnerability').length,
+      passedValidators: this.countPassedValidators(),
+      totalValidators: this.validators.size
+    };
+
+    const finalResults: ValidatorResultsType = {
+      summary,
+      findings: this.findings.filter(f => f.type === 'finding' || f.type === 'general'),
+      vulnerabilities: this.vulnerabilities.filter(f => f.type === 'vulnerability'),
+      recommendations: this.generateRecommendations(),
+      reportPath: this.options.reportPath
+    };
     
     // Save report if reportPath is provided
     if (this.options.reportPath) {
-      this.saveReport(report, this.options.reportPath);
-      report.reportPath = this.options.reportPath;
+      // generateReport erzeugt SecurityReviewReportType, saveReport erwartet dies auch
+      this.saveReport(this.generateFullReport(finalResults), this.options.reportPath);
     }
     
     this.logger.info(this.i18n.translate('security.validationComplete'), {
-      findingsCount: this.findings.length,
-      vulnerabilitiesCount: this.vulnerabilities.length,
-      securityScore: this.securityScore
+      findingsCount: finalResults.findings?.length || 0,
+      vulnerabilitiesCount: finalResults.vulnerabilities?.length || 0,
+      securityScore: summary.securityScore
     });
     
-    return report;
+    return finalResults;
   }
   
   /**
@@ -406,30 +341,23 @@ export class SecurityReview {
    * @returns Security report
    * @private
    */
-  private generateReport(): SecurityReport {
-    // Generate report ID
+  private generateFullReport(results: ValidatorResultsType): SecurityReviewReportType {
     const reportId = crypto.randomBytes(8).toString('hex');
-    
     return {
       id: reportId,
       timestamp: new Date().toISOString(),
       framework: {
         name: 'Claude Neural Framework',
-        version: configManager.getConfigValue<string>(ConfigType.GLOBAL, 'version', '1.0.0')
+        version: configManager.getConfigValue<string>(ConfigType.GLOBAL, 'version', '1.0.0') ?? '1.0.0',
       },
-      summary: {
-        securityScore: this.securityScore,
-        findingsCount: this.findings.length,
-        vulnerabilitiesCount: this.vulnerabilities.length,
-        passedValidators: this.countPassedValidators(),
-        totalValidators: this.validators.size
-      },
-      findings: this.findings,
-      vulnerabilities: this.vulnerabilities,
-      recommendations: this.generateRecommendations()
+      summary: results.summary,
+      findings: results.findings || [],
+      vulnerabilities: results.vulnerabilities || [],
+      recommendations: results.recommendations || [],
+      // reportPath wird nicht Teil des JSON-Berichts selbst, sondern ist eine Eigenschaft von ValidatorResultsType
     };
   }
-  
+
   /**
    * Count number of validators that passed (no findings or vulnerabilities)
    * 
@@ -451,34 +379,36 @@ export class SecurityReview {
    * @returns List of recommendations
    * @private
    */
-  private generateRecommendations(): SecurityRecommendation[] {
-    const recommendations: SecurityRecommendation[] = [];
-    
-    // Group findings by type
-    const findingsByType = this.findings.reduce<Record<string, SecurityFinding[]>>((groups, finding) => {
-      const { type } = finding;
-      if (!groups[type]) {
-        groups[type] = [];
+  private generateRecommendations(): RecommendationType[] {
+    const recommendations: RecommendationType[] = [];
+
+    // Group findings by type (validator name or a general category)
+    const findingsByValidator = this.findings.reduce<Record<string, SecurityFindingType[]>>((groups, finding) => {
+      const validatorName = finding.validator || 'general';
+      if (!groups[validatorName]) {
+        groups[validatorName] = [];
       }
-      groups[type].push(finding);
+      groups[validatorName].push(finding);
       return groups;
     }, {});
-    
-    // Generate recommendations for each type
-    for (const [type, findings] of Object.entries(findingsByType)) {
-      recommendations.push({
-        type,
-        findings: findings.length,
-        title: this.getRecommendationTitle(type),
-        description: this.getRecommendationDescription(type, findings)
-      });
+
+    for (const [validatorName, findings] of Object.entries(findingsByValidator)) {
+      if (findings.length > 0) {
+        recommendations.push({
+          // type hier als 'finding' oder 'general' basierend auf validatorName oder einer Logik
+          type: findings[0].type === 'vulnerability' ? 'vulnerability' : (findings[0].type || 'finding'),
+          title: this.getRecommendationTitle(validatorName), // Titel basierend auf Validator
+          description: this.getRecommendationDescription(validatorName, findings),
+          // severity könnte hier aggregiert werden, falls relevant
+        });
+      }
     }
     
-    // Add recommendations for vulnerabilities
+    // Add specific recommendations for high/critical vulnerabilities
     for (const vulnerability of this.vulnerabilities) {
       if (vulnerability.severity === 'critical' || vulnerability.severity === 'high') {
         recommendations.push({
-          type: 'vulnerability',
+          type: 'vulnerability', // Explizit als vulnerability
           severity: vulnerability.severity,
           title: `Fix ${vulnerability.severity} severity issue: ${vulnerability.title}`,
           description: vulnerability.recommendation || `Address the ${vulnerability.severity} severity issue in ${vulnerability.location}`
@@ -486,7 +416,9 @@ export class SecurityReview {
       }
     }
     
-    return recommendations;
+    // Deduplicate recommendations by title
+    const uniqueRecommendations = Array.from(new Map(recommendations.map(rec => [rec.title, rec])).values());
+    return uniqueRecommendations;
   }
   
   /**
@@ -498,21 +430,21 @@ export class SecurityReview {
    */
   private getRecommendationTitle(type: string): string {
     switch (type) {
-      case 'api-key':
+      case 'api-key-exposure':
         return 'Secure API Keys';
-      case 'dependency':
+      case 'secure-dependencies':
         return 'Update Vulnerable Dependencies';
-      case 'config':
+      case 'config-constraints':
         return 'Fix Configuration Issues';
-      case 'permission':
+      case 'file-permissions':
         return 'Secure File Permissions';
-      case 'communication':
+      case 'secure-communication':
         return 'Implement Secure Communication';
-      case 'validation':
+      case 'input-validation':
         return 'Improve Input Validation';
-      case 'authentication':
+      case 'authentication-security':
         return 'Strengthen Authentication';
-      case 'logging':
+      case 'audit-logging':
         return 'Enhance Audit Logging';
       default:
         return `Address ${type} Issues`;
@@ -521,44 +453,34 @@ export class SecurityReview {
   
   /**
    * Get description for a recommendation type
-   * 
-   * @param type - Recommendation type
+   *
+   * @param type - Recommendation type (validator name)
    * @param findings - List of findings
    * @returns Description
    * @private
    */
-  private getRecommendationDescription(type: string, findings: SecurityFinding[]): string {
-    switch (type) {
-      case 'api-key':
+  private getRecommendationDescription(validatorName: string, findings: SecurityFindingType[]): string {
+    // Diese Funktion könnte spezifischere Nachrichten basierend auf dem validatorName generieren
+    switch (validatorName) { // validatorName direkt verwenden
+      case 'api-key-exposure':
         return `Secure ${findings.length} potential API key exposures by using environment variables or secure storage solutions.`;
-      case 'dependency':
+      case 'secure-dependencies':
         return `Update ${findings.length} dependencies with known vulnerabilities to their latest secure versions.`;
-      case 'config':
-        return `Fix ${findings.length} configuration issues to enhance security compliance.`;
-      case 'permission':
-        return `Address ${findings.length} file permission issues to prevent unauthorized access.`;
-      case 'communication':
-        return `Implement secure communication protocols for ${findings.length} identified communication channels.`;
-      case 'validation':
-        return `Improve input validation for ${findings.length} potential entry points.`;
-      case 'authentication':
-        return `Strengthen authentication mechanisms for ${findings.length} identified weaknesses.`;
-      case 'logging':
-        return `Enhance audit logging for ${findings.length} sensitive operations.`;
+      // Weitere Fälle für andere Validatoren
       default:
-        return `Address ${findings.length} ${type} issues to improve security.`;
+        return `Address ${findings.length} ${validatorName} related issues to improve security. Review details for specific actions.`;
     }
   }
   
   /**
    * Save security report to file
    * 
-   * @param report - Security report
+   * @param report - Security report (vom Typ SecurityReviewReportType)
    * @param filePath - Output file path
    * @returns Success
    * @private
    */
-  private saveReport(report: SecurityReport, filePath: string): boolean {
+  private saveReport(report: SecurityReviewReportType, filePath: string): boolean {
     try {
       const reportDir = path.dirname(filePath);
       
@@ -586,16 +508,17 @@ export class SecurityReview {
    * 
    * @param finding - Finding details
    */
-  public addFinding(finding: Partial<SecurityFinding>): void {
-    const completeFinding: SecurityFinding = {
+  public addFinding(finding: Partial<SecurityFindingType>): void {
+    const completeFinding: SecurityFindingType = {
       id: finding.id || `finding-${crypto.randomBytes(4).toString('hex')}`,
       validator: finding.validator || 'manual',
-      type: finding.type || 'unknown',
+      type: finding.type || 'finding', // Standardtyp 'finding'
       title: finding.title || 'Unknown Finding',
       description: finding.description || '',
       location: finding.location || 'unknown',
+      severity: finding.severity || 'info', // Standard-Severity für Findings
       timestamp: finding.timestamp || new Date().toISOString(),
-      ...finding
+      ...finding,
     };
     
     this.findings.push(completeFinding);
@@ -606,20 +529,20 @@ export class SecurityReview {
    * 
    * @param vulnerability - Vulnerability details
    */
-  public addVulnerability(vulnerability: Partial<SecurityVulnerability>): void {
-    const completeVulnerability: SecurityVulnerability = {
+  public addVulnerability(vulnerability: Partial<SecurityFindingType>): void { // Nutzt SecurityFindingType, da Vulnerabilities eine Untermenge sind
+    const completeVulnerability: SecurityFindingType = {
       id: vulnerability.id || `vuln-${crypto.randomBytes(4).toString('hex')}`,
       validator: vulnerability.validator || 'manual',
-      type: vulnerability.type || 'unknown',
+      type: 'vulnerability', // Explizit als 'vulnerability'
       title: vulnerability.title || 'Unknown Vulnerability',
       description: vulnerability.description || '',
       severity: vulnerability.severity || 'medium',
       location: vulnerability.location || 'unknown',
       timestamp: vulnerability.timestamp || new Date().toISOString(),
-      ...vulnerability
+      ...vulnerability,
     };
     
-    this.vulnerabilities.push(completeVulnerability);
+    this.vulnerabilities.push(completeVulnerability); // Wird als SecurityFindingType gespeichert
   }
   
   /**
@@ -629,11 +552,11 @@ export class SecurityReview {
    * @returns Validation results
    * @private
    */
-  private async validateNoApiKeyExposure(context: ValidationContext): Promise<ValidationResult> {
+  private async validateNoApiKeyExposure(context: ValidationContextType): Promise<ValidatorResultsType> {
     this.logger.debug(this.i18n.translate('security.checkingApiKeyExposure'));
     
-    const findings: SecurityFinding[] = [];
-    const vulnerabilities: SecurityVulnerability[] = [];
+    const findings: SecurityFindingType[] = [];
+    const vulnerabilities: SecurityFindingType[] = [];
     
     // Implementation would scan files for API keys, tokens, etc.
     // This is a placeholder for the implementation
@@ -642,14 +565,15 @@ export class SecurityReview {
     findings.push({
       id: `api-key-${crypto.randomBytes(4).toString('hex')}`,
       validator: 'api-key-exposure',
-      type: 'api-key',
+      type: 'finding', // Oder 'general' je nach Definition
       title: 'Potential API Key in Code',
       description: 'Potential API key found in code. Use environment variables instead.',
       location: 'example/file/path.js:42',
+      severity: 'high', // Beispiel-Severity
       timestamp: new Date().toISOString()
     });
     
-    return { findings, vulnerabilities };
+    return { summary: this.generateInterimSummary(findings, vulnerabilities), findings, vulnerabilities };
   }
   
   /**
@@ -659,30 +583,32 @@ export class SecurityReview {
    * @returns Validation results
    * @private
    */
-  private async validateDependencies(context: ValidationContext): Promise<ValidationResult> {
+  private async validateDependencies(context: ValidationContextType): Promise<ValidatorResultsType> {
     this.logger.debug(this.i18n.translate('security.checkingDependencies'));
     
-    const findings: SecurityFinding[] = [];
-    const vulnerabilities: SecurityVulnerability[] = [];
+    const findings: SecurityFindingType[] = [];
+    const vulnerabilities: SecurityFindingType[] = [];
     
     // Implementation would check package.json dependencies
     // against vulnerability databases like npm audit
     // This is a placeholder for the implementation
     
     // Example finding:
-    findings.push({
-      id: `dependency-${crypto.randomBytes(4).toString('hex')}`,
+    // Beispiel: Eine Vulnerability wird als SecurityFindingType mit type='vulnerability' erstellt
+    vulnerabilities.push({
+      id: `dependency-vuln-${crypto.randomBytes(4).toString('hex')}`,
       validator: 'secure-dependencies',
-      type: 'dependency',
-      title: 'Outdated Package',
-      description: 'Using an outdated package with known vulnerabilities.',
+      type: 'vulnerability',
+      title: 'Outdated Package with CVE-XXXX',
+      description: 'Using an outdated package with known vulnerabilities (CVE-XXXX).',
       location: 'package.json',
+      severity: 'critical',
       timestamp: new Date().toISOString(),
-      package: 'example-package@1.0.0',
-      recommendedVersion: '1.2.3'
+      // package: 'example-package@1.0.0', // Zusätzliche Felder können hier rein, wenn SecurityFindingType es erlaubt
+      // recommendedVersion: '1.2.3'
     });
     
-    return { findings, vulnerabilities };
+    return { summary: this.generateInterimSummary(findings, vulnerabilities), findings, vulnerabilities };
   }
   
   /**
@@ -692,11 +618,11 @@ export class SecurityReview {
    * @returns Validation results
    * @private
    */
-  private async validateConfigConstraints(context: ValidationContext): Promise<ValidationResult> {
+  private async validateConfigConstraints(context: ValidationContextType): Promise<ValidatorResultsType> {
     this.logger.debug(this.i18n.translate('security.checkingConfigConstraints'));
     
-    const findings: SecurityFinding[] = [];
-    const vulnerabilities: SecurityVulnerability[] = [];
+    const findings: SecurityFindingType[] = [];
+    const vulnerabilities: SecurityFindingType[] = [];
     
     // Implementation would check security settings in config files
     // This is a placeholder for the implementation
@@ -705,19 +631,19 @@ export class SecurityReview {
     vulnerabilities.push({
       id: `config-${crypto.randomBytes(4).toString('hex')}`,
       validator: 'config-constraints',
-      type: 'configuration',
+      type: 'vulnerability', // Konfigurationsfehler als Vulnerability
       title: 'Insecure Configuration Setting',
       description: 'A security-critical configuration setting is set to an insecure value.',
       severity: 'high',
       location: 'core/config/security_constraints.json',
-      setting: 'network.allowed',
-      currentValue: true,
-      recommendedValue: false,
+      // setting: 'network.allowed', // Zusätzliche Felder
+      // currentValue: true,
+      // recommendedValue: false,
       recommendation: 'Disable unrestricted network access in security constraints.',
       timestamp: new Date().toISOString()
     });
     
-    return { findings, vulnerabilities };
+    return { summary: this.generateInterimSummary(findings, vulnerabilities), findings, vulnerabilities };
   }
   
   /**
@@ -727,16 +653,11 @@ export class SecurityReview {
    * @returns Validation results
    * @private
    */
-  private async validateFilePermissions(context: ValidationContext): Promise<ValidationResult> {
+  private async validateFilePermissions(context: ValidationContextType): Promise<ValidatorResultsType> {
     this.logger.debug(this.i18n.translate('security.checkingFilePermissions'));
-    
-    const findings: SecurityFinding[] = [];
-    const vulnerabilities: SecurityVulnerability[] = [];
-    
-    // Implementation would check file permissions
-    // This is a placeholder for the implementation
-    
-    return { findings, vulnerabilities };
+    const findings: SecurityFindingType[] = [];
+    const vulnerabilities: SecurityFindingType[] = [];
+    return { summary: this.generateInterimSummary(findings, vulnerabilities), findings, vulnerabilities };
   }
   
   /**
@@ -746,16 +667,11 @@ export class SecurityReview {
    * @returns Validation results
    * @private
    */
-  private async validateSecureCommunication(context: ValidationContext): Promise<ValidationResult> {
+  private async validateSecureCommunication(context: ValidationContextType): Promise<ValidatorResultsType> {
     this.logger.debug(this.i18n.translate('security.checkingSecureCommunication'));
-    
-    const findings: SecurityFinding[] = [];
-    const vulnerabilities: SecurityVulnerability[] = [];
-    
-    // Implementation would check for secure communication protocols
-    // This is a placeholder for the implementation
-    
-    return { findings, vulnerabilities };
+    const findings: SecurityFindingType[] = [];
+    const vulnerabilities: SecurityFindingType[] = [];
+    return { summary: this.generateInterimSummary(findings, vulnerabilities), findings, vulnerabilities };
   }
   
   /**
@@ -765,16 +681,11 @@ export class SecurityReview {
    * @returns Validation results
    * @private
    */
-  private async validateInputHandling(context: ValidationContext): Promise<ValidationResult> {
+  private async validateInputHandling(context: ValidationContextType): Promise<ValidatorResultsType> {
     this.logger.debug(this.i18n.translate('security.checkingInputValidation'));
-    
-    const findings: SecurityFinding[] = [];
-    const vulnerabilities: SecurityVulnerability[] = [];
-    
-    // Implementation would check for proper input validation
-    // This is a placeholder for the implementation
-    
-    return { findings, vulnerabilities };
+    const findings: SecurityFindingType[] = [];
+    const vulnerabilities: SecurityFindingType[] = [];
+    return { summary: this.generateInterimSummary(findings, vulnerabilities), findings, vulnerabilities };
   }
   
   /**
@@ -784,16 +695,11 @@ export class SecurityReview {
    * @returns Validation results
    * @private
    */
-  private async validateAuthentication(context: ValidationContext): Promise<ValidationResult> {
+  private async validateAuthentication(context: ValidationContextType): Promise<ValidatorResultsType> {
     this.logger.debug(this.i18n.translate('security.checkingAuthentication'));
-    
-    const findings: SecurityFinding[] = [];
-    const vulnerabilities: SecurityVulnerability[] = [];
-    
-    // Implementation would check authentication mechanisms
-    // This is a placeholder for the implementation
-    
-    return { findings, vulnerabilities };
+    const findings: SecurityFindingType[] = [];
+    const vulnerabilities: SecurityFindingType[] = [];
+    return { summary: this.generateInterimSummary(findings, vulnerabilities), findings, vulnerabilities };
   }
   
   /**
@@ -803,16 +709,24 @@ export class SecurityReview {
    * @returns Validation results
    * @private
    */
-  private async validateAuditLogging(context: ValidationContext): Promise<ValidationResult> {
+  private async validateAuditLogging(context: ValidationContextType): Promise<ValidatorResultsType> {
     this.logger.debug(this.i18n.translate('security.checkingAuditLogging'));
-    
-    const findings: SecurityFinding[] = [];
-    const vulnerabilities: SecurityVulnerability[] = [];
-    
-    // Implementation would check audit logging practices
-    // This is a placeholder for the implementation
-    
-    return { findings, vulnerabilities };
+    const findings: SecurityFindingType[] = [];
+    const vulnerabilities: SecurityFindingType[] = [];
+    return { summary: this.generateInterimSummary(findings, vulnerabilities), findings, vulnerabilities };
+  }
+
+  /**
+   * Helper to generate an interim summary for individual validator results.
+   */
+  private generateInterimSummary(findings: SecurityFindingType[], vulnerabilities: SecurityFindingType[]): SecurityReviewSummaryType {
+    return {
+      securityScore: 0, // Wird später berechnet
+      passedValidators: 0, // Wird später berechnet
+      totalValidators: 1, // Jeder Validator ist erstmal einer
+      vulnerabilitiesCount: vulnerabilities.length,
+      findingsCount: findings.length,
+    };
   }
 }
 

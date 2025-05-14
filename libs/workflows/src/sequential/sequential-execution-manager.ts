@@ -131,7 +131,7 @@ export class SequentialExecutionManager {
    * @param event Event name
    * @param data Event data
    */
-  private _notifyObservers(event: string, data: any): void {
+  private _notifyObservers(event: string, data: unknown): void {
     for (const observer of this.observers) {
       try {
         observer(event, data);

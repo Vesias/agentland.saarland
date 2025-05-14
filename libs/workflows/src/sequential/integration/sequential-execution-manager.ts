@@ -26,15 +26,7 @@ import { SequentialExecutionManager as CoreExecutionManager } from "./sequential
 // Import the sequential planner service
 import { sequentialPlanner } from "./services/sequential-planner";
 
-// Placeholder for logger
-const createLogger = (name: string) => {
-  return {
-    info: (message: string, data?: any) => console.log(`[INFO] ${name}: ${message}`, data || ''),
-    debug: (message: string, data?: any) => console.log(`[DEBUG] ${name}: ${message}`, data || ''),
-    warn: (message: string, data?: any) => console.log(`[WARN] ${name}: ${message}`, data || ''),
-    error: (message: string, data?: any) => console.log(`[ERROR] ${name}: ${message}`, data || '')
-  };
-};
+import { createLogger } from "../../../../core/src/logging/logger";
 
 const logger = createLogger('sequential-execution-manager-integration');
 

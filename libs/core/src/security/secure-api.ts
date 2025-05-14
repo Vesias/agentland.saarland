@@ -5,9 +5,10 @@
  * It should be used as a reference for implementing secure APIs within the framework.
  */
 
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import { promisify } from 'util';
 import { Request, Response, NextFunction } from 'express';
+import * as session from 'express-session'; // Default Import statt Named Import
 
 // Import standardized config manager
 import configManager, { ConfigType } from '../config/config-manager';
@@ -20,36 +21,18 @@ import { ValidationError, ClaudeError } from '../error/error-handler';
 
 // Import internationalization
 import { I18n } from '../i18n/i18n';
+// Die globale Namespace-Erweiterung wird entfernt, da @types/express-session
+// bereits eine Typisierung für req.session bereitstellen sollte.
+// und session.types.ts diese erweitert.
+
+import { PolicyLevel, SecureApiOptions as SecurityOptionsImport } from './security.types'; // Import der zentralen Typen
+import './session.types'; // Sicherstellen, dass die Modulerweiterung geladen wird
 
 /**
  * Promisified crypto functions
  */
 const randomBytes = promisify(crypto.randomBytes);
 const scrypt = promisify(crypto.scrypt);
-
-/**
- * Security policy level enum
- */
-export enum SecurityPolicyLevel {
-  STRICT = 'strict',
-  MODERATE = 'moderate',
-  OPEN = 'open'
-}
-
-/**
- * Interface for secure API options
- */
-export interface SecureAPIOptions {
-  rateLimitRequests?: number;
-  rateLimitWindowMs?: number;
-  sessionTimeoutMs?: number;
-  requireHTTPS?: boolean;
-  csrfProtection?: boolean;
-  secureHeaders?: boolean;
-  inputValidation?: boolean;
-  policyLevel?: SecurityPolicyLevel;
-  [key: string]: any;
-}
 
 /**
  * Interface for client rate limit state
@@ -85,7 +68,7 @@ export function isClaudeError(error: unknown): error is ClaudeError {
  */
 export class SecureAPI {
   private i18n: I18n;
-  private options: SecureAPIOptions;
+  private options: SecurityOptionsImport; // Verwendung des importierten Typs
   private rateLimitState: Map<string, ClientRateLimitState>;
   private securityHeaders: Record<string, string>;
   private logger: Logger;
@@ -95,7 +78,7 @@ export class SecureAPI {
    * 
    * @param options - Configuration options
    */
-  constructor(options: SecureAPIOptions = {}) {
+  constructor(options: SecurityOptionsImport = {}) { // Verwendung des importierten Typs
     // Initialize logger
     this.logger = new Logger('secure-api');
     
@@ -111,7 +94,7 @@ export class SecureAPI {
       csrfProtection: true,
       secureHeaders: true,
       inputValidation: true,
-      policyLevel: SecurityPolicyLevel.STRICT,
+      policyLevel: PolicyLevel.STRICT, // Verwendung von PolicyLevel
       ...options
     };
     
@@ -141,10 +124,12 @@ export class SecureAPI {
    * @param handler - Request handler function
    * @returns Secured request handler
    */
-  public secureHandler<T = any>(
-    handler: (req: Request, res: Response, ...args: any[]) => Promise<T>
-  ): (req: Request, res: Response, ...args: any[]) => Promise<T | void> {
-    return async (req: Request, res: Response, ...args: any[]): Promise<T | void> => {
+  public secureHandler<T = unknown, Args extends unknown[] = unknown[]>(
+    handler: (req: Request, res: Response, ...args: Args) => Promise<T>
+  ): (req: Request, res: Response, ...args: Args) => Promise<T | void> {
+    // Die ...args: Args Typisierung ist flexibel gehalten.
+    // Für spezifischere Anwendungsfälle könnte Args genauer definiert werden (z.B. [NextFunction] für Middleware).
+    return async (req: Request, res: Response, ...args: Args): Promise<T | void> => {
       try {
         // Verify HTTPS
         if (this.options.requireHTTPS && !req.secure) {
@@ -159,19 +144,13 @@ export class SecureAPI {
         // Apply rate limiting
         if (!this.checkRateLimit(req)) {
           throw new ValidationError(this.i18n.translate('errors.rateLimitExceeded'), {
-            details: {
-              retryAfter: this.getRateLimitReset(req)
-            },
-            statusCode: 429
-          });
+            retryAfter: this.getRateLimitReset(req)
+          }, 429);
         }
         
         // Validate CSRF token
         if (this.options.csrfProtection && !this.validateCSRF(req)) {
-          throw new ValidationError(this.i18n.translate('errors.invalidCsrfToken'), {
-            details: {},
-            statusCode: 403
-          });
+          throw new ValidationError(this.i18n.translate('errors.invalidCsrfToken'), {}, 403);
         }
         
         // Validate input
@@ -303,10 +282,11 @@ export class SecureAPI {
                         (req.query && req.query._csrf);
     
     // Get session token
-    const sessionToken = req.session && (req.session as any).csrfToken;
+    // req.session.csrfToken sollte dank session.types.ts direkt verfügbar sein
+    const sessionToken = req.session?.csrfToken;
     
     // Validate token
-    return Boolean(requestToken && sessionToken && requestToken === sessionToken);
+    return !!requestToken && !!sessionToken && requestToken === sessionToken;
   }
   
   /**
@@ -426,11 +406,8 @@ export class SecureAPI {
         // Check rate limit
         if (!this.checkRateLimit(req)) {
           throw new ValidationError(this.i18n.translate('errors.rateLimitExceeded'), {
-            details: {
-              retryAfter: this.getRateLimitReset(req)
-            },
-            statusCode: 429
-          });
+            retryAfter: this.getRateLimitReset(req)
+          }, 429);
         }
         
         // Check HTTPS requirement
@@ -440,10 +417,7 @@ export class SecureAPI {
         
         // Validate CSRF token for non-safe methods
         if (this.options.csrfProtection && !this.validateCSRF(req)) {
-          throw new ValidationError(this.i18n.translate('errors.invalidCsrfToken'), {
-            details: {},
-            statusCode: 403
-          });
+          throw new ValidationError(this.i18n.translate('errors.invalidCsrfToken'), {}, 403);
         }
         
         // Validate input if needed

@@ -1,0 +1,9 @@
+{
+  "run": {
+    "command": "nx run-many --target=serve --parallel=3",
+    "startTime": "2025-05-14T06:12:29.445Z",
+    "endTime": "2025-05-14T06:12:32.199Z",
+    "inner": false
+  },
+  "tasks": []
+}

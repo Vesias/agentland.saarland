@@ -1,59 +1,98 @@
-# Claude Neural Framework - AI Documentation Repository
+# Claude Neural Framework AI Documentation
 
-This directory contains AI-optimized documentation for the Claude Neural Framework. These documents serve as episodic memory for the system and provide context for neural operations.
+This directory contains documentation, templates, examples, and patterns for working with the Claude Neural Framework.
 
-## Contents
+## Directory Structure
 
-The repository contains various types of documents:
+## Inhaltsverzeichnis der Unterverzeichnisse
 
-- **Project Analysis**: High-level understanding of the codebase and architecture
-- **Integration Plans**: Strategies for connecting different system components
-- **Migration Checklists**: Steps for transitioning between system versions
-- **Security Guidelines**: Framework safety and permissions requirements
-- **Refactoring Summaries**: Records of code improvement initiatives
-- **Optimization Recommendations**: Suggestions for system performance improvements
+- [analysis](./analysis/)
+- [api](./api/)
+- [architecture](./architecture/)
+- [cleanup](./cleanup/)
+- [enterprise](./enterprise/)
+- [examples](./examples/)
+- [general](./general/)
+- [guides](./guides/)
+- [integration](./integration/)
+- [migration](./migration/)
+- [models](./models/)
+- [plans](./plans/)
+- [prompts](./prompts/)
+- [recommendations](./recommendations/)
+- [reports](./reports/)
+- [saar](./saar/)
+- [security](./security/)
+- [templates](./templates/)
+- [tutorials](./tutorials/)
+- **`prompts/`**: Contains prompt templates for different tasks
+  - `classification/`: Prompts for classification tasks
+  - `generation/`: Prompts for generation tasks
+  - `coding/`: Prompts for coding tasks
 
-## Usage
+- **`examples/`**: Contains end-to-end example implementations
+  - `code-analysis-example.md`: Demonstrates code analysis capabilities
+  - `agent-to-agent-integration.md`: Shows agent-to-agent communication
 
-These documents are accessed by the Claude Neural Framework when performing:
+- **`templates/`**: Contains reusable templates
+  - `code-review.md`: Template for code review tasks
 
-1. Code analysis operations
-2. Debugging and troubleshooting
-3. Architectural decision making
-4. Security auditing
-5. Integration planning
+## Usage Guidelines
 
-## Structure
+### Prompt Templates
 
-Each document follows a standardized format compatible with the Claude Neural Framework's pattern recognition system. This ensures maximum cognitive integration when the system processes the information.
+The prompt templates in this directory follow a standardized format:
 
-## Prompt Templates
+```
+# [Task Name]
 
-Structured prompt templates for different use cases:
+<role>
+[Description of the role Claude should adopt]
+</role>
 
-- Code generation
-- Refactoring
-- Documentation
-- Debugging
-- Analysis
+<instructions>
+[Detailed instructions for the task]
+</instructions>
 
-## Classification Models
+[Additional optional sections specific to the task]
 
-Resources for classification tasks:
+<input>
+{{INPUT_PLACEHOLDER}}
+</input>
+```
 
-- Sentiment analysis
-- Intent recognition
-- Code categorization
+### Examples
 
-## Generation Strategies
+Examples provide comprehensive demonstrations of how to use Claude's capabilities for specific tasks. Each example includes:
 
-Approaches for AI code and content generation:
+1. Use case description
+2. Implementation details
+3. Code samples
+4. Expected outcomes
+5. Potential extensions
 
-- Step-by-step generation
-- Test-driven development
-- Contextual generation
-- Recursive refinement
+### Best Practices
 
-## Connection to MCP System
+1. **Use Structured Prompts**: Always use structured XML-style tags to clearly delineate different parts of your prompt.
+2. **Be Specific**: Provide detailed instructions and examples to get consistent results.
+3. **Iterative Refinement**: Test prompts with various inputs and refine as needed.
+4. **Template Patterns**: Look for recurring patterns in successful prompts and build templates around them.
+5. **Contextual Awareness**: Consider how much context is appropriate for each task.
 
-These documents form part of the Context7 MCP server's knowledge base, allowing for contextual awareness during neural processing operations.
+## Contributing
+
+When adding new content to this directory:
+
+1. Follow the established naming conventions
+2. Include comprehensive documentation
+3. Add examples of usage where appropriate
+4. Update this README if adding new categories or significant content
+
+## Projektregeln
+
+Die detaillierten Projektregeln, Konventionen und Strukturvorgaben sind in der Datei [`.clauderules`](../.clauderules) im Root-Verzeichnis des Projekts definiert. Diese Datei dient als autoritative Quelle für alle Entwicklungsrichtlinien.
+## Resources
+
+- [Claude API Documentation](https://docs.anthropic.com/claude/reference)
+- [Prompt Engineering Guide](https://docs.anthropic.com/claude/docs/introduction-to-prompt-design)
+- [Claude Neural Framework](../README.md)

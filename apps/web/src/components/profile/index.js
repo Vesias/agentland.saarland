@@ -7,3 +7,4 @@ export {
   useProfile 
 } from './ProfileContext';
 export { default as ProfileClient } from './ProfileClient';
+export { default as UserProfileMenu } from './UserProfileMenu';

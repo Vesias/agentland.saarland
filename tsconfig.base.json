@@ -8,9 +8,11 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
+    "esModuleInterop": true, // Hinzugefügt für bessere Modulinteroperabilität
     "target": "es2015",
     "module": "esnext",
     "lib": ["es2020", "dom"],
+    "types": ["node", "jest"], // "jest" hinzugefügt
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
@@ -28,7 +30,11 @@
       "@rag/*": ["libs/rag/src/*"],
       "@workflows/*": ["libs/workflows/src/*"],
       "@shared/*": ["libs/shared/src/*"],
+      "@libs/*": ["libs/*/src"],
       "@apps/*": ["apps/*"],
+      "@ai_docs/*": ["ai_docs/*"],
+      "@specs/*": ["specs/*"],
+      "@.claude/*": [".claude/*"],
       "@configs/*": ["configs/*"],
       "@tools/*": ["tools/*"]
     }
