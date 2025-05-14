@@ -42,7 +42,7 @@ export class SecurityError extends Error {
   public readonly code: string;
   public readonly component: string;
   public readonly status: number;
-  public readonly metadata: Record<string, any>;
+  public readonly metadata: Record<string, unknown>; // Geändert von any zu unknown
   public readonly timestamp: Date;
 
   /**
@@ -107,8 +107,9 @@ export class SecurityConfigError extends SecurityError {
  */
 export class SecurityReview {
   private readonly i18n: I18n;
-  // TODO: Typ für this.config anpassen, sobald SecurityConfig aus security.types.ts hier verwendet wird
-  private readonly config: any; // Vorläufig any, bis configManager typisiert ist
+  // TODO: Typ für this.config (aktuell 'any') anpassen zu SecurityConfig (aus ./security.types.ts),
+  // sobald configManager.getConfig (aus ../config/config-manager) einen korrekt typisierten Wert zurückgibt.
+  private readonly config: any;
   private readonly options: Required<SecurityReviewOptions>;
   private findings: SecurityFinding[];
   private vulnerabilities: SecurityFinding[]; // Verwenden SecurityFinding auch für Vulnerabilities mit strengerer Severity
@@ -123,7 +124,9 @@ export class SecurityReview {
     this.i18n = new I18n(); // Annahme: I18n Konstruktor benötigt keine Argumente oder hat Defaults
 
     try {
-      // TODO: Typ für configManager.getConfig anpassen
+      // TODO: Den Rückgabewert von configManager.getConfig (aus ../config/config-manager) korrekt typisieren.
+      // Aktuell wird 'any' angenommen und this.config ist ebenfalls 'any'.
+      // Zieltyp sollte SecurityConfig aus ./security.types.ts sein.
       this.config = configManager.getConfig(ConfigType.SECURITY);
 
       this.options = {
@@ -143,9 +146,16 @@ export class SecurityReview {
       logger.info(this.i18n.translate('security.reviewInitialized'), {
         options: this.options,
       });
-    } catch (err: any) {
-      logger.error(this.i18n.translate('errors.securityInitFailed'), { error: err });
-      throw err; // Weiterwerfen des Originalfehlers
+    } catch (err: unknown) {
+      let errorMessage = 'Unknown error during SecurityReview initialization';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      logger.error(this.i18n.translate('errors.securityInitFailed'), { error: errorMessage, originalError: err });
+      // Es ist oft besser, einen spezifischeren Fehler zu werfen oder den Fehler zu wrappen,
+      // aber hier folgen wir dem ursprünglichen Verhalten, den Originalfehler weiterzuwerfen,
+      // nachdem er geloggt wurde.
+      throw err;
     }
   }
 
@@ -206,7 +216,7 @@ export class SecurityReview {
     this.vulnerabilities = [];
     this.securityScore = 100;
 
-    const validationPromises: Promise<{ name: string; findings: SecurityFinding[]; vulnerabilities: SecurityFinding[]; error?: string }>[] = [];
+    const validationPromises: Promise<{ name: string; findings: SecurityFinding[]; vulnerabilities: SecurityFinding[]; error?: string | undefined }>[] = [];
 
     for (const [name, validator] of this.validators.entries()) {
       logger.debug(this.i18n.translate('security.runningValidator'), { name });
@@ -232,12 +242,16 @@ export class SecurityReview {
             };
           });
         validationPromises.push(validatorPromise);
-      } catch (error: any) {
+      } catch (error: unknown) {
+        let errorMessage = `Unknown error executing validator ${name}`;
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        }
         logger.error(this.i18n.translate('security.validatorError'), {
           name,
-          error: error.message,
+          error: errorMessage,
         });
-         validationPromises.push(Promise.resolve({ name, error: error.message, findings: [], vulnerabilities: [] }));
+         validationPromises.push(Promise.resolve({ name, error: errorMessage, findings: [], vulnerabilities: [] }));
       }
     }
 
@@ -305,7 +319,8 @@ export class SecurityReview {
    */
   private generateReport(): SecurityReviewReport {
     const reportId = crypto.randomBytes(8).toString('hex');
-    // TODO: configManager.getConfigValue typisieren
+    // TODO: Den Rückgabewert von configManager.getConfigValue (aus ../config/config-manager) korrekt typisieren.
+    // Aktuell wird 'as string' verwendet. Idealerweise sollte getConfigValue einen generischen Typ oder string | number | boolean etc. zurückgeben.
     const frameworkVersion = configManager.getConfigValue(ConfigType.GLOBAL, 'version', '1.0.0') as string;
 
     const summary: SecurityReviewSummary = {
@@ -440,10 +455,14 @@ export class SecurityReview {
       fs.writeFileSync(filePath, JSON.stringify(report, null, 2), 'utf8');
       logger.info(this.i18n.translate('security.reportSaved'), { filePath });
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let errorMessage = `Unknown error saving report to ${filePath}`;
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
       logger.error(this.i18n.translate('security.reportSaveError'), {
         filePath,
-        error: error.message,
+        error: errorMessage,
       });
       return false;
     }
@@ -457,8 +476,10 @@ export class SecurityReview {
     const finding: SecurityFinding = {
       id: findingData.id || `finding-${crypto.randomBytes(4).toString('hex')}`,
       timestamp: findingData.timestamp || new Date().toISOString(),
+      // type muss in findingData vorhanden sein oder hier ein Default gesetzt werden, wenn SecurityFinding.type nicht optional ist.
+      // Annahme: findingData.type ist vorhanden oder SecurityFinding.type ist optional oder hat einen Default in der Definition.
       ...findingData,
-    } as SecurityFinding; // Cast to ensure all properties are present
+    } as SecurityFinding; // Cast beibehalten, da Omit und optionale Felder komplex sein können.
     this.findings.push(finding);
   }
 
@@ -470,9 +491,9 @@ export class SecurityReview {
     const vulnerability: SecurityFinding = {
       id: vulnerabilityData.id || `vuln-${crypto.randomBytes(4).toString('hex')}`,
       timestamp: vulnerabilityData.timestamp || new Date().toISOString(),
-      type: 'vulnerability',
+      type: 'vulnerability', // Explizit gesetzt
       ...vulnerabilityData,
-    } as SecurityFinding;
+    } as SecurityFinding; // Cast beibehalten für Konsistenz und komplexe Typinteraktion.
     this.vulnerabilities.push(vulnerability);
   }
 

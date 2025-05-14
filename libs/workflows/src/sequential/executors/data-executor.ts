@@ -1,7 +1,7 @@
-import { PlanStep, ExecutionResult } from "./types";
+import { PlanStep, ExecutionResult } from "../types";
 import { BaseExecutor } from './base-executor';
-import { ConfigManager } from '@claude-framework/core/config';
-import { ExecutionError } from '@claude-framework/core/error';
+import configManager, { ConfigType } from '../../../../core/src/config/config-manager';
+import { ClaudeError } from '../../../../core/src/error/error-handler';
 
 /**
  * Data-specific execution implementation.
@@ -23,7 +23,7 @@ export class DataExecutor extends BaseExecutor {
     this.logger.debug(`Executing data step: ${step.id}`, { step });
     
     try {
-      const config = ConfigManager.getInstance().getConfig();
+      const config = configManager.getConfig(ConfigType.GLOBAL); // Or a more specific config if available e.g. ConfigType.DATA
       
       switch(step.id) {
         case 'collect':
@@ -39,14 +39,17 @@ export class DataExecutor extends BaseExecutor {
         case 'store':
           return await this.storeData(step, context);
         default:
-          throw new ExecutionError(`Unknown data step: ${step.id}`);
+          throw new ClaudeError(`Unknown data step: ${step.id}`);
       }
     } catch (error) {
       this.logger.error(`Error executing data step ${step.id}`, { error });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       return {
+        type: step.actionType || step.id,
         success: false,
         stepId: step.id,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: errorMessage,
+        summary: `Error in data step ${step.id}: ${errorMessage}`,
         data: { error }
       };
     }
@@ -56,29 +59,37 @@ export class DataExecutor extends BaseExecutor {
    * Collects data from specified sources
    */
   private async collectData(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
-    this.logger.info('Collecting data', { 
-      sources: step.data.sources,
-      formats: step.data.formats 
-    });
-    
-    // Mock implementation
+    const sources = step.data?.sources || [];
+    const formats = step.data?.formats || ['csv', 'json'];
+    this.logger.info('Collecting data', { sources, formats });
+
+    // TODO: Implement actual data collection logic (e.g., reading files, querying APIs/databases)
+    // Example: const rawData = await Promise.all(sources.map(src => fetchData(src, formats)));
+
+    // Simulating data collection
+    const simulatedTotalRecords = Math.floor(Math.random() * 10000) + 5000;
     const dataCollectionResults = {
-      totalSources: step.data.sources.length,
-      totalFiles: 15,
-      totalRecords: 10000,
-      dataBySource: step.data.sources.map(source => ({
+      totalSources: sources.length,
+      totalFilesCollected: Math.floor(Math.random() * 20) + sources.length,
+      totalRecordsCollected: simulatedTotalRecords,
+      dataBySource: sources.map((source: string) => ({
         source,
-        files: Math.floor(Math.random() * 10) + 1,
-        records: Math.floor(Math.random() * 5000) + 500,
-        formats: step.data.formats
-      }))
+        files: Math.floor(Math.random() * 5) + 1,
+        records: Math.floor(simulatedTotalRecords / (sources.length || 1)),
+        formats,
+        status: 'success', // 'success' or 'failed'
+      })),
+      errors: [], // Populate with any errors during collection
     };
     
+    const message = `Collected ${dataCollectionResults.totalRecordsCollected} records from ${dataCollectionResults.totalSources} sources.`;
     return {
-      success: true,
+      type: 'collect',
+      success: true, // This would depend on the outcome of actual collection
       stepId: step.id,
-      message: `Collected ${dataCollectionResults.totalRecords} records from ${dataCollectionResults.totalSources} sources`,
-      data: { dataCollectionResults }
+      message,
+      summary: message,
+      data: { dataCollectionResults, rawData: { recordCount: simulatedTotalRecords, sample: "/* actual data sample */" } },
     };
   }
 
@@ -86,44 +97,58 @@ export class DataExecutor extends BaseExecutor {
    * Validates data quality and integrity
    */
   private async validateData(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
-    this.logger.info('Validating data', {
-      validateSchema: step.data.validateSchema,
-      checkCompleteness: step.data.checkCompleteness,
-      checkConsistency: step.data.checkConsistency
-    });
+    const validateSchema = step.data?.validateSchema !== false;
+    const checkCompleteness = step.data?.checkCompleteness !== false;
+    const checkConsistency = step.data?.checkConsistency !== false;
+    this.logger.info('Validating data', { validateSchema, checkCompleteness, checkConsistency });
     
-    const collectionResults = context.collect?.data?.dataCollectionResults;
-    if (!collectionResults) {
-      throw new ExecutionError('No data collection results available from collect step');
+    const previousCollectStep = Object.values(context).find(s => (s as ExecutionResult).stepId === 'collect') as ExecutionResult | undefined;
+    const rawData = previousCollectStep?.data?.rawData; // Assuming rawData is stored from collect step
+    const totalRecords = rawData?.recordCount || 0;
+
+    if (!rawData || totalRecords === 0) {
+      const errorMsg = 'No data available from collect step for validation.';
+      this.logger.error(errorMsg, { collectContext: previousCollectStep });
+      return {
+        type: 'validate',
+        success: false,
+        stepId: step.id,
+        error: errorMsg,
+        message: errorMsg,
+        summary: errorMsg,
+        data: { error: errorMsg }
+      };
     }
     
-    // Mock implementation
+    // TODO: Implement actual data validation logic (e.g., using a library like Zod or custom validation rules)
+    // Example: const validationReport = await performValidation(rawData, { validateSchema, checkCompleteness, checkConsistency });
+
+    // Simulating validation results
+    const invalidRecords = Math.floor(Math.random() * (totalRecords * 0.05)); // Simulate up to 5% invalid records
     const validationResults = {
-      totalRecords: collectionResults.totalRecords,
-      validRecords: collectionResults.totalRecords - Math.floor(Math.random() * 100),
-      invalidRecords: Math.floor(Math.random() * 100),
-      issues: {
-        schemaViolations: step.data.validateSchema ? Math.floor(Math.random() * 50) : 0,
-        incompleteness: step.data.checkCompleteness ? Math.floor(Math.random() * 30) : 0,
-        inconsistencies: step.data.checkConsistency ? Math.floor(Math.random() * 20) : 0
+      totalRecordsChecked: totalRecords,
+      validRecords: totalRecords - invalidRecords,
+      invalidRecords,
+      issuesFound: {
+        schemaViolations: validateSchema ? Math.floor(invalidRecords * 0.4) : 0,
+        incompletenessViolations: checkCompleteness ? Math.floor(invalidRecords * 0.3) : 0,
+        consistencyViolations: checkConsistency ? Math.floor(invalidRecords * 0.3) : 0,
       },
-      quality: {
-        completeness: 0.985,
-        consistency: 0.992,
-        accuracy: 0.978
-      }
+      dataQualityScore: (totalRecords - invalidRecords) / totalRecords,
     };
     
-    const totalIssues = Object.values(validationResults.issues).reduce((sum, val) => sum + val, 0);
-    const success = validationResults.invalidRecords / validationResults.totalRecords < 0.05;
+    const success = validationResults.invalidRecords === 0; // Or based on a threshold
+    const message = success
+      ? `Data validation passed for ${validationResults.totalRecordsChecked} records. Quality score: ${(validationResults.dataQualityScore * 100).toFixed(1)}%.`
+      : `Data validation found ${validationResults.invalidRecords} invalid records out of ${validationResults.totalRecordsChecked}.`;
     
     return {
+      type: 'validate',
       success,
       stepId: step.id,
-      message: success 
-        ? `Validated ${validationResults.totalRecords} records with ${totalIssues} minor issues`
-        : `Validation failed: ${validationResults.invalidRecords} invalid records out of ${validationResults.totalRecords}`,
-      data: { validationResults }
+      message,
+      summary: message,
+      data: { validationResults, validatedData: { recordCount: validationResults.validRecords, sample: "/* validated data sample */" } },
     };
   }
 
@@ -131,34 +156,53 @@ export class DataExecutor extends BaseExecutor {
    * Transforms and processes the data
    */
   private async transformData(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
-    this.logger.info('Transforming data', { 
-      transformations: step.data.transformations,
-      inPlace: step.data.inPlace
-    });
-    
-    const validationResults = context.validate?.data?.validationResults;
-    if (!validationResults) {
-      throw new ExecutionError('No validation results available from validate step');
+    const transformations = step.data?.transformations || [];
+    const inPlace = step.data?.inPlace === true;
+    this.logger.info('Transforming data', { transformations, inPlace });
+
+    const previousValidateStep = Object.values(context).find(s => (s as ExecutionResult).stepId === 'validate') as ExecutionResult | undefined;
+    const validatedData = previousValidateStep?.data?.validatedData;
+    const inputRecords = validatedData?.recordCount || 0;
+
+    if (!validatedData || inputRecords === 0) {
+      const errorMsg = 'No validated data available from validate step for transformation.';
+      this.logger.error(errorMsg, { validateContext: previousValidateStep });
+      return {
+        type: 'transform',
+        success: false,
+        stepId: step.id,
+        error: errorMsg,
+        message: errorMsg,
+        summary: errorMsg,
+        data: { error: errorMsg }
+      };
     }
     
-    // Mock implementation
+    // TODO: Implement actual data transformation logic (e.g., using a data manipulation library or custom functions)
+    // Example: const transformedDataPayload = await applyTransformations(validatedData, transformations);
+    
+    // Simulating transformation results
+    const recordsDropped = Math.floor(Math.random() * (inputRecords * 0.02)); // Simulate up to 2% records dropped
     const transformationResults = {
-      inputRecords: validationResults.validRecords,
-      outputRecords: validationResults.validRecords - Math.floor(Math.random() * 50),
-      transformations: step.data.transformations.map(transform => ({
+      inputRecords,
+      outputRecords: inputRecords - recordsDropped,
+      transformationsApplied: transformations.map((transform: string) => ({
         name: transform,
-        recordsAffected: Math.floor(Math.random() * validationResults.validRecords),
-        success: true
+        recordsAffected: Math.floor(Math.random() * inputRecords), // Simplified
+        status: 'success',
       })),
-      duration: Math.floor(Math.random() * 60) + 10, // seconds
-      inPlace: step.data.inPlace
+      durationSeconds: Math.floor(Math.random() * 60) + 10,
+      inPlace,
     };
     
+    const message = `Successfully transformed ${transformationResults.inputRecords} records to ${transformationResults.outputRecords} records in ${transformationResults.durationSeconds}s.`;
     return {
-      success: true,
+      type: 'transform',
+      success: true, // This would depend on the outcome of actual transformations
       stepId: step.id,
-      message: `Transformed ${transformationResults.inputRecords} records into ${transformationResults.outputRecords} output records in ${transformationResults.duration}s`,
-      data: { transformationResults, processedData: { records: transformationResults.outputRecords } }
+      message,
+      summary: message,
+      data: { transformationResults, processedData: { recordCount: transformationResults.outputRecords, sample: "/* processed data sample */" } },
     };
   }
 
@@ -166,44 +210,55 @@ export class DataExecutor extends BaseExecutor {
    * Analyzes the processed data
    */
   private async analyzeData(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
-    this.logger.info('Analyzing data', { 
-      analysisTypes: step.data.analysisTypes,
-      generateReports: step.data.generateReports
-    });
-    
-    const processedData = context.transform?.data?.processedData;
-    if (!processedData) {
-      throw new ExecutionError('No processed data available from transform step');
+    const analysisTypes = step.data?.analysisTypes || ['descriptive_stats'];
+    const generateReports = step.data?.generateReports === true;
+    this.logger.info('Analyzing data', { analysisTypes, generateReports });
+
+    const previousTransformStep = Object.values(context).find(s => (s as ExecutionResult).stepId === 'transform') as ExecutionResult | undefined;
+    const processedData = previousTransformStep?.data?.processedData;
+    const inputRecords = processedData?.recordCount || 0;
+
+    if (!processedData || inputRecords === 0) {
+      const errorMsg = 'No processed data available from transform step for analysis.';
+      this.logger.error(errorMsg, { transformContext: previousTransformStep });
+      return {
+        type: 'analyze',
+        success: false,
+        stepId: step.id,
+        error: errorMsg,
+        message: errorMsg,
+        summary: errorMsg,
+        data: { error: errorMsg }
+      };
     }
     
-    // Mock implementation
+    // TODO: Implement actual data analysis logic (e.g., using statistical libraries, ML models)
+    // Example: const analysisOutput = await performAnalysis(processedData, analysisTypes);
+
+    // Simulating analysis results
     const analysisResults = {
-      inputRecords: processedData.records,
-      analysisTypes: step.data.analysisTypes,
-      insights: [
-        { name: 'Key finding 1', confidence: 0.92, importance: 'high' },
-        { name: 'Key finding 2', confidence: 0.85, importance: 'medium' },
-        { name: 'Key finding 3', confidence: 0.78, importance: 'medium' }
+      inputRecords,
+      analysisTypesApplied: analysisTypes,
+      keyInsights: [
+        { description: 'Average user engagement increased by 15% month-over-month.', confidence: 0.95 },
+        { description: 'Product X shows highest correlation with repeat purchases.', confidence: 0.88 },
       ],
-      metrics: {
-        mean: 42.5,
-        median: 38.2,
-        mode: 35.0,
-        stdDev: 12.3
-      },
-      reports: step.data.generateReports ? [
-        { name: 'summary_report.pdf', size: 250000 },
-        { name: 'detailed_analysis.xlsx', size: 1250000 }
-      ] : []
+      summaryStatistics: { meanValue: 55.2, medianValue: 52.1, stdDeviation: 12.5 },
+      reportsGenerated: generateReports ? [
+        { name: 'analysis_summary_report.pdf', path: 'reports/analysis_summary_report.pdf', sizeBytes: 300000 },
+        { name: 'detailed_metrics.csv', path: 'reports/detailed_metrics.csv', sizeBytes: 150000 },
+      ] : [],
     };
     
+    const message = `Data analysis completed for ${analysisResults.inputRecords} records using ${analysisResults.analysisTypesApplied.join(', ')} methods. ${analysisResults.keyInsights.length} key insights found.` +
+                    (generateReports ? ` ${analysisResults.reportsGenerated.length} reports generated.` : '');
     return {
-      success: true,
+      type: 'analyze',
+      success: true, // This would depend on the outcome of actual analysis
       stepId: step.id,
-      message: `Analyzed ${analysisResults.inputRecords} records with ${analysisResults.analysisTypes.length} analysis types${
-        step.data.generateReports ? ` and generated ${analysisResults.reports.length} reports` : ''
-      }`,
-      data: { analysisResults }
+      message,
+      summary: message,
+      data: { analysisResults },
     };
   }
 
@@ -211,37 +266,50 @@ export class DataExecutor extends BaseExecutor {
    * Creates visualizations of the analysis results
    */
   private async visualizeResults(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
-    this.logger.info('Visualizing results', { 
-      visualizationTypes: step.data.visualizationTypes,
-      interactive: step.data.interactive
-    });
-    
-    const analysisResults = context.analyze?.data?.analysisResults;
-    if (!analysisResults) {
-      throw new ExecutionError('No analysis results available from analyze step');
+    const visualizationTypes = step.data?.visualizationTypes || ['bar_chart', 'line_graph'];
+    const interactive = step.data?.interactive === true;
+    this.logger.info('Visualizing results', { visualizationTypes, interactive });
+
+    const previousAnalysisStep = Object.values(context).find(s => (s as ExecutionResult).stepId === 'analyze') as ExecutionResult | undefined;
+    const analysisData = previousAnalysisStep?.data?.analysisResults;
+
+    if (!analysisData) {
+      const errorMsg = 'No analysis results available from analyze step for visualization.';
+      this.logger.error(errorMsg, { analysisContext: previousAnalysisStep });
+      return {
+        type: 'visualize',
+        success: false,
+        stepId: step.id,
+        error: errorMsg,
+        message: errorMsg,
+        summary: errorMsg,
+        data: { error: errorMsg }
+      };
     }
     
-    // Mock implementation
+    // TODO: Implement actual visualization generation (e.g., using charting libraries like Chart.js, D3, or Plotly)
+    // Example: const vizOutputs = await generateVisualizations(analysisData, visualizationTypes, interactive);
+
+    // Simulating visualization results
     const visualizationResults = {
-      visualizationTypes: step.data.visualizationTypes,
-      interactive: step.data.interactive,
-      visualizations: [
-        { type: 'chart', name: 'distribution.png', size: 150000 },
-        { type: 'graph', name: 'correlations.png', size: 180000 },
-        { type: 'table', name: 'summary_table.html', size: 50000 }
+      typesGenerated: visualizationTypes,
+      isInteractive: interactive,
+      visualizationsCreated: [
+        { type: 'bar_chart', name: 'sales_by_region.png', path: 'visualizations/sales_by_region.png', sizeBytes: 120000 },
+        { type: 'line_graph', name: 'engagement_trend.svg', path: 'visualizations/engagement_trend.svg', sizeBytes: 80000 },
       ],
-      dashboards: step.data.interactive ? [
-        { name: 'interactive_dashboard.html', size: 500000 }
-      ] : []
+      dashboardLinks: interactive ? [{ name: 'Live Dashboard', url: 'http://localhost:3001/dashboard/xyz' }] : [],
     };
     
+    const message = `Successfully created ${visualizationResults.visualizationsCreated.length} visualizations (${visualizationResults.typesGenerated.join(', ')}).` +
+                    (interactive && visualizationResults.dashboardLinks.length > 0 ? ` Interactive dashboard available.` : '');
     return {
-      success: true,
+      type: 'visualize',
+      success: true, // This would depend on the outcome of actual visualization
       stepId: step.id,
-      message: `Created ${visualizationResults.visualizations.length} visualizations${
-        step.data.interactive ? ` and ${visualizationResults.dashboards.length} interactive dashboard(s)` : ''
-      }`,
-      data: { visualizationResults }
+      message,
+      summary: message,
+      data: { visualizationResults },
     };
   }
 
@@ -249,69 +317,76 @@ export class DataExecutor extends BaseExecutor {
    * Stores the processed data to the target location
    */
   private async storeData(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
-    this.logger.info('Storing processed data', { 
-      destination: step.data.destination,
-      format: step.data.format,
-      compression: step.data.compression
-    });
-    
-    // Get the final data based on what steps were executed
-    const hasAnalysisResults = !!context.analyze?.data?.analysisResults;
-    const hasVisualizationResults = !!context.visualize?.data?.visualizationResults;
-    const processedData = context.transform?.data?.processedData;
-    
-    if (!processedData) {
-      throw new ExecutionError('No processed data available from previous steps');
+    const destination = step.data?.destination || 'output/processed_data';
+    const format = step.data?.format || 'parquet';
+    const compression = step.data?.compression || 'snappy';
+    this.logger.info('Storing processed data', { destination, format, compression });
+
+    const previousTransformStep = Object.values(context).find(s => (s as ExecutionResult).stepId === 'transform') as ExecutionResult | undefined;
+    const processedData = previousTransformStep?.data?.processedData; // Main data to store
+    const analysisResults = (Object.values(context).find(s => (s as ExecutionResult).stepId === 'analyze') as ExecutionResult | undefined)?.data?.analysisResults;
+    const visualizationResults = (Object.values(context).find(s => (s as ExecutionResult).stepId === 'visualize') as ExecutionResult | undefined)?.data?.visualizationResults;
+
+    if (!processedData && !analysisResults && !visualizationResults) {
+      const errorMsg = 'No data or results available from previous steps to store.';
+      this.logger.warn(errorMsg);
+      return {
+        type: 'store',
+        success: false, // Or true if nothing to store is not an error
+        stepId: step.id,
+        message: errorMsg,
+        summary: errorMsg,
+        data: { message: errorMsg },
+      };
     }
     
-    // Mock implementation
-    const storageResults = {
-      destination: step.data.destination,
-      format: step.data.format,
-      compression: step.data.compression,
-      files: [
-        { name: 'processed_data.json', size: 2500000, compressed: step.data.compression !== 'none' },
-        { name: 'metadata.json', size: 15000, compressed: false }
-      ],
-      totalSize: 2515000,
-      compressedSize: step.data.compression !== 'none' ? 950000 : 2515000,
-      timestamp: new Date().toISOString()
+    // TODO: Implement actual data storage logic (e.g., writing to filesystem, database, S3)
+    // Example: await saveData(destination, format, compression, processedData, analysisResults, visualizationResults);
+
+    // Simulating storage results
+    let filesStored: Array<{ name: string; path: string; sizeBytes: number; compressed: boolean }> = [];
+    let totalSizeBytes = 0;
+    let compressedSizeBytes = 0;
+
+    if (processedData) {
+      const size = (processedData.recordCount || 1000) * 100; // Estimate size
+      filesStored.push({ name: `data.${format}`, path: `${destination}/data.${format}`, sizeBytes: size, compressed: compression !== 'none' });
+      totalSizeBytes += size;
+      compressedSizeBytes += compression !== 'none' ? size * 0.3 : size; // Estimate compression
+    }
+    if (analysisResults?.reportsGenerated?.length) {
+      analysisResults.reportsGenerated.forEach((report: any) => {
+        filesStored.push({ name: report.name, path: report.path, sizeBytes: report.sizeBytes, compressed: false });
+        totalSizeBytes += report.sizeBytes;
+        compressedSizeBytes += report.sizeBytes;
+      });
+    }
+    if (visualizationResults?.visualizationsCreated?.length) {
+       visualizationResults.visualizationsCreated.forEach((viz: any) => {
+        filesStored.push({ name: viz.name, path: viz.path, sizeBytes: viz.sizeBytes, compressed: false });
+        totalSizeBytes += viz.sizeBytes;
+        compressedSizeBytes += viz.sizeBytes;
+      });
+    }
+    
+    const storageOpResults = {
+      destinationPath: destination,
+      outputFormat: format,
+      compressionUsed: compression,
+      filesWritten: filesStored.length,
+      totalSizeBytes,
+      compressedSizeBytes,
+      timestamp: new Date().toISOString(),
     };
     
-    // Add additional files if we have analysis or visualization results
-    if (hasAnalysisResults) {
-      storageResults.files.push({ 
-        name: 'analysis_results.json', 
-        size: 350000, 
-        compressed: step.data.compression !== 'none' 
-      });
-      storageResults.totalSize += 350000;
-      storageResults.compressedSize += step.data.compression !== 'none' ? 120000 : 350000;
-    }
-    
-    if (hasVisualizationResults) {
-      storageResults.files.push(
-        ...context.visualize.data.visualizationResults.visualizations.map(v => ({
-          name: v.name,
-          size: v.size,
-          compressed: false // Assume visualizations are already compressed
-        }))
-      );
-      
-      const visualizationSize = context.visualize.data.visualizationResults.visualizations
-        .reduce((sum, v) => sum + v.size, 0);
-      
-      storageResults.totalSize += visualizationSize;
-      storageResults.compressedSize += visualizationSize;
-    }
-    
+    const message = `Successfully stored ${storageOpResults.filesWritten} item(s) to ${storageOpResults.destinationPath}. Total size: ${(storageOpResults.totalSizeBytes / (1024*1024)).toFixed(2)}MB (Compressed: ${(storageOpResults.compressedSizeBytes / (1024*1024)).toFixed(2)}MB).`;
     return {
-      success: true,
+      type: 'store',
+      success: true, // This would depend on the outcome of actual storage operation
       stepId: step.id,
-      message: `Stored ${storageResults.files.length} files (${Math.round(storageResults.totalSize/1024/1024 * 100) / 100}MB raw, ${
-        Math.round(storageResults.compressedSize/1024/1024 * 100) / 100
-      }MB stored) to ${storageResults.destination}`,
-      data: { storageResults }
+      message,
+      summary: message,
+      data: { storageResults: storageOpResults },
     };
   }
 }

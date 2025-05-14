@@ -6,7 +6,8 @@
 
 import fs from 'fs';
 import path from 'path';
-import { Logger } from '@core/logging/logger';
+import Ajv, { ValidateFunction } from 'ajv';
+import { Logger } from '@claude-framework/core';
 
 // Base directory for schemas
 const SCHEMA_BASE_DIR = path.join(__dirname, '..', 'schemas');
@@ -119,6 +120,30 @@ export class SchemaLoader {
     }
     
     return true;
+  }
+
+  /**
+   * Validates data against a given JSON schema using AJV.
+   *
+   * @param schema - The JSON schema to validate against.
+   * @param data - The data to validate.
+   * @returns An object containing a boolean `valid` and an array of `errors` (if any).
+   */
+  public validateDataWithSchema(schema: Record<string, any>, data: any): { valid: boolean; errors: ValidateFunction['errors'] } {
+    try {
+      const ajv = new Ajv();
+      const validate = ajv.compile(schema);
+      const valid = validate(data);
+      if (!valid) {
+        this.logger.warn('Data validation failed against the schema.', { errors: validate.errors });
+        return { valid: false, errors: validate.errors };
+      }
+      return { valid: true, errors: null };
+    } catch (err) {
+      this.logger.error('Error during data validation with schema.', { error: err });
+      // It's possible the schema itself is invalid for AJV
+      throw new Error(`Error validating data with schema: ${(err as Error).message}`);
+    }
   }
 }
 

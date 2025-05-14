@@ -151,19 +151,21 @@ describe('Security Schemas', () => {
 
      it('should validate valid security findings (finding type)', () => {
       const validFinding = {
+        id: 'find-001', // Hinzugefügt
+        timestamp: new Date().toISOString(), // Hinzugefügt
         validator: 'config-linter',
         type: 'finding',
         title: 'Insecure Default Setting',
         description: 'Default setting for Y is insecure.',
         location: 'config.yaml',
-        severity: 'medium', // Severity is required
-        timestamp: new Date().toISOString(),
+        severity: 'medium',
       };
       expect(SecurityFindingSchema.parse(validFinding)).toEqual(validFinding);
     });
 
     it('should reject invalid security findings (missing title)', () => {
       const invalidFinding = {
+        // Fehlende obligatorische Felder id, timestamp, title
         description: 'A finding without a title.',
         location: 'some/file.js',
         severity: 'low',
@@ -208,16 +210,22 @@ describe('Security Schemas', () => {
           findingsCount: 2,
         },
         vulnerabilities: [{
+            id: 'vuln-002',
+            timestamp: new Date().toISOString(),
             title: 'SQL Injection',
             description: 'Possible SQL injection vector.',
             location: 'userController.ts:42',
             severity: 'critical',
+            type: 'vulnerability',
         }],
         findings: [{
+            id: 'find-002',
+            timestamp: new Date().toISOString(),
             title: 'Missing CSRF token',
             description: 'Form X is missing CSRF protection.',
             location: 'views/formX.ejs',
             severity: 'medium',
+            type: 'finding',
         }],
         recommendations: [{
             title: 'Use ORM',
@@ -249,6 +257,8 @@ describe('Security Schemas', () => {
         },
         findings: [
           {
+            id: 'find-003',
+            timestamp: new Date().toISOString(),
             title: 'Verbose error messages',
             description: 'Error messages might reveal sensitive information.',
             location: 'errorHandler.ts',
@@ -258,6 +268,8 @@ describe('Security Schemas', () => {
         ],
         vulnerabilities: [
            {
+            id: 'vuln-003',
+            timestamp: new Date().toISOString(),
             title: 'XSS in user profile',
             description: 'User input in profile page is not properly sanitized.',
             location: 'profile.js:101',

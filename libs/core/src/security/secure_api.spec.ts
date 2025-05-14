@@ -33,13 +33,18 @@ jest.mock('../config/config-manager', () => ({
       mcp: { allowed_servers: [] },
       // Weitere benötigte Config-Properties
     }),
-    getConfigValue: jest.fn((type: any, key: string, defaultValue: any) => defaultValue ?? '1.0.0'),
+    // TODO: defaultValue genauer typisieren, falls möglich, basierend auf der Verwendung in SecureAPI
+    getConfigValue: jest.fn((type: string /* ConfigType */, key: string, defaultValue: any) => defaultValue ?? '1.0.0'),
   },
 }));
 
 jest.mock('../i18n/i18n.js', () => ({
   I18n: jest.fn().mockImplementation(() => ({
-    translate: jest.fn().mockImplementation((...args: any[]) => args[0]), // Akzeptiert beliebige Argumente, gibt das erste zurück (den Key)
+    translate: jest.fn().mockImplementation((...args: any[]) => { // Akzeptiert beliebige Argumente
+      // Für Testzwecke geben wir einfach den ersten Parameter zurück (typischerweise der Key)
+      // oder einen leeren String, falls keine Argumente vorhanden sind.
+      return args.length > 0 && typeof args[0] === 'string' ? args[0] : 'mocked.translation.key';
+    }),
   })),
 }));
 
@@ -64,7 +69,7 @@ describe('SecureAPI', () => {
     res.setHeader = jest.fn();
     // Korrekte Typisierung für jest.fn(), das eine Funktion zurückgibt
     res.status = jest.fn<(code: number) => MockResponse>().mockImplementation(() => res as MockResponse);
-    res.json = jest.fn<(body: any) => MockResponse>().mockImplementation(() => res as MockResponse);
+    res.json = jest.fn<(body: unknown) => MockResponse>().mockImplementation(() => res as MockResponse);
     return res as MockResponse;
   };
 
@@ -219,8 +224,9 @@ describe('SecureAPI', () => {
 
     it('should call validateInput if inputValidation is true', async () => {
       const apiWithInputValidation = new SecureAPI({ inputValidation: true });
-      // @ts-ignore - spyOn private/protected method
-      const validateInputSpy = jest.spyOn(apiWithInputValidation, 'validateInput' as any);
+      // @ts-ignore - spyOn protected method 'validateInput' for testing purposes.
+      // 'as any' is used here because 'validateInput' is protected and not directly accessible for spying without type assertion.
+      const validateInputSpy = jest.spyOn(apiWithInputValidation, 'validateInput' as keyof SecureAPI);
       const req = mockRequest();
       const res = mockResponse();
       const securedHandler = apiWithInputValidation.secureHandler(mockHandler);

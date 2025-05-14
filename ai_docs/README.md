@@ -4,6 +4,27 @@ This directory contains documentation, templates, examples, and patterns for wor
 
 ## Directory Structure
 
+## Inhaltsverzeichnis der Unterverzeichnisse
+
+- [analysis](./analysis/)
+- [api](./api/)
+- [architecture](./architecture/)
+- [cleanup](./cleanup/)
+- [enterprise](./enterprise/)
+- [examples](./examples/)
+- [general](./general/)
+- [guides](./guides/)
+- [integration](./integration/)
+- [migration](./migration/)
+- [models](./models/)
+- [plans](./plans/)
+- [prompts](./prompts/)
+- [recommendations](./recommendations/)
+- [reports](./reports/)
+- [saar](./saar/)
+- [security](./security/)
+- [templates](./templates/)
+- [tutorials](./tutorials/)
 - **`prompts/`**: Contains prompt templates for different tasks
   - `classification/`: Prompts for classification tasks
   - `generation/`: Prompts for generation tasks

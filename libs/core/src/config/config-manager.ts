@@ -75,166 +75,179 @@ const LOCAL_CONFIG_PATHS: Record<string, string> = {
 /**
  * Interface for server configuration
  */
-interface ServerConfig {
-  enabled: boolean;
-  autostart: boolean;
-  command: string;
-  args: string[];
-  description: string;
-  api_key_env?: string;
-}
+const ServerConfigSchema = z.object({
+  enabled: z.boolean(),
+  autostart: z.boolean(),
+  command: z.string(),
+  args: z.array(z.string()),
+  description: z.string(),
+  api_key_env: z.string().optional(),
+});
+interface ServerConfig extends z.infer<typeof ServerConfigSchema> {}
 
 /**
  * Interface for theme colors
  */
-interface ThemeColors {
-  primary: string;
-  secondary: string;
-  accent: string;
-  success: string;
-  warning: string;
-  danger: string;
-  info: string;
-  background: string;
-  surface: string;
-  text: string;
-  textSecondary: string;
-  border: string;
-  shadow: string;
-}
+const ThemeColorsSchema = z.object({
+  primary: z.string(),
+  secondary: z.string(),
+  accent: z.string(),
+  success: z.string(),
+  warning: z.string(),
+  danger: z.string(),
+  info: z.string(),
+  background: z.string(),
+  surface: z.string(),
+  text: z.string(),
+  textSecondary: z.string(),
+  border: z.string(),
+  shadow: z.string(),
+});
+interface ThemeColors extends z.infer<typeof ThemeColorsSchema> {}
 
 /**
  * Interface for theme
  */
-interface Theme {
-  name: string;
-  colors: ThemeColors;
-}
+const ThemeSchema = z.object({
+  name: z.string(),
+  colors: ThemeColorsSchema,
+});
+interface Theme extends z.infer<typeof ThemeSchema> {}
 
 /**
  * Interface for RAG configuration
  */
-interface RagConfig {
-  version: string;
-  database: {
-    type: string;
-    path: string;
-  };
-  embedding: {
-    model: string;
-    api_key_env: string;
-  };
-  claude: {
-    api_key_env: string;
-    model: string;
-  };
-}
+const RagConfigSchema = z.object({
+  version: z.string(),
+  database: z.object({
+    type: z.string(),
+    path: z.string(),
+  }),
+  embedding: z.object({
+    model: z.string(),
+    api_key_env: z.string(),
+  }),
+  claude: z.object({
+    api_key_env: z.string(),
+    model: z.string(),
+  }),
+});
+interface RagConfig extends z.infer<typeof RagConfigSchema> {}
 
 /**
  * Interface for MCP configuration
  */
-interface McpConfig {
-  version: string;
-  servers: Record<string, ServerConfig>;
-}
+const McpConfigSchema = z.object({
+  version: z.string(),
+  servers: z.record(ServerConfigSchema),
+});
+interface McpConfig extends z.infer<typeof McpConfigSchema> {}
 
 /**
  * Interface for Security configuration
  */
-interface SecurityConfig {
-  version: string;
-  mcp: {
-    allowed_servers: string[];
-    allow_server_autostart: boolean;
-    allow_remote_servers: boolean;
-  };
-  filesystem: {
-    allowed_directories: string[];
-  };
-}
+const SecurityConfigSchema = z.object({
+  version: z.string(),
+  mcp: z.object({
+    allowed_servers: z.array(z.string()),
+    allow_server_autostart: z.boolean(),
+    allow_remote_servers: z.boolean(),
+  }),
+  filesystem: z.object({
+    allowed_directories: z.array(z.string()),
+  }),
+});
+interface SecurityConfig extends z.infer<typeof SecurityConfigSchema> {}
 
 /**
  * Interface for Color Schema configuration
  */
-interface ColorSchemaConfig {
-  version: string;
-  themes: Record<string, Theme>;
-  userPreferences: {
-    activeTheme: string;
-    custom: Theme | null;
-  };
-}
+const ColorSchemaConfigSchema = z.object({
+  version: z.string(),
+  themes: z.record(ThemeSchema),
+  userPreferences: z.object({
+    activeTheme: z.string(),
+    custom: ThemeSchema.nullable(),
+  }),
+});
+interface ColorSchemaConfig extends z.infer<typeof ColorSchemaConfigSchema> {}
 
 /**
  * Interface for Global configuration
  */
-interface GlobalConfig {
-  version: string;
-  timezone: string;
-  language: string;
-  notifications: {
-    enabled: boolean;
-    showErrors: boolean;
-    showWarnings: boolean;
-  };
-  logging: {
-    level: number;
-    format: string;
-    colorize: boolean;
-    timestamp: boolean;
-    showSource: boolean;
-    showHostname: boolean;
-    consoleOutput: boolean;
-    fileOutput: boolean;
-  };
-}
+export const GlobalConfigSchema = z.object({
+  version: z.string(),
+  timezone: z.string(),
+  language: z.string(),
+  notifications: z.object({
+    enabled: z.boolean(),
+    showErrors: z.boolean(),
+    showWarnings: z.boolean(),
+  }),
+  logging: z.object({
+    level: z.number(),
+    format: z.string(),
+    colorize: z.boolean(),
+    timestamp: z.boolean(),
+    showSource: z.boolean(),
+    showHostname: z.boolean(),
+    consoleOutput: z.boolean(),
+    fileOutput: z.boolean(),
+  }),
+});
+export interface GlobalConfig extends z.infer<typeof GlobalConfigSchema> {}
 
 /**
  * Interface for User configuration
  */
-interface UserConfig {
-  version: string;
-  user_id: string;
-  name: string;
-  preferences: {
-    theme: string;
-    language: string;
-  };
-}
+const UserConfigSchema = z.object({
+  version: z.string(),
+  user_id: z.string(),
+  name: z.string(),
+  preferences: z.object({
+    theme: z.string(),
+    language: z.string(),
+  }),
+});
+interface UserConfig extends z.infer<typeof UserConfigSchema> {}
 
 /**
  * Interface for I18n configuration
  */
-interface I18nConfig {
-  version: string;
-  locale: string;
-  fallbackLocale: string;
-  loadPath: string;
-  debug: boolean;
-  supportedLocales: string[];
-  dateFormat: {
-    short: Record<string, string>;
-    medium: Record<string, string>;
-    long: Record<string, string>;
-  };
-  numberFormat: {
-    decimal: Record<string, any>;
-    percent: Record<string, any>;
-    currency: Record<string, any>;
-  };
-}
+const I18nConfigSchema = z.object({
+  version: z.string(),
+  locale: z.string(),
+  fallbackLocale: z.string(),
+  loadPath: z.string(),
+  debug: z.boolean(),
+  supportedLocales: z.array(z.string()),
+  dateFormat: z.object({
+    short: z.record(z.string()),
+    medium: z.record(z.string()),
+    long: z.record(z.string()),
+  }),
+  numberFormat: z.object({
+    decimal: z.record(z.any()),
+    percent: z.record(z.any()),
+    currency: z.record(z.any()),
+  }),
+});
+interface I18nConfig extends z.infer<typeof I18nConfigSchema> {}
 
 /**
  * Type for all configuration types
  */
-type ConfigData = 
-  | RagConfig 
-  | McpConfig 
-  | SecurityConfig 
-  | ColorSchemaConfig 
-  | GlobalConfig 
-  | UserConfig 
-  | I18nConfig;
+// Union schema for all config types
+const ConfigDataSchema = z.union([
+  RagConfigSchema,
+  McpConfigSchema,
+  SecurityConfigSchema,
+  ColorSchemaConfigSchema,
+  GlobalConfigSchema,
+  UserConfigSchema,
+  I18nConfigSchema,
+]);
+type ConfigData = z.infer<typeof ConfigDataSchema>;
 
 /**
  * Default configuration values
@@ -441,7 +454,7 @@ export const DEFAULT_CONFIGS: Record<string, ConfigData> = {
 /**
  * Interface for schema validation
  */
-interface SchemaValidationResult {
+export interface SchemaValidationResult {
   valid: boolean;
   errors: string[];
 }
@@ -501,60 +514,67 @@ function saveJsonConfig(configPath: string, config: Record<string, any>): boolea
 }
 
 /**
- * Simple schema validation for configuration objects
- * 
- * @param config - Configuration object to validate
- * @param schema - Schema to validate against
- * @returns Validation result {valid: boolean, errors: Array}
+ * Validates a configuration object against a Zod schema.
+ *
+ * @param config - Configuration object to validate.
+ * @param schema - Zod schema to validate against.
+ * @returns Validation result {valid: boolean, errors: string[]}.
  */
-function validateConfig(config: Record<string, any>, schema: Record<string, any>): SchemaValidationResult {
-  const errors: string[] = [];
-  
-  function validateObject(obj: Record<string, any>, schemaObj: Record<string, any>, path = '') {
-    // Check required fields
-    if (schemaObj.required) {
-      for (const field of schemaObj.required) {
-        if (obj[field] === undefined) {
-          errors.push(`Missing required field: ${path ? path + '.' : ''}${field}`);
-        }
-      }
+export function validateConfig<T extends z.ZodTypeAny>( // Exporting for testing
+  config: unknown,
+  schema: T
+): SchemaValidationResult {
+  try {
+    schema.parse(config);
+    return {
+      valid: true,
+      errors: [],
+    };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        valid: false,
+        errors: error.errors.map(
+          (err) => `${err.path.join('.')} - ${err.message}`
+        ),
+      };
     }
-    
-    // Check properties
-    if (schemaObj.properties) {
-      for (const [key, propSchema] of Object.entries(schemaObj.properties)) {
-        if (obj[key] !== undefined) {
-          const fieldPath = path ? `${path}.${key}` : key;
-          
-          // Type checking
-          if (propSchema.type && typeof obj[key] !== propSchema.type) {
-            errors.push(`Invalid type for ${fieldPath}: expected ${propSchema.type}, got ${typeof obj[key]}`);
-          }
-          
-          // Nested objects
-          if (propSchema.type === 'object' && obj[key] && propSchema.properties) {
-            validateObject(obj[key], propSchema, fieldPath);
-          }
-          
-          // Array validation
-          if (propSchema.type === 'array' && Array.isArray(obj[key]) && propSchema.items) {
-            obj[key].forEach((item: any, index: number) => {
-              if (propSchema.items.type === 'object' && propSchema.items.properties) {
-                validateObject(item, propSchema.items, `${fieldPath}[${index}]`);
-              }
-            });
-          }
-        }
-      }
-    }
+    // Handle unexpected errors
+    return {
+      valid: false,
+      errors: ['An unexpected error occurred during validation.'],
+    };
   }
-  
-  validateObject(config, schema);
-  
-  return {
-    valid: errors.length === 0,
-    errors
-  };
+}
+
+/**
+ * Returns the Zod schema for a given ConfigType.
+ * @param configType The type of configuration.
+ * @returns The corresponding Zod schema.
+ * @throws {ConfigError} If the configType is unknown.
+ */
+export function getZodSchemaForConfigType(configType: ConfigType): z.ZodTypeAny { // Exporting for testing
+  switch (configType) {
+    case ConfigType.RAG:
+      return RagConfigSchema;
+    case ConfigType.MCP:
+      return McpConfigSchema;
+    case ConfigType.SECURITY:
+      return SecurityConfigSchema;
+    case ConfigType.COLOR_SCHEMA:
+      return ColorSchemaConfigSchema;
+    case ConfigType.GLOBAL:
+      return GlobalConfigSchema;
+    case ConfigType.USER:
+      return UserConfigSchema;
+    case ConfigType.I18N:
+      return I18nConfigSchema;
+    default:
+      // This should ideally be caught by TypeScript if all ConfigType cases are handled.
+      // However, as a runtime safeguard:
+      const exhaustiveCheck: never = configType;
+      throw new ConfigError(`Unknown configuration type for Zod schema: ${exhaustiveCheck}`);
+  }
 }
 
 /**
@@ -819,9 +839,10 @@ export class ConfigManager {
    * @throws {ConfigValidationError} If schema validation fails
    */
   public saveConfig(configType: ConfigType, config: ConfigData): boolean {
-    // Validate the configuration if schema is available
-    if (this.schemaValidation && this.schemas[configType]) {
-      const validation = validateConfig(config as Record<string, any>, this.schemas[configType]);
+    // Validate the configuration using Zod
+    if (this.schemaValidation) {
+      const zodSchema = getZodSchemaForConfigType(configType);
+      const validation = validateConfig(config, zodSchema);
       if (!validation.valid) {
         throw new ConfigValidationError(
           `Invalid configuration for ${configType}`,
@@ -1060,15 +1081,29 @@ export class ConfigManager {
    */
   public importConfig(configType: ConfigType, importPath: string): boolean {
     try {
-      const config = loadJsonConfig(importPath, null);
-      if (!config) {
-        throw new ConfigError(`Failed to load configuration from ${importPath}`);
+      // loadJsonConfig will throw if the file doesn't exist and no default is provided,
+      // or return an empty object if a default is not provided and the file is empty.
+      // We want to ensure we get a valid config object or throw.
+      const config = loadJsonConfig(importPath); // No default config, rely on loadJsonConfig's behavior or throw
+
+      if (Object.keys(config).length === 0 && !fs.existsSync(importPath)) {
+        // If config is empty and file doesn't exist, it means loadJsonConfig returned its internal default {}
+        // which is not what we want for an import.
+        throw new ConfigError(`Configuration file not found or is empty: ${importPath}`);
       }
       
+      // At this point, 'config' should be the parsed JSON content.
+      // saveConfig will perform Zod validation.
       return this.saveConfig(configType, config as ConfigData);
     } catch (err) {
-      this.logger.error(`Failed to import ${configType} configuration`, { error: err });
-      throw err;
+      // Log the original error if it's a ConfigError, otherwise wrap it.
+      if (err instanceof ConfigError) {
+        this.logger.error(`Failed to import ${configType} configuration from ${importPath}: ${err.message}`, { error: err });
+        throw err;
+      }
+      const importError = new ConfigAccessError(`Failed to import ${configType} configuration from ${importPath}: ${(err as Error).message}`);
+      this.logger.error(importError.message, { error: err });
+      throw importError;
     }
   }
 }

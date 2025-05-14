@@ -38,7 +38,11 @@ const scryptAsync = promisify(crypto.scrypt);
  * Type for a request handler function.
  * Adjust `any` to more specific types if your framework (e.g., Express) provides them.
  */
-type RequestHandler = (req: MockRequest, res: MockResponse, ...args: any[]) => Promise<any>;
+type RequestHandler<T extends any[] = any[], R = any> = (
+  req: MockRequest,
+  res: MockResponse,
+  ...args: T
+) => Promise<R>;
 
 /**
  * Secure API base class with security best practices.
@@ -89,8 +93,10 @@ export class SecureAPI {
    * @param handler - The request handler function.
    * @returns A new, secured request handler function.
    */
-  public secureHandler(handler: RequestHandler): RequestHandler {
-    return async (req: MockRequest, res: MockResponse, ...args: any[]): Promise<any> => {
+  public secureHandler<T extends any[] = any[], R = any>(
+    handler: RequestHandler<T, R>
+  ): RequestHandler<T, R> {
+    return async (req: MockRequest, res: MockResponse, ...args: T): Promise<R> => {
       try {
         if (this.options.requireHTTPS && !req.secure) {
           throw new ValidationError(this.i18n.translate('errors.httpsRequired'));
@@ -106,13 +112,13 @@ export class SecureAPI {
             metadata: { // Same here for metadata
               retryAfter: this.getRateLimitReset(req),
             },
-          } as any); // Cast as any if ValidationError constructor doesn't match
+          } as any); // TODO: Überprüfen und entfernen, sobald ValidationError aus ../error/error_handler.js korrekte Typen für status und metadata.retryAfter exportiert
         }
 
         if (this.options.csrfProtection && !this.validateCSRF(req)) {
           throw new ValidationError(this.i18n.translate('errors.invalidCsrfToken'), {
             status: 403,
-          } as any);
+          } as any); // TODO: Überprüfen und entfernen, sobald ValidationError aus ../error/error_handler.js korrekte Typen für status exportiert
         }
 
         if (this.options.inputValidation) {
@@ -120,10 +126,18 @@ export class SecureAPI {
         }
 
         return await handler(req, res, ...args);
-      } catch (error: any) {
-        logger.error(this.i18n.translate('errors.requestError'), { error: error.message });
-        const formattedError = this.formatErrorResponse(error);
+      } catch (error: unknown) {
+        let errorMessage = 'An unknown error occurred in secureHandler';
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        logger.error(this.i18n.translate('errors.requestError'), { error: errorMessage, originalError: error });
+        const formattedError = this.formatErrorResponse(error); // formatErrorResponse behandelt bereits unknown
         res.status(formattedError.status || 500).json({ error: formattedError });
+        // Ensure a Promise<R> is returned in all paths, even if R is void or undefined.
+        // If R is expected to be a specific type, this might need adjustment
+        // or the calling code needs to handle `undefined`.
+        return undefined as R;
       }
     };
   }
@@ -204,7 +218,11 @@ export class SecureAPI {
     if (['GET', 'HEAD', 'OPTIONS'].includes(req.method?.toUpperCase() || '')) {
       return true;
     }
-    const requestToken = req.headers['x-csrf-token'] || req.body?._csrf || req.query?._csrf;
+    // Type assertion to access _csrf, as req.body and req.query are unknown
+    const bodyAsRecord = req.body as Record<string, string> | undefined;
+    const queryAsRecord = req.query as Record<string, string> | undefined;
+
+    const requestToken = req.headers['x-csrf-token'] || bodyAsRecord?._csrf || queryAsRecord?._csrf;
     const sessionToken = req.session?.csrfToken;
     return !!requestToken && !!sessionToken && requestToken === sessionToken;
   }
@@ -227,7 +245,7 @@ export class SecureAPI {
    * @returns A formatted error response object.
    * @private
    */
-  private formatErrorResponse(error: any): FormattedErrorResponse {
+  private formatErrorResponse(error: unknown): FormattedErrorResponse {
     if (error instanceof FrameworkError) { // Use FrameworkError if it's the base for ValidationError
       return {
         message: error.message,
@@ -238,8 +256,12 @@ export class SecureAPI {
         ...(error.metadata?.retryAfter && { retryAfter: error.metadata.retryAfter }),
       };
     }
+    let message = this.i18n.translate('errors.unexpectedError');
+    if (error instanceof Error) {
+      message = error.message;
+    }
     return {
-      message: error.message || this.i18n.translate('errors.unexpectedError'),
+      message,
       code: 'ERR_UNKNOWN',
       status: 500,
     };

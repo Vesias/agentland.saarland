@@ -167,8 +167,8 @@ describe('Security Check CLI (security_check.ts)', () => {
     const detailedResults: ValidatorResults = {
       summary: { vulnerabilitiesCount: 0, findingsCount: 0, securityScore: 100, passedValidators: 1, totalValidators: 1 },
       reportPath: 'report.json',
-      vulnerabilities: [{ title: 'Mock Vuln', description: 'Desc', location: 'loc', severity: 'high' }] as ReadonlyArray<SecurityFinding>,
-      findings: [{ title: 'Mock Finding', description: 'Desc', location: 'loc', severity: 'medium', validator: 'mock-validator' }] as ReadonlyArray<SecurityFinding>,
+      vulnerabilities: [{ id: 'vuln1', timestamp: new Date().toISOString(), title: 'Mock Vuln', description: 'Desc', location: 'loc', severity: 'high' }] as ReadonlyArray<SecurityFinding>,
+      findings: [{ id: 'find1', timestamp: new Date().toISOString(), title: 'Mock Finding', description: 'Desc', location: 'loc', severity: 'medium', validator: 'mock-validator' }] as ReadonlyArray<SecurityFinding>,
       recommendations: [{ title: 'Mock Rec', description: 'Desc', type: 'general' }] as ReadonlyArray<Recommendation>,
     };
     mockRunValidators.mockResolvedValue(detailedResults);

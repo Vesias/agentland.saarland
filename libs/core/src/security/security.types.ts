@@ -24,7 +24,7 @@ export interface SecurityEvent {
   readonly timestamp: Date;
   readonly severity: 'info' | 'warning' | 'error' | 'critical';
   readonly message: string;
-  readonly details?: Record<string, any>;
+  readonly details?: Record<string, unknown>; // Geändert von any zu unknown
 }
 
 export interface SecurityReport {
@@ -61,13 +61,15 @@ export interface SecurityReviewSummary {
 }
 
 export interface SecurityFinding {
+  readonly id: string; // Hinzugefügt als readonly und nicht-optional
+  readonly timestamp: string; // ISO Date String, hinzugefügt als readonly und nicht-optional
   readonly title: string;
   readonly description: string;
   readonly location: string;
   readonly severity: 'critical' | 'high' | 'medium' | 'low' | 'info';
   readonly recommendation?: string;
   readonly validator?: string; // Für Findings
-  readonly type?: 'vulnerability' | 'finding';
+  readonly type?: 'vulnerability' | 'finding' | 'general'; // 'general' hinzugefügt
 }
 
 export interface Recommendation {
@@ -115,7 +117,7 @@ export interface SecurityReviewReport {
 export interface SecurityErrorOptions {
   code?: string;
   status?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>; // Geändert von any zu unknown
 }
 
 // Zusätzliche Typen für secure_api.ts
@@ -138,16 +140,16 @@ export interface MockRequest {
   readonly headers: Record<string, string | string[] | undefined>;
   readonly connection: { remoteAddress?: string };
   readonly method?: string;
-  readonly body?: any;
-  readonly query?: any;
-  readonly session?: { csrfToken?: string; [key: string]: any };
+  readonly body?: unknown; // Geändert von any zu unknown
+  readonly query?: unknown; // Geändert von any zu unknown
+  readonly session?: { csrfToken?: string; [key: string]: unknown }; // Geändert von any zu unknown
   // Weitere Request-Eigenschaften nach Bedarf
 }
 
 export interface MockResponse {
   setHeader(name: string, value: string | number | readonly string[]): void;
   status(code: number): this; // Ermöglicht Chaining wie res.status(200).json(...)
-  json(body: any): this; // Ermöglicht Chaining
+  json(body: unknown): this; // Ermöglicht Chaining, body von any zu unknown geändert
   // Weitere Response-Eigenschaften und Methoden nach Bedarf
 }
 

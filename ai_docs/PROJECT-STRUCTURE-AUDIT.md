@@ -79,6 +79,14 @@ Detailliertere Unterverzeichnisstrukturen sind in den jeweiligen Hauptverzeichni
 *   Durch die schrittweise Migration und klare Dokumentation der Änderungen wurde das Risiko von Fehlern oder Brüchen in der Funktionalität minimiert.
 *   Die Beibehaltung des `saar.sh` Skripts im Root stellt sicher, dass der Haupteinstiegspunkt für das System unverändert bleibt und bestehende Workflows nicht sofort angepasst werden müssen.
 
+## Audit Historie
+
+*   [Plan zur Auditierung der Projektstruktur](./PROJECT_STRUCTURE_AUDIT_PLAN.md)
+*   [Bericht zur Komponentenentfernung](./cleanup/component_removal_report.md)
+*   [Integrationsbericht (Integration)](./integration/INTEGRATION-REPORT.md)
+*   [Integrationsbericht (Reports)](./reports/INTEGRATION-REPORT.md)
+*   [Zusammenfassung Refactoring](./reports/REFACTORING-SUMMARY.md)
+*   [Zusammenfassung Migration Sicherheitsmodul](./reports/SECURITY-MODULE-MIGRATION-SUMMARY.md)
 ## 5. Wartungsempfehlungen
 
 ### 5.1 Best Practices

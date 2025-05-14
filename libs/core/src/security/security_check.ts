@@ -11,7 +11,7 @@ import { program, OptionValues } from 'commander';
 import chalk from 'chalk';
 
 // Import the security review module
-import { SecurityReview } from './security_review'; // Diese Datei wird später migriert
+import { SecurityReview } from './security_review'; // Annahme: Diese Datei (security_review.js) wird später nach TypeScript migriert
 
 // Import logger
 import { createLogger } from '../logging/logger'; // Annahme: logger.ts exportiert createLogger
@@ -37,7 +37,8 @@ async function runSecurityCheck(options: SecurityCheckOptions): Promise<void> {
 
   try {
     // Create security review instance
-    const securityReview = new SecurityReview({ // SecurityReview muss noch migriert werden
+    // TODO: Typen für SecurityReviewOptions anpassen, sobald security_review.js nach TypeScript migriert wurde
+    const securityReview = new SecurityReview({
       autoFix: options.autofix,
       strictMode: !options.relaxed,
       reportPath: options.output || path.join(process.cwd(), 'security-report.json'),
@@ -53,7 +54,8 @@ async function runSecurityCheck(options: SecurityCheckOptions): Promise<void> {
     };
 
     // Run validators
-    // TODO: SecurityReview.runValidators muss noch typisiert werden
+    // TODO: Die Methode runValidators in SecurityReview (aus security_review.js) muss nach der Migration Typen zurückgeben,
+    // die mit ValidatorResults kompatibel sind oder ValidatorResults selbst.
     const results: ValidatorResults = await securityReview.runValidators(context);
 
     // Print results summary
@@ -74,8 +76,12 @@ async function runSecurityCheck(options: SecurityCheckOptions): Promise<void> {
     } else {
       process.exit(0);
     }
-  } catch (error: any) {
-    console.error(chalk.red(`\nError: ${error.message}`));
+  } catch (error: unknown) {
+    let errorMessage = 'An unknown error occurred';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    console.error(chalk.red(`\nError: ${errorMessage}`));
 
     if (options.verbose) {
       console.error(error);

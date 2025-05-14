@@ -44,6 +44,7 @@ jest.mock('../config/config-manager', () => ({
       mcp: { allowed_servers: [] },
       version: '1.0.0', // Example if SecurityReview uses it
     }),
+    // TODO: Typen für type (z.B. ConfigType) und defaultValue (unknown oder spezifischer) verbessern, falls bekannt.
     getConfigValue: jest.fn((type: any, key: string, defaultValue: any) => {
       if (key === 'version') return '1.0.0-mock'; // Specific mock for version
       return defaultValue;
@@ -53,7 +54,8 @@ jest.mock('../config/config-manager', () => ({
 
 jest.mock('../i18n/i18n.js', () => ({
   I18n: jest.fn().mockImplementation(() => ({
-    translate: jest.fn((key: string, _options?: any) => key), // Korrekte Mock-Signatur
+    // TODO: _options?: Record<string, unknown> oder spezifischer, falls die echte Implementierung das erfordert.
+    translate: jest.fn((key: string, _options?: any) => key),
   })),
 }));
 
@@ -166,16 +168,16 @@ describe('SecurityReview', () => {
   describe('runValidators', () => {
     it('should run all registered validators and generate a report', async () => {
       const finding1Data: SecurityFinding = {
-        // id wird intern generiert
+        id: 'find-1', // id wird intern generiert, aber für den Mock benötigt
+        timestamp: new Date().toISOString(), // timestamp wird intern generiert, aber für den Mock benötigt
         validator: 'validator-1', type: 'finding', title: 'Finding 1',
         description: 'Test finding 1', location: 'test1.js', severity: 'low',
-        // timestamp wird intern generiert
       };
       const vulnerability1Data: SecurityFinding = {
-        // id wird intern generiert
+        id: 'vuln-1', // id wird intern generiert, aber für den Mock benötigt
+        timestamp: new Date().toISOString(), // timestamp wird intern generiert, aber für den Mock benötigt
         validator: 'validator-2', type: 'vulnerability', title: 'Vulnerability 1',
         description: 'Test vulnerability 1', severity: 'high', location: 'test2.js',
-        // timestamp wird intern generiert
       };
 
       const validator1 = createMockValidator([finding1Data]);
@@ -194,7 +196,8 @@ describe('SecurityReview', () => {
     });
 
     it('should handle validator errors gracefully', async () => {
-      const failingValidator = jest.fn<() => Promise<any>>().mockRejectedValue(new Error('Validator failed'));
+      const failingValidator = jest.fn<() => Promise<{ findings: SecurityFinding[]; vulnerabilities: SecurityFinding[] }>>()
+        .mockRejectedValue(new Error('Validator failed'));
       securityReview.registerValidator('failing-validator', failingValidator as ValidatorFunction);
       const report = await securityReview.runValidators(defaultValidationContext);
       expect(failingValidator).toHaveBeenCalled();
@@ -253,11 +256,11 @@ describe('SecurityReview', () => {
       securityReview['validators'].clear();
 
        securityReview.registerValidator('api-key-exposure', createMockValidator([{
-        title: 'API Key Exposure', description: 'd', location: 'l', severity: 'medium', type: 'finding', validator: 'api-key-exposure'
+        id: 'api-key-finding', timestamp: new Date().toISOString(), title: 'API Key Exposure', description: 'd', location: 'l', severity: 'medium', type: 'finding', validator: 'api-key-exposure'
       }]));
        securityReview.registerValidator('xss-check', createMockValidator([], [{
-        // id und type werden intern gesetzt/überschrieben
-        title: 'Critical XSS', description: 'd', location: 'l', severity: 'critical', validator: 'xss-check'
+        id: 'xss-vuln', timestamp: new Date().toISOString(), // id und type werden intern gesetzt/überschrieben
+        title: 'Critical XSS', description: 'd', location: 'l', severity: 'critical', validator: 'xss-check', type: 'vulnerability' // type hier explizit für den Mock
       }]));
 
 

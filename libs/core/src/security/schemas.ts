@@ -60,6 +60,9 @@ export const SecurityEventSchema = z.object({
   timestamp: z.date(),
   severity: z.enum(['info', 'warning', 'error', 'critical']),
   message: z.string().min(1),
+  // z.any() für details erlaubt maximale Flexibilität.
+  // Falls eine spezifischere Struktur für details bekannt ist oder erzwungen werden soll,
+  // könnte hier ein spezifischeres z.object({...}) Schema verwendet werden.
   details: z.record(z.any()).optional(),
 });
 
@@ -113,15 +116,15 @@ export const SecurityReviewSummarySchema = z.object({
  * differentiated by the `type` and `severity` fields.
  */
 export const SecurityFindingSchema = z.object({
-  id: z.string().optional(), // ID might be generated runtime
+  id: z.string(), // ID ist jetzt obligatorisch
   validator: z.string().optional(),
-  type: z.enum(['vulnerability', 'finding']).optional(),
+  type: z.enum(['vulnerability', 'finding', 'general']).optional(), // 'general' hinzugefügt
   title: z.string().min(1),
   description: z.string().min(1),
   location: z.string().min(1),
   severity: z.enum(['critical', 'high', 'medium', 'low', 'info']),
   recommendation: z.string().optional(),
-  timestamp: z.string().datetime().optional(), // Or z.date() if preferred
+  timestamp: z.string().datetime(), // Timestamp ist jetzt obligatorisch (ISO-String)
 });
 
 /**
