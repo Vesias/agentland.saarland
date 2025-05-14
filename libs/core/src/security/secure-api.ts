@@ -23,41 +23,16 @@ import { ValidationError, ClaudeError } from '../error/error-handler';
 import { I18n } from '../i18n/i18n';
 // Die globale Namespace-Erweiterung wird entfernt, da @types/express-session
 // bereits eine Typisierung für req.session bereitstellen sollte.
-// Wir werden den csrfToken direkt beim Zugriff typisieren.
+// und session.types.ts diese erweitert.
+
+import { PolicyLevel, SecureApiOptions as SecurityOptionsImport } from './security.types'; // Import der zentralen Typen
+import './session.types'; // Sicherstellen, dass die Modulerweiterung geladen wird
 
 /**
  * Promisified crypto functions
  */
 const randomBytes = promisify(crypto.randomBytes);
 const scrypt = promisify(crypto.scrypt);
-
-/**
- * Security policy level enum
- */
-export enum SecurityPolicyLevel {
-  STRICT = 'strict',
-  MODERATE = 'moderate',
-  OPEN = 'open'
-}
-
-/**
- * Interface for secure API options
- */
-export interface SecureAPIOptions {
-  rateLimitRequests?: number;
-  rateLimitWindowMs?: number;
-  sessionTimeoutMs?: number;
-  requireHTTPS?: boolean;
-  csrfProtection?: boolean;
-  secureHeaders?: boolean;
-  inputValidation?: boolean;
-  policyLevel?: SecurityPolicyLevel;
-  /**
-   * Allows for additional, unspecified options.
-   * Consider defining more specific types if possible for better type safety.
-   */
-  [key: string]: any;
-}
 
 /**
  * Interface for client rate limit state
@@ -93,7 +68,7 @@ export function isClaudeError(error: unknown): error is ClaudeError {
  */
 export class SecureAPI {
   private i18n: I18n;
-  private options: SecureAPIOptions;
+  private options: SecurityOptionsImport; // Verwendung des importierten Typs
   private rateLimitState: Map<string, ClientRateLimitState>;
   private securityHeaders: Record<string, string>;
   private logger: Logger;
@@ -103,7 +78,7 @@ export class SecureAPI {
    * 
    * @param options - Configuration options
    */
-  constructor(options: SecureAPIOptions = {}) {
+  constructor(options: SecurityOptionsImport = {}) { // Verwendung des importierten Typs
     // Initialize logger
     this.logger = new Logger('secure-api');
     
@@ -119,7 +94,7 @@ export class SecureAPI {
       csrfProtection: true,
       secureHeaders: true,
       inputValidation: true,
-      policyLevel: SecurityPolicyLevel.STRICT,
+      policyLevel: PolicyLevel.STRICT, // Verwendung von PolicyLevel
       ...options
     };
     
@@ -307,12 +282,11 @@ export class SecureAPI {
                         (req.query && req.query._csrf);
     
     // Get session token
-    // Wir nehmen an, dass req.session von express-session typisiert wird
-    // und fügen csrfToken spezifisch hinzu.
-    const sessionToken = req.session && (req.session as { csrfToken?: string }).csrfToken;
+    // req.session.csrfToken sollte dank session.types.ts direkt verfügbar sein
+    const sessionToken = req.session?.csrfToken;
     
     // Validate token
-    return Boolean(requestToken && sessionToken && requestToken === sessionToken);
+    return !!requestToken && !!sessionToken && requestToken === sessionToken;
   }
   
   /**

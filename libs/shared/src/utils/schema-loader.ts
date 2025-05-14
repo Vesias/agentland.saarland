@@ -148,7 +148,7 @@ export class SchemaLoader {
    * @param data - The data to validate.
    * @returns An object containing a boolean `valid` and an array of `errors` (if any).
    */
-  public validateDataWithSchema(schema: Record<string, any>, data: any): { valid: boolean; errors: ValidateFunction['errors'] } {
+  public validateDataWithSchema(schema: Record<string, any>, data: unknown): { valid: boolean; errors: ValidateFunction['errors'] } { // data: any zu data: unknown geändert
     try {
       const ajv = new Ajv();
       const validate = ajv.compile(schema);

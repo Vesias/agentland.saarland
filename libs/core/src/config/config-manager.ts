@@ -724,23 +724,53 @@ export class ConfigManager {
   }
 
   private _loadGlobalConfig(): void {
+    let loadedConfig: GlobalConfig | null = null;
+    const globalConfigPath = path.join(this.globalConfigPath, 'config.json');
     try {
-      const globalConfigPath = path.join(this.globalConfigPath, 'config.json');
-      this.configs[ConfigType.GLOBAL] = loadJsonConfig(globalConfigPath, DEFAULT_CONFIGS[ConfigType.GLOBAL]) as GlobalConfig;
+      const rawConfig = loadJsonConfig(globalConfigPath, {});
+      if (Object.keys(rawConfig).length === 0 && !fs.existsSync(globalConfigPath)) {
+        loadedConfig = DEFAULT_CONFIGS[ConfigType.GLOBAL] as GlobalConfig;
+        this.logger.info(`Global config file ${globalConfigPath} not found. Using default.`);
+      } else {
+        const zodSchema = getZodSchemaForConfigType(ConfigType.GLOBAL);
+        const validation = validateConfig(rawConfig, zodSchema);
+        if (validation.valid) {
+          loadedConfig = rawConfig as GlobalConfig;
+        } else {
+          this.logger.warn(`Validation failed for global configuration from ${globalConfigPath}. Errors: ${validation.errors.join(', ')}. Falling back to default.`);
+          loadedConfig = DEFAULT_CONFIGS[ConfigType.GLOBAL] as GlobalConfig;
+        }
+      }
+      this.configs[ConfigType.GLOBAL] = loadedConfig;
       this.configVersions.set(ConfigType.GLOBAL, Date.now());
     } catch (err) {
-      this.logger.error(`Failed to load global configuration`, { error: err });
+      this.logger.error(`Failed to load or validate global configuration from ${globalConfigPath}`, { error: err });
       this.configs[ConfigType.GLOBAL] = DEFAULT_CONFIGS[ConfigType.GLOBAL] as GlobalConfig; // Fallback
     }
   }
 
   private _loadUserConfig(): void {
+    let loadedConfig: UserConfig | null = null;
+    const userConfigPath = path.join(this.globalConfigPath, 'user.about.json');
     try {
-      const userConfigPath = path.join(this.globalConfigPath, 'user.about.json');
-      this.configs[ConfigType.USER] = loadJsonConfig(userConfigPath, DEFAULT_CONFIGS[ConfigType.USER]) as UserConfig;
+      const rawConfig = loadJsonConfig(userConfigPath, {});
+      if (Object.keys(rawConfig).length === 0 && !fs.existsSync(userConfigPath)) {
+        loadedConfig = DEFAULT_CONFIGS[ConfigType.USER] as UserConfig;
+        this.logger.info(`User config file ${userConfigPath} not found. Using default.`);
+      } else {
+        const zodSchema = getZodSchemaForConfigType(ConfigType.USER);
+        const validation = validateConfig(rawConfig, zodSchema);
+        if (validation.valid) {
+          loadedConfig = rawConfig as UserConfig;
+        } else {
+          this.logger.warn(`Validation failed for user configuration from ${userConfigPath}. Errors: ${validation.errors.join(', ')}. Falling back to default.`);
+          loadedConfig = DEFAULT_CONFIGS[ConfigType.USER] as UserConfig;
+        }
+      }
+      this.configs[ConfigType.USER] = loadedConfig;
       this.configVersions.set(ConfigType.USER, Date.now());
     } catch (err) {
-      this.logger.error(`Failed to load user configuration`, { error: err });
+      this.logger.error(`Failed to load or validate user configuration from ${userConfigPath}`, { error: err });
       this.configs[ConfigType.USER] = DEFAULT_CONFIGS[ConfigType.USER] as UserConfig; // Fallback
     }
   }
@@ -766,12 +796,29 @@ export class ConfigManager {
    */
   private _loadSpecificLocalConfig(configType: ConfigType): void {
     if (LOCAL_CONFIG_PATHS[configType]) {
+      let loadedConfig: ConfigData | null = null;
       try {
-        this.configs[configType] = loadJsonConfig(LOCAL_CONFIG_PATHS[configType], DEFAULT_CONFIGS[configType]) as ConfigData;
+        // Lade Konfiguration ohne Default, um leere/fehlerhafte Dateien besser zu behandeln
+        const rawConfig = loadJsonConfig(LOCAL_CONFIG_PATHS[configType], {}); 
+        if (Object.keys(rawConfig).length === 0 && !fs.existsSync(LOCAL_CONFIG_PATHS[configType])) {
+            // Datei existiert nicht, Default verwenden
+            loadedConfig = DEFAULT_CONFIGS[configType] as ConfigData;
+            this.logger.info(`Config file ${LOCAL_CONFIG_PATHS[configType]} not found for ${configType}. Using default.`);
+        } else {
+            const zodSchema = getZodSchemaForConfigType(configType);
+            const validation = validateConfig(rawConfig, zodSchema);
+            if (validation.valid) {
+              loadedConfig = rawConfig as ConfigData;
+            } else {
+              this.logger.warn(`Validation failed for ${configType} configuration from ${LOCAL_CONFIG_PATHS[configType]}. Errors: ${validation.errors.join(', ')}. Falling back to default.`);
+              loadedConfig = DEFAULT_CONFIGS[configType] as ConfigData;
+            }
+        }
+        this.configs[configType] = loadedConfig;
         this.configVersions.set(configType, Date.now());
-      } catch (err) {
-        this.logger.error(`Failed to load ${configType} configuration`, { error: err });
-        this.configs[configType] = DEFAULT_CONFIGS[configType]; // Fallback
+      } catch (err) { // Catch errors from loadJsonConfig or other unexpected issues
+        this.logger.error(`Failed to load or validate ${configType} configuration from ${LOCAL_CONFIG_PATHS[configType]}`, { error: err });
+        this.configs[configType] = DEFAULT_CONFIGS[configType] as ConfigData; // Fallback to default
       }
     } else {
       // This case should ideally not be reached if configType is a valid local config type

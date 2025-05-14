@@ -7,11 +7,11 @@ import * as toml from 'toml'; // Diese Abhängigkeit muss später installiert we
 interface ProjectRules {
   name?: string;
   docs_base?: string;
-  [key: string]: any; // Für Flexibilität, falls weitere Felder existieren
+  [key: string]: unknown; // Geändert von any zu unknown
 }
 
 interface AiDocsRules {
-  must_have?: string[];
+  readonly must_have?: readonly string[];
 }
 
 interface EnforceStructureRules {
@@ -23,7 +23,7 @@ interface FoldersRules {
 }
 
 interface ScriptsRules {
-  only_root_script?: string[];
+  readonly only_root_script?: readonly string[];
   disallow_other_root_scripts?: boolean;
 }
 
@@ -35,7 +35,7 @@ interface ClaudeRules {
   project?: ProjectRules;
   folders?: FoldersRules;
   enforce?: EnforceRules;
-  [key: string]: any; // Für Flexibilität
+  [key: string]: unknown; // Geändert von any zu unknown
 }
 
 export function validateClauderules(filePath: string = './.clauderules'): string[] {
@@ -51,8 +51,12 @@ export function validateClauderules(filePath: string = './.clauderules'): string
   try {
     const fileContent = fs.readFileSync(fullPath, 'utf-8');
     rules = toml.parse(fileContent);
-  } catch (error: any) {
-    issues.push(`Fehler beim Parsen der TOML-Datei: ${error.message}`);
+  } catch (error: unknown) {
+    let message = 'Unbekannter Fehler beim Parsen der TOML-Datei.';
+    if (error instanceof Error) {
+      message = error.message;
+    }
+    issues.push(`Fehler beim Parsen der TOML-Datei: ${message}`);
     return issues;
   }
 

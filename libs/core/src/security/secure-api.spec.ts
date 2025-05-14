@@ -2,7 +2,8 @@
  * Tests for the SecureAPI module
  */
 
-import { SecureAPI, SecurityPolicyLevel, isClaudeError } from './secure-api';
+import { SecureAPI, isClaudeError } from './secure-api';
+import { PolicyLevel } from './security.types'; // PolicyLevel hier importieren
 import { ValidationError } from '../error/error-handler';
 import { Request, Response } from 'express';
 
@@ -49,7 +50,7 @@ describe('SecureAPI', () => {
       secure: true,
       socket: {
         remoteAddress: '127.0.0.1'
-      } as any, // Cast to any to satisfy Socket type for testing purposes
+      } as Request['socket'], // Spezifischerer Cast für das Socket-Objekt
       body: {},
       query: {}
     };
@@ -77,7 +78,7 @@ describe('SecureAPI', () => {
       const customApi = new SecureAPI({
         rateLimitRequests: 50,
         requireHTTPS: false,
-        policyLevel: SecurityPolicyLevel.MODERATE
+        policyLevel: PolicyLevel.MODERATE // SecurityPolicyLevel zu PolicyLevel geändert
       });
       expect(customApi).toBeInstanceOf(SecureAPI);
     });

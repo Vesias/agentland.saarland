@@ -7,32 +7,44 @@
  * - Secure API implementation
  */
 
-// Export security review components
+// Export security review classes and functions
 export {
   SecurityReview,
-  SecurityError,
+  SecurityError, // Diese sind in security-review.ts definiert
   SecurityViolationError,
   SecurityConfigError,
-  type SecurityErrorOptions,
-  type SecurityReviewOptions,
-  type ValidationContext,
-  type SecurityFinding,
-  type SecurityVulnerability,
-  type SecurityRecommendation,
-  type ValidationResult,
-  type SecurityReportSummary,
-  type SecurityReport
 } from './security-review';
 
-// Export secure API components
+// Export secure API class, function and related types (PasswordHashResult ist in secure-api.ts definiert)
 export {
   SecureAPI,
-  SecurityPolicyLevel,
-  type SecureAPIOptions,
-  type PasswordHashResult,
-  isClaudeError
+  isClaudeError, // ist in secure-api.ts definiert
+  type PasswordHashResult, // ist in secure-api.ts definiert
 } from './secure-api';
 
+// Export all types from security.types.ts as they are the central source of truth
+export type {
+  ApiAccessRule,
+  SecurityConfig,
+  SecurityEvent,
+  SecurityReport as SecurityReportTypeAlias, // Alias, da SecurityReport auch in security-review.ts lokal war
+  SecurityCheckOptions,
+  ValidationContext,
+  SecurityReviewSummary,
+  SecurityFinding,
+  Recommendation,
+  ValidatorResults,
+  SecurityReviewOptions,
+  ValidatorFunction, // Obwohl dieser Typ in security-review.ts verwendet wird, ist er in security.types.ts definiert
+  SecurityReviewReport,
+  SecurityErrorOptions,
+  SecureApiOptions,
+  MockRequest,
+  MockResponse,
+  FormattedErrorResponse,
+  PolicyLevel, // Ersetzt SecurityPolicyLevel
+} from './security.types';
+
 // Default export for easy importing
-import SecurityReview from './security-review';
-export default SecurityReview;
+import { SecurityReview as DefaultSecurityReview } from './security-review'; // Alias um Kollision zu vermeiden
+export default DefaultSecurityReview;

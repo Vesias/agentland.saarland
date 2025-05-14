@@ -47,7 +47,7 @@ export interface SecurityCheckOptions {
 }
 
 export interface ValidationContext {
-  readonly targetDir: string;
+  readonly targetDir?: string; // Geändert zu optional
   readonly targetFiles?: ReadonlyArray<string>;
   readonly excludePatterns?: ReadonlyArray<string>;
 }
@@ -97,7 +97,7 @@ export interface SecurityReviewOptions {
 }
 
 export interface ValidatorFunction {
-  (context: ValidationContext): Promise<{ findings: SecurityFinding[]; vulnerabilities: SecurityFinding[] }>;
+  (context: ValidationContext): Promise<ValidatorResults>; // Geändert, um ValidatorResults zurückzugeben
 }
 
 export interface SecurityReviewReport {
@@ -130,6 +130,11 @@ export interface SecureApiOptions {
   readonly csrfProtection?: boolean;
   readonly secureHeaders?: boolean;
   readonly inputValidation?: boolean;
+  readonly policyLevel?: PolicyLevel; // Hinzugefügt, verwendet PolicyLevel aus dieser Datei
+  /**
+   * Allows for additional, unspecified options.
+   */
+  readonly [key: string]: any; // Beibehaltung der Flexibilität für zusätzliche Optionen
   // Ggf. weitere Optionen aus dem Konstruktor von SecureAPI
 }
 

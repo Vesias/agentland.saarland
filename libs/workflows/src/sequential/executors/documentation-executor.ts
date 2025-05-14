@@ -25,7 +25,7 @@ export class DocumentationExecutor extends BaseExecutor {
    * @param context Execution context with data from previous steps
    * @returns Result of the execution
    */
-  async executeStep(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
+  async executeStep(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> { // any zu unknown
     this.logger.debug(`Executing documentation step: ${step.id}`, { step });
     
     try {
@@ -45,7 +45,7 @@ export class DocumentationExecutor extends BaseExecutor {
         default:
           throw new ClaudeError(`Unknown documentation step: ${step.id}`);
       }
-    } catch (error) {
+    } catch (error: unknown) { // any zu unknown
       this.logger.error(`Error executing documentation step ${step.id}`, { error });
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       return {
@@ -62,12 +62,12 @@ export class DocumentationExecutor extends BaseExecutor {
   /**
    * Analyzes the codebase to identify components requiring documentation
    */
-  private async analyzeCodebase(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
+  private async analyzeCodebase(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> { // any zu unknown
     const patterns: string[] = step.data?.patterns || ['**/*.ts', '**/*.tsx', '!**/*.spec.ts', '!**/node_modules/**'];
     const basePath = step.data?.basePath || '.'; // Base path for glob patterns
     this.logger.info('Analyzing codebase structure', { patterns, basePath });
 
-    let analyzedFiles: { path: string, type: string, lastModified?: string, needsDocumentation: boolean, coverage?: number, elements?: any[], elementsCount?: number }[] = [];
+    let analyzedFiles: { path: string, type: string, lastModified?: string, needsDocumentation: boolean, coverage?: number, elements?: any[], elementsCount?: number, error?: string }[] = [];
     let filesFoundCount = 0;
     let filesRequiringDocsCount = 0;
 
@@ -84,40 +84,49 @@ export class DocumentationExecutor extends BaseExecutor {
           if (['.ts', '.js'].includes(fileExtension)) type = 'module';
           if (['.tsx', '.jsx'].includes(fileExtension)) type = 'component';
           
+                          this.logger.debug(`Analyzing file ${fullPath} for documentation needs using heuristic methods.`);
                           // Basic analysis to determine `needsDocumentation` and `coverage`.
-                          // This is still a simplification; full AST parsing would be more robust.
+                          // This is a simplification; full AST parsing (e.g. with TypeScript API or Babel) would be more robust.
                           let fileContentForAnalysis = "";
                           try {
                             fileContentForAnalysis = await fs.readFile(fullPath, 'utf-8');
                           } catch (readError: any) {
                             this.logger.warn(`Could not read file ${fullPath} for analysis: ${readError.message}`);
+                            // Skip further analysis for this file if content cannot be read
+                            analyzedFiles.push({ path: filePath, type, lastModified: stats.mtime.toISOString(), needsDocumentation: true, coverage: 0, elementsCount: 0, error: 'File read error' });
+                            filesRequiringDocsCount++; // Assume it needs docs if unreadable
+                            continue;
                           }
                 
                           // Check for common indicators of documentation or need thereof
                           const hasDocComments = /\/\*\*\s*([\s\S]*?)\s*\*\//.test(fileContentForAnalysis); // JSDoc/TSDoc style
-                          const hasTodoDocument = /\/\/\s*TODO:\s*(Document|Add docs)/i.test(fileContentForAnalysis);
-                          const exportCount = (fileContentForAnalysis.match(/export\s+(class|function|const|let|var|type|interface)/g) || []).length;
+                          const hasTodoDocument = /\/\/\s*TODO:\s*(Document|Add docs|document this)/i.test(fileContentForAnalysis);
+                          const exportCount = (fileContentForAnalysis.match(/export\s+(default\s+)?(async\s+)?(class|function|const|let|var|type|interface|enum)/g) || []).length;
                           
                           let needsDoc = false;
-                          let estimatedCoverage = 0.5; // Default if no info
+                          let estimatedCoverage = 0.5; // Default heuristic value
                 
-                          if (exportCount > 0) { // Only consider files with exports for detailed coverage
+                          if (exportCount > 0) { // Only consider files with exports for detailed coverage heuristics
                             if (hasTodoDocument) {
                               needsDoc = true;
-                              estimatedCoverage = 0.2; // Low coverage if explicitly marked with TODO
+                              estimatedCoverage = 0.1; // Very low coverage if explicitly marked with TODO
+                              this.logger.debug(`File ${filePath} marked with TODO for documentation.`);
                             } else if (hasDocComments) {
-                              // Simple heuristic: if doc comments exist, assume some coverage.
-                              // A real system would count documented exports vs total exports.
+                              // Simple heuristic: count JSDoc blocks vs exports.
+                              // A real system would parse AST to map comments to specific exports.
                               const commentBlockCount = (fileContentForAnalysis.match(/\/\*\*\s*([\s\S]*?)\s*\*\//g) || []).length;
-                              estimatedCoverage = Math.min(1, commentBlockCount / (exportCount || 1)); // Avoid division by zero
-                              needsDoc = estimatedCoverage < 0.7; // Needs more docs if coverage is below 70%
+                              estimatedCoverage = Math.min(1, commentBlockCount / exportCount); // Ensure exportCount is not zero
+                              needsDoc = estimatedCoverage < (step.data?.coverageTarget || 0.7); // Needs more docs if coverage is below target (default 70%)
+                              this.logger.debug(`File ${filePath} has ${commentBlockCount} doc comment(s) and ${exportCount} export(s). Estimated coverage: ${estimatedCoverage.toFixed(2)}. Needs docs: ${needsDoc}`);
                             } else {
                               needsDoc = true; // No doc comments but has exports
                               estimatedCoverage = 0.0;
+                              this.logger.debug(`File ${filePath} has ${exportCount} export(s) but no doc comments. Needs docs.`);
                             }
                           } else {
-                            needsDoc = false; // No exports, likely doesn't need top-level file docs in the same way
-                            estimatedCoverage = 1.0; // Or N/A, depending on definition
+                            needsDoc = false; // No exports, heuristic assumes it doesn't need top-level file docs in the same way
+                            estimatedCoverage = 1.0; // Or N/A, depending on definition. For simplicity, assume covered.
+                            this.logger.debug(`File ${filePath} has no exports. Assuming no specific documentation needed via this heuristic.`);
                           }
 
           if (needsDoc) filesRequiringDocsCount++;
@@ -130,8 +139,9 @@ export class DocumentationExecutor extends BaseExecutor {
             coverage: parseFloat(estimatedCoverage.toFixed(2)),
             elementsCount: exportCount // Store count of exported elements found
           });
-        } catch (fileStatError: any) {
-          this.logger.warn(`Could not stat file ${fullPath}: ${fileStatError.message}`);
+        } catch (fileStatError: unknown) { // any zu unknown
+          const statErrorMsg = fileStatError instanceof Error ? fileStatError.message : 'Unknown stat error';
+          this.logger.warn(`Could not stat file ${fullPath}: ${statErrorMsg}`);
         }
       }
       
@@ -144,15 +154,16 @@ export class DocumentationExecutor extends BaseExecutor {
         summary: message,
         data: { analysisResults: { files: analyzedFiles, patternsUsed: patterns, basePath } },
       };
-    } catch (error: any) {
-      this.logger.error('Error during codebase analysis with glob', { error: error.message });
+    } catch (error: unknown) { // any zu unknown
+      const globErrorMsg = error instanceof Error ? error.message : 'Unknown glob error';
+      this.logger.error('Error during codebase analysis with glob', { error: globErrorMsg });
       return {
         type: 'analyze-codebase',
         success: false,
         stepId: step.id,
-        message: `Error during codebase analysis: ${error.message}`,
+        message: `Error during codebase analysis: ${globErrorMsg}`,
         summary: 'Codebase analysis failed.',
-        error: error.message,
+        error: globErrorMsg,
         data: { patternsUsed: patterns, basePath },
       };
     }
@@ -161,7 +172,7 @@ export class DocumentationExecutor extends BaseExecutor {
   /**
    * Extracts documentation from code comments and structure
    */
-  private async extractDocumentation(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
+  private async extractDocumentation(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> { // any zu unknown
     const extractExamples = step.data?.extractExamples === true;
     const commentTypes = step.data?.commentTypes || ['JSDoc', 'TSDoc']; // Specify which comment types to look for
     this.logger.info('Extracting documentation from code', { extractExamples, commentTypes });
@@ -197,8 +208,12 @@ export class DocumentationExecutor extends BaseExecutor {
         const fileContent = await fs.readFile(fullPath, 'utf-8');
         
         const extractedElements: any[] = [];
-        // More robust regex or AST parsing would be needed here.
-        // This is a very simplified example for JSDoc-like comments.
+        // NOTE: The following documentation extraction uses regular expressions.
+        // This is a simplification and can be error-prone for complex code structures or nested comments.
+        // A more robust solution would involve using an Abstract Syntax Tree (AST) parser
+        // (e.g., TypeScript API, Babel, esprima) to accurately identify code elements and their associated comments.
+        this.logger.debug(`Using regex-based comment extraction for ${fullPath}. For complex scenarios, consider AST parsing.`);
+
         // Improved Regex for JSDoc/TSDoc blocks and associated code structure
         // This regex tries to capture the comment block and the line(s) following it to infer name and type
         const jsdocRegex = /\/\*\*\s*([\s\S]*?)\s*\*\/\s*([\s\S]*?)(?=(\/\*\*|$|\n\s*(?:export|class|interface|type|const|let|var|function|async function|private|public|protected|static)))/g;
@@ -270,8 +285,9 @@ export class DocumentationExecutor extends BaseExecutor {
         if (extractedElements.length > 0) {
           extractedItemsOverall.push(...extractedElements);
         }
-      } catch (error: any) {
-        this.logger.error(`Failed to extract documentation from ${fullPath}: ${error.message}`);
+      } catch (error: unknown) { // any zu unknown
+        const extractErrorMsg = error instanceof Error ? error.message : 'Unknown extraction error';
+        this.logger.error(`Failed to extract documentation from ${fullPath}: ${extractErrorMsg}`);
       }
     }
     
@@ -289,7 +305,7 @@ export class DocumentationExecutor extends BaseExecutor {
   /**
    * Generates documentation files based on extracted information
    */
-  private async generateDocumentation(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
+  private async generateDocumentation(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> { // any zu unknown
     const outputFormat = step.data?.format || 'markdown'; // e.g., markdown, html
     const outputDir = step.data?.outputDir || 'docs/generated';
     const templateName = step.data?.template || 'default'; // Allow specifying a template
@@ -326,7 +342,9 @@ generatedAt: ${new Date().toISOString()}
 format: ${outputFormat}
 ---
 # Documentation for ${filePath}\n\n`;
-
+      // NOTE: For more complex documentation structures or custom theming,
+      // consider using a templating engine (e.g., Handlebars, EJS, Nunjucks)
+      // instead of direct string concatenation.
       if (outputFormat === 'markdown') {
         for (const item of items) {
           docContent += `## \`${item.name || 'Unnamed Element'}\` (${item.type || 'N/A'})\n\n`;
@@ -381,14 +399,15 @@ format: ${outputFormat}
           sizeBytes: stats.size,
           status: 'success',
         });
-      } catch (error: any) {
-        this.logger.error(`Failed to write documentation file ${outputFilePath}: ${error.message}`);
+      } catch (error: unknown) {
+        const writeErrorMsg = error instanceof Error ? error.message : 'Unknown error writing documentation file';
+        this.logger.error(`Failed to write documentation file ${outputFilePath}: ${writeErrorMsg}`);
         generatedFiles.push({
           sourceFilePath: filePath,
           outputFilePath,
           sizeBytes: 0,
           status: 'failed',
-          error: error.message,
+          error: writeErrorMsg,
         });
       }
     }
@@ -407,7 +426,7 @@ format: ${outputFormat}
   /**
    * Validates the generated documentation
    */
-  private async validateDocumentation(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
+  private async validateDocumentation(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> { // any zu unknown
     const checkBrokenLinks = step.data?.checkBrokenLinks !== false;
     const checkCoverage = step.data?.checkCoverage !== false;
     const coverageThreshold = step.data?.coverageThreshold || 80; // Minimum coverage in percent
@@ -444,13 +463,16 @@ format: ${outputFormat}
             const link = match[1];
             if (link.startsWith('http')) {
                 // For external links, a real check would involve an HTTP request.
-                // Simulating a check for a known "broken" pattern for now.
-                if (link.includes('example.com/broken-link-test')) {
+                // This is a SIMULATION. A production system would use a library to make HEAD or GET requests.
+                this.logger.debug(`Simulating check for external link: ${link} in ${docFile.outputFilePath}`);
+                if (link.includes('example.com/broken-link-test-simulation')) { // More specific simulation trigger
                     brokenLinksFound++;
-                    validationIssues.push({ file: docFile.outputFilePath, type: 'broken_external_link', link });
+                    validationIssues.push({ file: docFile.outputFilePath, type: 'broken_external_link_simulated', link, message: "Simulated broken external link." });
+                    this.logger.warn(`Simulated broken external link found: ${link} in ${docFile.outputFilePath}`);
                 }
             } else if (!link.startsWith('#') && !link.startsWith('mailto:')) {
                 // Handle relative local links
+                this.logger.debug(`Checking local link: ${link} in ${docFile.outputFilePath}`);
                 const outputDir = previousGenerateStep?.data?.outputDirectory || 'docs/generated';
                 let targetPath = path.resolve(path.dirname(docFile.outputFilePath), link);
                 
@@ -494,8 +516,9 @@ format: ${outputFormat}
             }
           }
         }
-      } catch (error: any) {
-        this.logger.warn(`Could not read generated file ${docFile.outputFilePath} for validation: ${error.message}`);
+      } catch (error: unknown) { // any zu unknown
+        const readDocErrorMsg = error instanceof Error ? error.message : 'Unknown error reading generated doc file';
+        this.logger.warn(`Could not read generated file ${docFile.outputFilePath} for validation: ${readDocErrorMsg}`);
       }
     }
     // previousAnalysisStep is now declared at the beginning of the function.
@@ -557,7 +580,7 @@ format: ${outputFormat}
   /**
    * Generates API documentation
    */
-  private async generateApiDocs(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
+  private async generateApiDocs(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> { // any zu unknown
     const outputFormat = step.data?.format || 'html'; // e.g., html, openapi_json, markdown
     const outputDir = step.data?.outputDir || 'docs/api';
     const apiSpecPath = step.data?.apiSpecPath; // Path to an OpenAPI/Swagger spec file
@@ -577,9 +600,10 @@ format: ${outputFormat}
         } else {
             throw new Error('Invalid API specification file format or content.');
         }
-      } catch (error: any) {
-        this.logger.error(`Failed to load API spec file ${apiSpecPath}: ${error.message}`);
-        return { type: 'generate-api-docs', success: false, stepId: step.id, message: `Error loading API spec: ${error.message}`, summary: 'API spec loading failed.', data: { error: error.message, apiSpecPath } };
+      } catch (error: unknown) { // any zu unknown
+        const loadSpecErrorMsg = error instanceof Error ? error.message : 'Unknown error loading API spec';
+        this.logger.error(`Failed to load API spec file ${apiSpecPath}: ${loadSpecErrorMsg}`);
+        return { type: 'generate-api-docs', success: false, stepId: step.id, message: `Error loading API spec: ${loadSpecErrorMsg}`, summary: 'API spec loading failed.', data: { error: loadSpecErrorMsg, apiSpecPath } };
       }
     } else if (useExtractedItems) {
       const previousExtractStep = Object.values(context).find(s => (s as ExecutionResult).type === 'extract-documentation') as ExecutionResult | undefined;
@@ -608,17 +632,27 @@ format: ${outputFormat}
 
 
     if (apiSpecPath && itemsToProcess.length > 0 && itemsToProcess[0].type === 'api_spec') {
-        // If we have a spec file, the "generation" might be just copying it or using a tool like Swagger UI/Redocly
-        // For simulation, if format is openapi_json, just use the content. Otherwise, a placeholder.
+        // If we have a spec file, the "generation" might be just copying it or using a dedicated tool.
+        // This is a SIMPLIFIED placeholder. For production, use tools like Swagger UI, Redocly, or similar
+        // to generate rich, interactive API documentation from an OpenAPI/Swagger spec.
+        this.logger.warn(`Processing API spec file ${apiSpecPath} with simplified placeholder logic. Consider dedicated tools for production.`);
         if (outputFormat === 'openapi_json') {
-            apiDocContent = itemsToProcess[0].content;
+            apiDocContent = itemsToProcess[0].content; // Directly use the spec content if JSON output is requested
         } else if (outputFormat === 'html') {
-            // Basic HTML rendering of a supposed spec. Real tools would do this.
-            apiDocContent += `<h2>API Specification: ${itemsToProcess[0].filePath}</h2><pre><code>${itemsToProcess[0].content.replace(/</g, "<").replace(/>/g, ">")}</code></pre>`;
+            // Basic HTML rendering of a supposed spec. Real tools would generate interactive UIs.
+            apiDocContent += `<h2>API Specification (from ${itemsToProcess[0].filePath})</h2>
+                              <p><strong>Note:</strong> This is a basic rendering. For interactive API docs, use tools like Swagger UI or Redocly.</p>
+                              <pre><code>${itemsToProcess[0].content.replace(/</g, "<").replace(/>/g, ">")}</code></pre>`;
         } else if (outputFormat === 'markdown') {
-            apiDocContent += `## API Specification: ${itemsToProcess[0].filePath}\n\n\`\`\`json\n${itemsToProcess[0].content}\n\`\`\`\n`;
+            apiDocContent += `## API Specification (from ${itemsToProcess[0].filePath})\n\n
+**Note:** This is a basic rendering. For interactive API docs, consider dedicated tools.\n\n
+\`\`\`json\n${itemsToProcess[0].content}\n\`\`\`\n`;
+        } else {
+            this.logger.warn(`Unsupported output format '${outputFormat}' for API spec. Defaulting to raw content.`);
+            apiDocContent += `Raw API Spec Content from ${itemsToProcess[0].filePath}:\n\n${itemsToProcess[0].content}`;
         }
-    } else { // Generating from extracted items
+    } else { // Generating from extracted items (less common for formal API docs but supported as fallback)
+        this.logger.info(`Generating API documentation from extracted code comments. For formal API docs, an OpenAPI/Swagger spec is recommended.`);
         itemsToProcess.forEach(item => {
           if (outputFormat === 'markdown') {
             apiDocContent += `## \`${item.name || 'Unnamed'}\` (${item.type || 'N/A'})\n\n${item.description || ''}\n\n`;
@@ -644,14 +678,15 @@ format: ${outputFormat}
         sizeBytes: stats.size,
         status: 'success',
       });
-    } catch (error: any) {
-      this.logger.error(`Failed to write API documentation file ${outputFilePath}: ${error.message}`);
+    } catch (error: unknown) {
+      const writeApiDocErrorMsg = error instanceof Error ? error.message : 'Unknown error writing API documentation file';
+      this.logger.error(`Failed to write API documentation file ${outputFilePath}: ${writeApiDocErrorMsg}`);
       apiDocFiles.push({
-        source: apiSpecPath || 'extracted_items',
+        source: apiSpecPath || (itemsToProcess.length > 0 && itemsToProcess[0].filePath ? itemsToProcess[0].filePath : 'extracted_items'), // Sicherstellen, dass source einen Wert hat
         outputFilePath,
         sizeBytes: 0,
         status: 'failed',
-        error: error.message,
+        error: writeApiDocErrorMsg, // Korrekt hier
       });
     }
     

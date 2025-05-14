@@ -12,30 +12,19 @@ import { program } from 'commander';
 import chalk from 'chalk';
 
 // Import the security review module
-import { SecurityReview, SecurityReport } from './security-review';
+import { SecurityReview } from './security-review'; // SecurityReport entfernt
 
 // Import logger
 import { Logger } from '../logging/logger';
-
-/**
- * Interface for security check options
- */
-interface SecurityCheckOptions {
-  dir?: string;
-  files?: string;
-  exclude?: string;
-  output?: string;
-  autofix?: boolean;
-  relaxed?: boolean;
-  verbose?: boolean;
-}
+// Import SecurityCheckOptions type
+import type { SecurityCheckOptions as SecurityCheckOptionsType, ValidatorResults, Recommendation, SecurityFinding } from './security.types'; // SecurityReport durch spezifischere Typen ersetzt
 
 /**
  * Run security check
  * 
  * @param options - Security check options
  */
-async function runSecurityCheck(options: SecurityCheckOptions): Promise<void> {
+async function runSecurityCheck(options: SecurityCheckOptionsType): Promise<void> {
   const logger = new Logger('security-check');
   
   console.log(chalk.bold('\n=== Claude Neural Framework - Security Check ===\n'));
@@ -93,7 +82,7 @@ async function runSecurityCheck(options: SecurityCheckOptions): Promise<void> {
  * 
  * @param results - Security report results
  */
-function printResultsSummary(results: SecurityReport): void {
+function printResultsSummary(results: ValidatorResults): void { // Geändert zu ValidatorResults
   const { summary } = results;
   
   console.log('\n');
@@ -184,7 +173,7 @@ function printResultsSummary(results: SecurityReport): void {
  * 
  * @param results - Security report results
  */
-function printDetailedResults(results: SecurityReport): void {
+function printDetailedResults(results: ValidatorResults): void { // Geändert zu ValidatorResults
   console.log('\n');
   console.log(chalk.bold('Detailed Security Review Results:'));
   console.log('═'.repeat(70));
@@ -286,4 +275,4 @@ program
   .parse(process.argv);
 
 // Run security check with CLI options
-runSecurityCheck(program.opts() as SecurityCheckOptions);
+runSecurityCheck(program.opts() as SecurityCheckOptionsType);

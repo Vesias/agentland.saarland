@@ -139,6 +139,32 @@ must_have = ["folder1", "folder2"]
       const issues = validateClauderules(mockFilePath);
       expect(issues.filter(issue => issue.includes('folders.enforce_structure.ai_docs'))).toHaveLength(0);
     });
+
+    test('sollte den Fallback "ai_docs/" für docs_base verwenden, wenn nicht in project definiert', () => {
+      const customContent = `
+[project]
+name = "Test Project Without Docs Base"
+# docs_base fehlt
+
+[folders.enforce_structure.ai_docs]
+must_have = ["fallback_folder"]
+      `;
+      mockedFs.readFileSync.mockReturnValue(customContent);
+      mockedFs.existsSync.mockImplementation(p => {
+        if (p === mockResolvedPath) return true;
+        // Prüft, ob der Fallback-Pfad verwendet wird
+        if (p === actualPath.join('ai_docs/', 'fallback_folder')) return true;
+        return false;
+      });
+      mockedFs.lstatSync.mockImplementation(p => {
+        if (p === actualPath.join('ai_docs/', 'fallback_folder')) return { isDirectory: () => true } as fs.Stats;
+        throw new Error('File not found for lstatSync in fallback test');
+      });
+
+      const issues = validateClauderules(mockFilePath);
+      expect(issues.filter(issue => issue.includes('fallback_folder'))).toHaveLength(0);
+      expect(mockedFs.existsSync).toHaveBeenCalledWith(actualPath.join('ai_docs/', 'fallback_folder'));
+    });
   });
 
   describe('enforce.scripts Validierung', () => {
@@ -172,7 +198,7 @@ disallow_other_root_scripts = true
         if (p === actualPath.resolve(otherScript)) return true; // Das "unerlaubte" Skript existiert auch
         return false;
       });
-      mockedFs.readdirSync.mockReturnValue([rootScript1, rootScript2, otherScript, 'README.md'] as any); // Enthält erlaubte und unerlaubte Skripte
+      mockedFs.readdirSync.mockReturnValue([rootScript1, rootScript2, otherScript, 'README.md'] as any); // Zurück zu any wegen Mock-Typisierung
       mockedFs.lstatSync.mockImplementation(p => {
         const fileName = actualPath.basename(p.toString());
         if (fileName.endsWith('.sh') || fileName.endsWith('.js')) {
@@ -228,7 +254,7 @@ disallow_other_root_scripts = false # Geändert
             if (p === actualPath.resolve(otherScript)) return true;
             return false;
         });
-        mockedFs.readdirSync.mockReturnValue([rootScript1, otherScript] as any);
+        mockedFs.readdirSync.mockReturnValue([rootScript1, otherScript] as any); // Zurück zu any
 
 
         const issues = validateClauderules(mockFilePath);
@@ -275,7 +301,7 @@ disallow_other_root_scripts = true
         if (p === actualPath.resolve('start.sh')) return '#!/bin/bash\necho "start"';
         throw new Error(`Unexpected readFileSync call: ${p}`);
     });
-    mockedFs.readdirSync.mockReturnValue(['start.sh', 'README.md'] as any);
+    mockedFs.readdirSync.mockReturnValue(['start.sh', 'README.md'] as any); // Zurück zu any
 
 
     const issues = validateClauderules(mockFilePath);

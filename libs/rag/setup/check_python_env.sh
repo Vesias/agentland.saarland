@@ -6,7 +6,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RAG_BASE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)" # Should resolve to libs/rag
 VENV_DIR="$RAG_BASE_DIR/scripts/.venv" # Points to the venv created by setup_rag.sh
-CHECK_SCRIPT="$RAG_BASE_DIR/src/check_env_status.py" # Points to the script in libs/rag/src
+CHECK_SCRIPT="$RAG_BASE_DIR/scripts/check_env_status.py" # Points to the script in libs/rag/scripts
 
 # Colors for output
 GREEN='\033[0;32m'

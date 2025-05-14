@@ -187,7 +187,7 @@ export const SecureApiOptionsSchema = z.object({
   csrfProtection: z.boolean().optional(),
   secureHeaders: z.boolean().optional(),
   inputValidation: z.boolean().optional(),
-  // policyLevel: PolicyLevelSchema.optional(), // policyLevel is part of ApiAccessRule, not general SecureApiOptions
+  policyLevel: PolicyLevelSchema.optional(), // Hinzugefügt für Konsistenz mit SecureApiOptions Interface und SecureAPI Klasse
 }).strict(); // Use strict to prevent unknown keys if these are the exact options.
 
 // Define types from Zod schemas to be used in the application

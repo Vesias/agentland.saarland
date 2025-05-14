@@ -4,6 +4,9 @@ import configManager, { ConfigType } from '../../../../core/src/config/config-ma
 import { ClaudeError } from '../../../../core/src/error/error-handler';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import fetch from 'node-fetch'; // Import für API-Aufrufe hinzufügen
+import Ajv, { ValidateFunction } from 'ajv'; // Import für JSON-Schema-Validierung und ValidateFunction
+import addFormats from 'ajv-formats'; // Import für zusätzliche Formate in Ajv
 // Potenziell CSV-Parser-Bibliothek importieren, falls CSV-Verarbeitung implementiert wird
 // import Papa from 'papaparse';
 
@@ -23,7 +26,7 @@ export class DataExecutor extends BaseExecutor {
    * @param context Execution context with data from previous steps
    * @returns Result of the execution
    */
-  async executeStep(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
+  async executeStep(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> { // any zu unknown
     this.logger.debug(`Executing data step: ${step.id}`, { step });
     
     try {
@@ -45,7 +48,7 @@ export class DataExecutor extends BaseExecutor {
         default:
           throw new ClaudeError(`Unknown data step: ${step.id}`);
       }
-    } catch (error) {
+    } catch (error: unknown) { // any zu unknown
       this.logger.error(`Error executing data step ${step.id}`, { error });
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       return {
@@ -119,22 +122,52 @@ export class DataExecutor extends BaseExecutor {
           filesCollectedCount += sourceFileCount;
           status = 'success';
         } else if (source.type === 'api' && source.url) {
-          // TODO: Implement API fetching logic
           this.logger.info(`Collecting from API: ${source.url} (format: ${sourceFormat})`);
-          // const response = await fetch(source.url);
-          // const data = await response.json(); // or .text() for CSV
-          // sourceData = ...
-          status = 'skipped_not_implemented';
-          errorMsg = `API collection for ${source.url} not yet implemented.`;
-          this.logger.warn(errorMsg);
-          collectionErrors.push({ source: source.url, error: errorMsg });
+          const response = await fetch(source.url);
+          if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}: ${await response.text()}`);
+          }
+          if (sourceFormat === 'json') {
+            const jsonData = await response.json();
+            sourceData = Array.isArray(jsonData) ? jsonData : [jsonData];
+          } else if (sourceFormat === 'csv') {
+            const csvText = await response.text();
+            const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
+            if (lines.length > 0) {
+                const headers = this.parseCsvLine(lines[0]);
+                if (lines.length > 1) {
+                    sourceData = lines.slice(1).map(line => {
+                        const values = this.parseCsvLine(line);
+                        return headers.reduce((obj, header, index) => {
+                            obj[header.trim()] = values[index] !== undefined ? values[index].trim() : '';
+                            return obj;
+                        }, {} as Record<string, string>);
+                    });
+                }
+            }
+            if (sourceData.length === 0 && lines.length > 0) {
+                this.logger.warn(`API CSV response from ${source.url} contained no data rows or only a header.`);
+            }
+          } else {
+            // Fallback to text if format is not json or csv
+            const textData = await response.text();
+            sourceData = [textData]; // Store as an array with a single string element
+            this.logger.info(`API response from ${source.url} treated as plain text.`);
+          }
+          sourceRecordCount = sourceData.length;
+          allRawData.push(...sourceData);
+          totalRecordsCollected += sourceRecordCount;
+          status = 'success';
         } else if (source.type === 'database' && source.query) {
-          // TODO: Implement Database querying logic
-          this.logger.info(`Collecting from Database (query): ${source.query} (format: ${sourceFormat})`);
+          // TODO: Implement Database querying logic. This requires a specific DB driver.
+          // Example structure:
+          // const dbConnection = await getDbConnection(source.connectionDetails); // Hypothetical function
+          // sourceData = await dbConnection.query(source.query);
+          // await dbConnection.close();
           status = 'skipped_not_implemented';
-          errorMsg = `Database collection for query ${source.query} not yet implemented.`;
+          errorMsg = `Database collection for query "${source.query}" not yet implemented. Requires specific database driver and connection details.`;
           this.logger.warn(errorMsg);
-          collectionErrors.push({ source: source.query, error: errorMsg });
+          collectionErrors.push({ source: `db_query: ${source.query}`, error: errorMsg });
         } else {
           throw new Error(`Unsupported source type or missing parameters: ${JSON.stringify(source)}`);
         }
@@ -216,20 +249,23 @@ export class DataExecutor extends BaseExecutor {
     let currentInvalidRecordsCount = 0;
     const issuesFound = { schemaViolations: 0, incompletenessViolations: 0, consistencyViolations: 0, other: 0 };
     const validationDetails: any[] = [];
+    let ajvValidate: ValidateFunction | undefined;
 
     if (validateSchema && schemaDefinition) {
-      this.logger.info('Schema validation is configured. NOTE: Full schema validation logic (e.g. Ajv) is not yet implemented here. Performing basic checks based on other rules.');
-      // Placeholder: Actual schema validation (e.g. with Ajv) would go here.
-      // For now, we rely on completeness and consistency checks.
-      // If using Ajv:
-      // try {
-      //   const ajv = new Ajv();
-      //   const schema = typeof schemaDefinition === 'string' ? JSON.parse(await fs.readFile(schemaDefinition, 'utf-8')) : schemaDefinition;
-      //   const ajvValidate = ajv.compile(schema);
-      // } catch (err) {
-      //    this.logger.error('Failed to load or compile schema definition', { path: schemaDefinition, error: err });
-      //    // Decide if this is a fatal error for the validation step
-      // }
+      this.logger.info('Schema validation is configured. Attempting to load and compile schema.');
+      try {
+        const ajv = new Ajv({ allErrors: true });
+        addFormats(ajv); // Fügt Formate wie date-time, email, etc. hinzu
+        const schema = typeof schemaDefinition === 'string'
+          ? JSON.parse(await fs.readFile(schemaDefinition, 'utf-8'))
+          : schemaDefinition;
+        ajvValidate = ajv.compile(schema);
+        this.logger.info('JSON Schema compiled successfully.');
+      } catch (err: any) {
+         this.logger.error('Failed to load or compile schema definition. Schema validation will be skipped.', { schemaDefinition, error: err.message });
+         // Optional: Decide if this is a fatal error for the validation step
+         // return { type: 'validate', success: false, stepId: step.id, error: `Schema compilation failed: ${err.message}`, ... };
+      }
     }
 
     for (const record of rawDataArray) {
@@ -278,11 +314,16 @@ export class DataExecutor extends BaseExecutor {
         }
       }
       
-      // if (validateSchema && ajvValidate && !ajvValidate(record)) {
-      //   isValidRecord = false;
-      //   issuesFound.schemaViolations++;
-      //   ajvValidate.errors?.forEach(err => recordIssues.push(`Schema error: ${err.instancePath || 'record'} ${err.message}`));
-      // }
+      if (ajvValidate) { // Führe Schema-Validierung durch, wenn ajvValidate definiert ist
+        if (!ajvValidate(record)) {
+          isValidRecord = false;
+          issuesFound.schemaViolations++;
+          ajvValidate.errors?.forEach(err => {
+            const path = err.instancePath || (err.params as any)?.missingProperty || (err.params as any)?.additionalProperty || 'record';
+            recordIssues.push(`Schema error: '${path}' ${err.message}`);
+          });
+        }
+      }
 
       if (isValidRecord) {
         validRecords.push(record);
@@ -383,16 +424,57 @@ export class DataExecutor extends BaseExecutor {
             }
             break;
           case 'calculateField':
-             this.logger.warn(`Transformation type '${transform.type}' with expression is a placeholder and not fully implemented securely.`);
-            // Example: transformedData.forEach(r => { try { r[transform.newField] = new Function('record', `return ${transform.expression}`)(r); recordsAffectedThisTransform++; } catch(e) { this.logger.error('Expression eval error', e); } });
-            recordsAffectedThisTransform = transformedData.length;
+            this.logger.warn(`Transformation type '${transform.type}' with expression ('${transform.expression}') is a placeholder and NOT SECURE for production. It needs a proper expression parser/evaluator.`);
+            if (transform.newField && transform.expression) {
+              // UNSAFE PLACEHOLDER - DO NOT USE IN PRODUCTION WITHOUT A SECURE EXPRESSION EVALUATOR
+              // This is a highly simplified and potentially unsafe example.
+              // For a real implementation, use a library like 'expr-eval' or similar.
+              transformedData.forEach(record => {
+                try {
+                  // Example: if expression is "record.price * 1.1"
+                  // This is just a conceptual placeholder, direct evaluation of arbitrary expressions is dangerous.
+                  if (transform.expression === 'record.price * 1.1' && record.price !== undefined) {
+                     record[transform.newField!] = parseFloat(record.price) * 1.1;
+                     recordsAffectedThisTransform++;
+                  } else if (transform.expression === 'record.quantity + 1' && record.quantity !== undefined) {
+                     record[transform.newField!] = parseInt(record.quantity, 10) + 1;
+                     recordsAffectedThisTransform++;
+                  } else {
+                     this.logger.warn(`Unsupported or unsafe expression for calculateField: ${transform.expression}. Field not calculated.`);
+                  }
+                } catch (e: any) {
+                  this.logger.error(`Error evaluating calculateField expression '${transform.expression}' for record: ${e.message}`);
+                }
+              });
+            } else {
+              throw new Error("Invalid parameters for calculateField: requires 'newField' and 'expression'.");
+            }
             break;
           case 'filterRecords':
-            this.logger.warn(`Transformation type '${transform.type}' with expression is a placeholder and not fully implemented securely.`);
-            // const originalLength = transformedData.length;
-            // transformedData = transformedData.filter(record => { try { return new Function('record', `return ${transform.expression}`)(record); } catch(e) { this.logger.error('Filter expression eval error', e); return true; }});
-            // recordsDroppedCount += originalLength - transformedData.length;
-            // recordsAffectedThisTransform = originalLength - transformedData.length;
+            this.logger.warn(`Transformation type '${transform.type}' with expression ('${transform.expression}') is a placeholder and NOT SECURE for production. It needs a proper expression parser/evaluator.`);
+            if (transform.expression) {
+              // UNSAFE PLACEHOLDER - DO NOT USE IN PRODUCTION WITHOUT A SECURE EXPRESSION EVALUATOR
+              const originalLength = transformedData.length;
+              // Example: if expression is "record.isActive === true"
+              // This is just a conceptual placeholder.
+              transformedData = transformedData.filter(record => {
+                try {
+                  if (transform.expression === 'record.isActive === true') {
+                    return record.isActive === true;
+                  } else if (transform.expression === 'record.value > 100' && record.value !== undefined) {
+                    return parseFloat(record.value) > 100;
+                  }
+                  this.logger.warn(`Unsupported or unsafe expression for filterRecords: ${transform.expression}. Record not filtered.`);
+                  return true; // Keep record if expression is not understood/unsafe
+                } catch (e: any) {
+                  this.logger.error(`Error evaluating filterRecords expression '${transform.expression}' for record: ${e.message}`);
+                  return true; // Keep record on error to be safe
+                }
+              });
+              recordsAffectedThisTransform = originalLength - transformedData.length;
+            } else {
+              throw new Error("Invalid parameters for filterRecords: requires 'expression'.");
+            }
             break;
           case 'removeFields':
             if (transform.fields && Array.isArray(transform.fields)) {
@@ -536,14 +618,24 @@ export class DataExecutor extends BaseExecutor {
             }
             break;
           case 'correlation_analysis':
-            this.logger.warn(`Analysis task '${task.type}' is a placeholder and not fully implemented.`);
+            this.logger.warn(`Analysis task '${task.type}' for fields '${task.fields?.join(', ')}' is a placeholder and not fully implemented. It requires a statistical library for actual calculation.`);
             if (task.fields && task.fields.length >= 2 && processedDataArray.length > 0) {
-                // Placeholder for actual correlation logic (e.g. Pearson)
-                const simulatedCorrelation = (Math.random() * 1.8 - 0.9).toFixed(3); // between -0.9 and 0.9
-                taskResult = { ...taskResult, status: 'success', correlation: { [`${task.fields[0]}_vs_${task.fields[1]}`]: simulatedCorrelation } };
-                overallAnalysisResults.keyInsights.push({ description: `Simulated correlation between ${task.fields[0]} & ${task.fields[1]}: ${simulatedCorrelation}.`, type: task.type, fields: task.fields});
+                // Placeholder for actual correlation logic (e.g. Pearson).
+                // A real implementation would require a library like 'simple-statistics' or similar.
+                const field1 = task.fields[0];
+                const field2 = task.fields[1];
+                const simulatedCorrelation = (Math.random() * 1.8 - 0.9).toFixed(3); // Random value between -0.9 and 0.9
+                const message = `Simulated correlation between '${field1}' & '${field2}': ${simulatedCorrelation}. NOTE: This is a placeholder value.`;
+                this.logger.info(message);
+                taskResult = {
+                    ...taskResult,
+                    status: 'success_placeholder', // Indicate it's a placeholder success
+                    correlation: { [`${field1}_vs_${field2}`]: simulatedCorrelation },
+                    message
+                };
+                overallAnalysisResults.keyInsights.push({ description: message, type: task.type, fields: task.fields});
             } else {
-                 taskResult = { ...taskResult, status: 'skipped', message: 'Requires at least two fields for correlation_analysis.' };
+                 taskResult = { ...taskResult, status: 'skipped', message: 'Requires at least two fields specified in task.fields and non-empty data for correlation_analysis.' };
             }
             break;
           default:
@@ -621,26 +713,30 @@ export class DataExecutor extends BaseExecutor {
       this.logger.debug(`Creating visualization: ${task.type} - ${task.outputName}`, { task });
       let taskResult: any = { name: task.outputName, type: task.type, status: 'pending' };
       try {
+        this.logger.warn(`Visualization task '${task.type}' for output '${task.outputName}' is a SIMULATION. Actual chart generation requires a charting library.`);
         // Placeholder for actual visualization generation
         if (!analysisData.summaryStatistics && !analysisData.keyInsights && !(analysisData.inputRecords > 0) ) { // Check if there's any data to visualize
-            throw new Error(`No suitable data in analysisResults for visualization task ${task.type} for output ${task.outputName}`);
+            this.logger.warn(`No suitable data in analysisResults for visualization task ${task.type} for output ${task.outputName}. Skipping file creation.`);
+            taskResult = { ...taskResult, status: 'skipped_no_data', message: 'No data from analysis to visualize.'};
+            allTasksSuccessful = false; // Or consider this a partial success depending on requirements
+        } else {
+            const vizFileName = `${task.outputName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${Date.now()}.${task.options?.format || 'png'}`;
+            const vizPath = `visualizations/${vizFileName}`;
+            const simulatedSizeBytes = Math.floor(Math.random() * 200000) + 50000; // 50KB - 250KB
+
+            await fs.mkdir('visualizations', { recursive: true }); // Ensure directory exists
+            // Simulate file creation - in a real scenario, a charting library would output a file or buffer
+            const placeholderContent = `SIMULATED VISUALIZATION\nType: ${task.type}\nOutput: ${task.outputName}\nData Key Used (simulated): ${task.dataKey || 'summaryStatistics'}\nTimestamp: ${new Date().toISOString()}\n\nNOTE: This is a placeholder file. Actual chart generation is not implemented.`;
+            await fs.writeFile(vizPath, placeholderContent);
+            
+            this.logger.info(`Simulated visualization file created: ${vizPath}`);
+
+            taskResult = { ...taskResult, status: 'success_simulated', path: vizPath, sizeBytes: simulatedSizeBytes, message: 'Visualization file is a simulation.' };
+            overallVisualizationResults.visualizationsCreated.push({ type: task.type, name: vizFileName, path: vizPath, sizeBytes: simulatedSizeBytes, dataKeyUsed: task.dataKey || 'summaryStatistics', statusMessage: 'Simulated' });
         }
-
-        const vizFileName = `${task.outputName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${Date.now()}.${task.options?.format || 'png'}`;
-        const vizPath = `visualizations/${vizFileName}`;
-        const simulatedSizeBytes = Math.floor(Math.random() * 200000) + 50000;
-
-        await fs.mkdir('visualizations', { recursive: true }); // Ensure directory exists
-        // Simulate file creation - in a real scenario, a charting library would output a file or buffer
-        await fs.writeFile(vizPath, `Placeholder content for ${task.type}: ${task.outputName}\nData used (simulated): ${JSON.stringify(task.dataKey ? analysisData[task.dataKey] : analysisData.summaryStatistics)}`);
-        
-        this.logger.info(`Simulated visualization created: ${vizPath}`);
-
-        taskResult = { ...taskResult, status: 'success', path: vizPath, sizeBytes: simulatedSizeBytes };
-        overallVisualizationResults.visualizationsCreated.push({ type: task.type, name: vizFileName, path: vizPath, sizeBytes: simulatedSizeBytes, dataKeyUsed: task.dataKey || 'summaryStatistics' });
         
       } catch (error: any) {
-        this.logger.error(`Error during visualization task ${task.type} (${task.outputName}): ${error.message}`, { task });
+        this.logger.error(`Error during (simulated) visualization task ${task.type} (${task.outputName}): ${error.message}`, { task });
         taskResult = { ...taskResult, status: 'failed', error: error.message };
         allTasksSuccessful = false;
       }
@@ -727,7 +823,11 @@ export class DataExecutor extends BaseExecutor {
     for (const item of itemsToStore) {
       try {
         const itemFormat = item.format || defaultFormat;
-        const itemCompression = item.compression || defaultCompression; // TODO: Implement compression
+        const itemCompression = item.compression || defaultCompression;
+        if (itemCompression !== 'none') {
+            this.logger.warn(`Compression type '${itemCompression}' for item '${item.name}' is configured but NOT IMPLEMENTED. Data will be stored uncompressed.`);
+            // TODO: Implement compression logic here, e.g., using zlib for gzip
+        }
         let fileName = item.name;
         if (!path.extname(fileName)) { // Ensure extension
             fileName = `${fileName}.${itemFormat}`;
@@ -789,17 +889,19 @@ export class DataExecutor extends BaseExecutor {
           filePath = path.join(basePath, fileName);
           await fs.writeFile(filePath, dataToWrite);
           const stats = await fs.stat(filePath);
-          storageOpResults.filesWrittenDetails.push({ name: fileName, path: filePath, sizeBytes: stats.size, format: itemFormat, type: item.type });
+          storageOpResults.filesWrittenDetails.push({ name: fileName, path: filePath, sizeBytes: stats.size, format: itemFormat, type: item.type, compression: itemCompression });
           storageOpResults.totalSizeBytes += stats.size;
         } else if (destinationConfig.type === 's3') {
-          // TODO: Implement S3 upload logic
-          this.logger.warn(`S3 storage for ${fileName} not implemented. Skipping.`);
-          storageOpResults.filesWrittenDetails.push({ name: fileName, path: `s3://${destinationConfig.bucket}/${destinationConfig.pathPrefix || ''}${fileName}`, status: 'skipped_s3_not_implemented', type: item.type });
+          // TODO: Implement S3 upload logic using AWS SDK
+          this.logger.warn(`S3 storage for '${fileName}' to bucket '${destinationConfig.bucket}' is NOT IMPLEMENTED. Skipping S3 upload.`);
+          storageOpResults.filesWrittenDetails.push({ name: fileName, path: `s3://${destinationConfig.bucket}/${destinationConfig.pathPrefix || ''}${fileName}`, status: 'skipped_s3_not_implemented', type: item.type, format: itemFormat, compression: itemCompression });
           allStoresSuccessful = false; // Mark as not fully successful if S3 fails/skipped
         } else {
             throw new Error(`Unsupported destination type: ${destinationConfig.type}`);
         }
-        this.logger.info(`Stored ${item.type} '${fileName}' to ${filePath || destinationConfig.type}.`);
+        if (destinationConfig.type === 'filesystem') {
+             this.logger.info(`Stored ${item.type} '${fileName}' to ${filePath}.`);
+        }
 
       } catch (error: any) {
         this.logger.error(`Failed to store item ${item.name}: ${error.message}`, { item });

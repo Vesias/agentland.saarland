@@ -89,13 +89,12 @@ install_advanced_packages() {
 
 # Function to create minimal RAG scripts if they don't exist
 create_rag_scripts() {
-  # Ensure rag directory exists
-  mkdir -p "$RAG_BASE_DIR/src"
+  # Python scripts will be created in SCRIPT_DIR (libs/rag/scripts)
   
   # Create indexing script
-  if [ ! -f "$RAG_BASE_DIR/src/update_vector_db.py" ]; then
+  if [ ! -f "$SCRIPT_DIR/update_vector_db.py" ]; then
     echo "Creating indexing script..."
-    cat > "$RAG_BASE_DIR/src/update_vector_db.py" << 'EOL'
+    cat > "$SCRIPT_DIR/update_vector_db.py" << 'EOL'
 #!/usr/bin/env python3
 """
 Vector Database Updater Script
@@ -164,13 +163,13 @@ if __name__ == "__main__":
     main()
 EOL
 
-    chmod +x "$RAG_BASE_DIR/src/update_vector_db.py"
+    chmod +x "$SCRIPT_DIR/update_vector_db.py"
   fi
   
   # Create query script
-  if [ ! -f "$RAG_BASE_DIR/src/query_rag.py" ]; then
+  if [ ! -f "$SCRIPT_DIR/query_rag.py" ]; then
     echo "Creating query script..."
-    cat > "$RAG_BASE_DIR/src/query_rag.py" << 'EOL'
+    cat > "$SCRIPT_DIR/query_rag.py" << 'EOL'
 #!/usr/bin/env python3
 """
 RAG Query Script
@@ -248,13 +247,13 @@ if __name__ == "__main__":
     main()
 EOL
 
-    chmod +x "$RAG_BASE_DIR/src/query_rag.py"
+    chmod +x "$SCRIPT_DIR/query_rag.py"
   fi
   
   # Create rag_framework.py
-  if [ ! -f "$RAG_BASE_DIR/src/rag_framework.py" ]; then
+  if [ ! -f "$SCRIPT_DIR/rag_framework.py" ]; then
     echo "Creating RAG framework script..."
-    cat > "$RAG_BASE_DIR/src/rag_framework.py" << 'EOL'
+    cat > "$SCRIPT_DIR/rag_framework.py" << 'EOL'
 #!/usr/bin/env python3
 """
 RAG Framework
@@ -423,10 +422,10 @@ if __name__ == "__main__":
     main()
 EOL
 
-    chmod +x "$RAG_BASE_DIR/src/rag_framework.py"
+    chmod +x "$SCRIPT_DIR/rag_framework.py"
   fi
   
-  echo "RAG scripts created"
+  echo "RAG scripts created in $SCRIPT_DIR"
 }
 
 # Create logs directory if it doesn't exist
@@ -472,11 +471,12 @@ EOF
     echo "Creating RAG runner script..."
     cat > "$SCRIPT_DIR/run_rag.sh" << EOF
 #!/bin/bash
+set -e
 # Runner script for RAG functionality
 
 SCRIPT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
 RAG_BASE_DIR="\$(cd "\$SCRIPT_DIR/.." && pwd)" # Should resolve to libs/rag
-VENV_DIR="\$RAG_BASE_DIR/scripts/.venv"
+VENV_DIR="\$RAG_BASE_DIR/scripts/.venv" # This is libs/rag/scripts/.venv
 
 if [ ! -f "\$VENV_DIR/bin/activate" ]; then
   echo "Error: Python virtual environment not found. Please run setup_rag.sh first."
@@ -487,8 +487,8 @@ fi
 source "\$VENV_DIR/bin/activate"
 
 # Set PYTHONPATH
-# This will point to libs/rag/src, allowing Python to find modules there
-export PYTHONPATH="\$RAG_BASE_DIR/src:\$PYTHONPATH"
+# This will point to SCRIPT_DIR (libs/rag/scripts), allowing Python to find modules there
+export PYTHONPATH="\$SCRIPT_DIR:\$PYTHONPATH"
 
 # Run command or show help
 if [ \$# -eq 0 ]; then
@@ -503,22 +503,27 @@ if [ \$# -eq 0 ]; then
   echo "  shell         Start Python shell with virtual environment"
   echo ""
   echo "Examples:"
-  echo "  \$0 run libs/rag/src/rag_framework.py"
+  echo "  \$0 run ./rag_framework.py" # Assuming rag_framework.py is in SCRIPT_DIR
   echo "  \$0 update docs/"
   echo "  \$0 query 'How does the RAG system work?'"
 else
   case "\$1" in
     run)
       shift
-      python "\$@"
+      # If a path is given, use it, otherwise assume script is in SCRIPT_DIR
+      if [[ "\$1" == */* ]]; then
+        python "\$@"
+      else
+        python "\$SCRIPT_DIR/\$@"
+      fi
       ;;
     update)
       shift
-      python "\$RAG_BASE_DIR/src/update_vector_db.py" "\$@"
+      python "\$SCRIPT_DIR/update_vector_db.py" "\$@"
       ;;
     query)
       shift
-      python "\$RAG_BASE_DIR/src/query_rag.py" "\$@"
+      python "\$SCRIPT_DIR/query_rag.py" "\$@"
       ;;
     shell)
       python
@@ -547,7 +552,7 @@ EOF
   echo "To run RAG commands:"
   echo "  ./run_rag.sh query 'How does the system work?'"
   echo "  ./run_rag.sh update docs/"
-  echo "  ./run_rag.sh run ../src/rag_framework.py" # Adjusted path for example
+  echo "  ./run_rag.sh run ./rag_framework.py" # Script is now in the same directory as run_rag.sh
   echo ""
   echo "To install additional packages:"
   echo "  source ./activate_venv.sh"
