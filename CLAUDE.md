@@ -2,201 +2,182 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Overview
+
+The Claude Neural Framework is a comprehensive platform for integrating Claude AI capabilities with development workflows. It combines agent-based architecture, Model Context Protocol (MCP) integration, and Retrieval Augmented Generation (RAG) in a consistent environment.
+
+Key features include:
+- System of specialized AI agents for different tasks
+- MCP integration for extended AI functionality
+- RAG framework for context-aware information retrieval
+- Recursive debugging tools
+- Automated documentation generation
+- Comprehensive security framework with TypeScript typing
+- SAAR workflow for simplified configuration and usage
+
+## Architecture
+
+The framework follows a monorepo structure with clear modularization:
+
+1. **Core** (`libs/core`): Core functionality including MCP integration and configuration
+2. **Agents** (`libs/agents`): Agent-to-agent communication framework and specialized agents
+3. **MCP** (`libs/mcp`): Integration with various MCP servers for extended functionality
+4. **RAG** (`libs/rag`): Retrieval Augmented Generation framework for context-aware responses
+5. **Workflows** (`libs/workflows`): Sequential planning and execution engines
+6. **Apps** (`apps/`): Applications including CLI, API, and web interface
+
 ## Development Commands
+
+### Basic Commands
 
 ```bash
 # Install dependencies
 npm install
 
-# Start development server
+# Start development server (runs up to 3 services in parallel)
 npm run dev
 
-# Build the project
-npm run build
-
-# Run tests
+# Run all tests
 npm test
-npm run test:jest            # Run Jest tests
-npm run test:jest:watch      # Run Jest tests in watch mode
 
-# Linting
+# Lint all projects
 npm run lint
 
-# Validate clauderules
-npm run validate:clauderules
-
-# Run specific projects with Nx
-nx serve [project]           # Start development server for specific project
-nx test [project]            # Run tests for specific project
-nx lint [project]            # Run linting for specific project
-nx build [project]           # Build specific project
+# Build all projects
+npm run build
 ```
 
-## Project Architecture
+### Web Application
 
-The Claude Neural Framework follows a pentagonal architecture pattern that extends the traditional hexagonal (ports and adapters) architecture with specialized layers for AI operations:
+To start the web application specifically:
 
-1. **Domain Layer**: Core business logic, entities, value objects
-2. **Application Layer**: Orchestrates domain objects for specific use cases
-3. **Neural Layer**: AI-related operations, model interactions, ML workflows
-4. **Ports Layer**: Interfaces for communication with external systems
-5. **Adapters Layer**: Implementation of ports for specific external technologies
+```bash
+# Navigate to the web application directory
+cd apps/web
 
-The codebase is organized as a monorepo with the following structure:
+# Install web app dependencies if needed
+npm install
 
-- `libs/`: Core framework libraries
-  - `core/`: Configuration, logging, i18n, security modules
-  - `agents/`: Agent-to-agent communication and specialized agents
-  - `mcp/`: Integration with Model Context Protocol servers
-  - `rag/`: Retrieval Augmented Generation framework
-  - `workflows/`: Sequential planning and execution engines
-- `apps/`: CLI, web interface, and API applications
-- `configs/`: Central configuration files
-- `tools/`: Development scripts and utilities
-- `ai_docs/`: Documentation organized by topic
+# Start web development server
+npm run dev
+```
 
-## Key Components
+The web application will be available at http://localhost:5000 with hot reload enabled.
 
-### Sequential Execution Manager
+Alternatively, you can use the start script:
 
-The Sequential Execution Manager (`libs/workflows/src/sequential/services/sequential-planner.ts`) provides a powerful interface for sequential planning and execution across different domains with features like:
+```bash
+# Run the start script from the web app directory
+cd apps/web
+./start.sh
+```
 
-- Domain-specific planning and execution
-- Custom step handlers for different action types
-- Observer pattern for real-time notifications
-- Event-driven execution workflow
-- Robust error handling and recovery
-- Complete state management
+### Nx-specific Commands
 
-### Model Context Protocol (MCP) Integration
+```bash
+# Run the web app specifically
+nx serve web
 
-The framework integrates with various MCP servers through client modules in `libs/mcp/src/client/`:
+# Test a specific project
+nx test [project-name]
 
-- Sequential thinking for recursive thought generation
-- Context7 for context awareness
-- Brave search for web search capabilities
-- Image generation capabilities
-- React hooks for frontend integration (`apps/web/src/hooks/mcp/`)
+# Lint a specific project
+nx lint [project-name]
 
-### Agent System
+# Build a specific project
+nx build [project-name]
 
-The Agent-to-Agent communication system (`libs/agents/src/`) enables specialized AI agents to collaborate on complex tasks by:
+# Create a new library
+nx g @nx/js:lib my-lib
 
-- Defining a standard messaging format
-- Providing a central agent registry
-- Supporting capability-based agent discovery
-- Implementing specialized agents for different domains
+# Create a new application
+nx g @nx/node:app my-app
 
-### RAG System
+# View dependency graph
+nx graph
+```
 
-The Retrieval Augmented Generation system (`libs/rag/src/`) enhances Claude's responses by retrieving relevant context from a knowledge database:
+### Running Individual Tests
 
-- Document indexing and embedding generation
-- Vector-based information retrieval
-- Augmented response generation
-- Support for different embedding providers and vector databases
+```bash
+# Run specific test file
+nx test [project-name] --testFile=path/to/test-file.spec.ts
 
-## TypeScript Development
+# Run tests in watch mode
+nx test [project-name] --watch
 
-The codebase is primarily written in TypeScript with a focus on:
+# Run tests with coverage
+nx test [project-name] --coverage
+```
 
-- Strong typing with proper interfaces and type definitions
-- Functional programming patterns
-- Component-based architecture
-- Jest for testing (configuration in `jest.config.js`)
+## Development Conventions
+
+### Code Style
+
+- TypeScript is used throughout the codebase with strict typing
+- Use functional programming patterns where appropriate
+- Follow the hexagonal architecture pattern for better separation of concerns
+- Use dependency injection for better testability
+
+### Testing
+
+- Write unit tests for all core functionality
+- Use integration tests for testing between modules
+- Use E2E tests for testing applications
+- Use mocks and test doubles for external dependencies
+
+### Documentation
+
+- Document all public APIs with JSDoc comments
+- Keep README files up-to-date
+- Document architectural decisions
+- Use diagrams to explain complex systems
+
+## MCP Integration
+
+The framework integrates with various MCP servers:
+
+- **sequentialthinking**: Recursive thought generation
+- **context7**: Context awareness and documentation access
+- **desktop-commander**: Filesystem integration and shell execution
+- **brave-search**: External knowledge acquisition
+- **think-mcp**: Meta-cognitive reflection
+
+## Agent System
+
+The agent system is based on specialized agents that communicate with each other through a standardized protocol:
+
+- **Debug Agents**: For recursive debugging and bug hunting
+- **Documentation Agents**: For generating documentation from code
+- **Git Agents**: For integrating with Git workflows
+- **Orchestrator**: For coordinating agent activities
+
+## RAG Framework
+
+The RAG framework provides context-aware responses by:
+
+1. Indexing code and documentation
+2. Generating embeddings for efficient retrieval
+3. Retrieving relevant context for a given query
+4. Generating responses augmented with retrieved information
+
+## Sequential Thinking and Planning
+
+The framework implements sequential thinking and planning through:
+
+1. Breaking down complex problems into steps
+2. Generating plans for achieving goals
+3. Executing plans step by step
+4. Monitoring and adapting to changes during execution
 
 ## SAAR Workflow
 
-SAAR (Simplified Agent Architecture and Routing) provides a streamlined workflow with scripts in the repository root (`saar.sh`).
+SAAR (Simplified Agent Architecture and Routing) provides a streamlined workflow for configuring and using the framework. The startup scripts are located in `libs/workflows/src/saar/startup/` and follow a sequential execution pattern from basic setup to advanced features.
 
-## Environment Variables
+## Project Structure Notes
 
-Required environment variables for development:
-- None specified in the standard configuration
-
-## Additional Notes
-
-- Follow the existing code style and patterns when adding new components
-- Document new functionality with inline comments and in the appropriate documentation files
-- Ensure tests are written for all new functionality
-- Make TypeScript types as specific as possible, avoiding `any` types
-
-## Agentland.Saarland Dashboard Konzept V1
-
-### Ziel
-Ein erstes, klares und nutzerorientiertes Dashboard-Design für agentland.saarland, das die Kernfunktionen zugänglich macht und die Vision des "Real-Life Agenten" sowie den Zugang zur "KI-Schmiede Saar" in den Mittelpunkt stellt.
-
-### Grundprinzipien
-- **Fokus & Klarheit**: Der Nutzer erkennt sofort die wichtigsten Funktionen und nächsten Schritte.
-- **Regionale Identität**: Dashboard ist klar als agentland.saarland erkennbar und spiegelt die regionale Verbundenheit wider.
-- **Handlungsorientierung**: Unterstützung des Nutzers bei der Zielerreichung und Plattform-Interaktion.
-- **Modularität & Skalierbarkeit**: Design ermöglicht einfache Erweiterung um neue Funktionen und Module.
-- **Motivation & Engagement**: Spielerische und motivierende Gestaltung des "Real-Life Agent"-Aspekts.
-
-### Dashboard-Struktur und Elemente
-
-#### 1. Globale Kopfzeile (Header)
-- Logo: agentland.saarland Logo
-- Globale Suchfunktion
-- Benachrichtigungen
-- Benutzerprofil-Icon
-- Sprachauswahl
-
-#### 2. Hauptbereich (Modulares Kachel-/Widget-Design)
-Widgets:
-1. **Real-Life Agent Cockpit**
-   - Aktuelle Top-Mission
-   - Fortschrittsbalken
-   - Gamification-Elemente (Agenten-Level, Erfahrungspunkte)
-
-2. **KI-Workspace / KI-Schmiede Saar**
-   - Workspace-Status
-   - Schnell-Aktion Buttons
-   - Links zu KI-Tools und Modellen
-
-3. **AGENT_LAND Aktuell (Informations-Feed)**
-   - Neuigkeiten
-   - Lernmodule
-   - Community-Events
-   - Erfolgsgeschichten
-
-4. **Starthilfe & Support**
-   - Direktlinks zu Anleitungen
-   - FAQ
-   - Support-Kontakt
-
-#### 3. Optionale Seitenleiste
-- Dashboard
-- Mein Agent
-- KI-Workspace
-- KI-Schmiede
-- Community
-- Einstellungen
-
-### Visuelles Design & Branding
-- **Farbschema**: 
-  - Primär: Modernes Blau/Violett
-  - Sekundär: Waldgrün/Industrierot
-  - Hintergrund: Hell und sauber
-
-- **Typografie**:
-  - Überschriften: Moderne Sans-Serif
-  - Fließtext: Gut lesbare Systemschrift
-
-- **Bildsprache & Icons**:
-  - Einheitlich und modern
-  - Subtiler regionaler Hintergrund
-
-### Interaktion & User Experience
-- Responsiv
-- Performant
-- Intuitiv
-- Motivierendes Feedback
-- Barrierearm (WCAG-konform)
-
-### Nächste Schritte
-- Feedback einholen
-- Priorisierung der Funktionen
-- Wireframing & Prototyping
-- Technische Planung
-- Iterative Entwicklung
+- The project is structured as an Nx monorepo with workspaces for apps and libraries
+- Configuration files are stored in the `configs/` directory
+- Documentation is available in the `docs/` directory with subdirectories for different aspects
+- Tools and scripts for development are in the `tools/` directory
+- Examples are provided in `docs/examples/` and `tools/examples/`

@@ -1,0 +1,21 @@
+Debugger listening on ws://127.0.0.1:42727/03a81077-d3a9-415b-81a9-5290de7dd272
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
+Debugger listening on ws://127.0.0.1:39813/1387274f-7188-4260-8ffc-64038c851717
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
+
+> web@1.0.0 serve
+> vite
+
+[1G[0Ksh: 1: vite: not found
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m Lifecycle script `serve` failed with error:
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mcode[39m [33m127[39m
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mpath[39m /home/jan/Dokumente/agentland.saarland/apps/web
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mworkspace[39m web@1.0.0
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mlocation[39m /home/jan/Dokumente/agentland.saarland/apps/web
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m command failed
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mcommand[39m sh -c vite
+[1G[0K⠙[1G[0KWaiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...

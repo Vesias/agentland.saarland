@@ -1,0 +1,331 @@
+:root {
+  /* Base typography */
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* Base colors for Agentland Saarland */
+  --primary: #5C41A8;
+  --primary-light: #7E64CA;
+  --primary-dark: #3A2980;
+  --secondary: #2A8D4E;
+  --secondary-light: #4CAF71;
+  --secondary-dark: #1B6E3A;
+  --accent: #C92E2E;
+  --accent-light: #E15858;
+  --accent-dark: #9E1B1B;
+  
+  /* Default light theme colors (will be overridden by ThemeProvider) */
+  --primary-color: var(--primary);
+  --secondary-color: var(--secondary);
+  --accent-color: var(--accent);
+  
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --danger-color: #f44336;
+  --info-color: #2196f3;
+  
+  --background-color: #F8F9FC;
+  --surface-color: #ffffff;
+  --text-color: #202124;
+  --text-secondary-color: #5F6368;
+  --text-muted: #9AA0A6;
+  --border-color: #E5E7EB;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+
+  /* Spacing */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-12: 3rem;
+  
+  /* Font sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  
+  /* Transitions */
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Theme support for dark mode */
+body.theme-dark, [data-theme="dark"] {
+  --primary-color: var(--primary-light);
+  --secondary-color: var(--secondary-light);
+  --accent-color: var(--accent-light);
+  
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --danger-color: #cf6679;
+  --info-color: #2196f3;
+  
+  --background-color: #17181D;
+  --surface-color: #222328;
+  --text-color: #E9EAEC;
+  --text-secondary-color: #9AA0A6;
+  --text-muted: #6B7280;
+  --border-color: #36373d;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Theme support for blue mode */
+body.theme-blue {
+  --primary-color: #1565c0;
+  --secondary-color: #42a5f5;
+  --accent-color: #82b1ff;
+  
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --danger-color: #f44336;
+  --info-color: #29b6f6;
+  
+  --background-color: #f5f9ff;
+  --surface-color: #ffffff;
+  --text-color: #263238;
+  --text-secondary-color: #546e7a;
+  --border-color: #bbdefb;
+  --shadow-color: rgba(21, 101, 192, 0.1);
+}
+
+/* Global classes */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.page {
+  padding: 1rem 0;
+  flex: 1;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Agentland Saarland Dashboard Styles */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-6, 1.5rem);
+  padding: var(--spacing-6, 1.5rem) 0;
+}
+
+.card {
+  background-color: var(--surface-color);
+  border-radius: var(--radius-lg, 0.75rem);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  padding: var(--spacing-6, 1.5rem);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2, 0.5rem) var(--spacing-4, 1rem);
+  border-radius: var(--radius-md, 0.5rem);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-light, #7E64CA);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-light, #4CAF71);
+}
+
+.btn-danger {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: var(--accent-light, #E15858);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+.btn-outline:hover {
+  background-color: var(--surface-color);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.badge {
+  display: inline-block;
+  padding: var(--spacing-1, 0.25rem) var(--spacing-2, 0.5rem);
+  border-radius: var(--radius-sm, 0.25rem);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.badge-primary {
+  background-color: var(--primary-light, #7E64CA);
+  color: white;
+}
+
+.badge-secondary {
+  background-color: var(--secondary-light, #4CAF71);
+  color: white;
+}
+
+.badge-danger {
+  background-color: var(--accent-light, #E15858);
+  color: white;
+}
+
+.text-muted {
+  color: var(--text-secondary-color);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-2 {
+  gap: var(--spacing-2, 0.5rem);
+}
+
+.gap-4 {
+  gap: var(--spacing-4, 1rem);
+}
+
+.mt-2 {
+  margin-top: var(--spacing-2, 0.5rem);
+}
+
+.mt-4 {
+  margin-top: var(--spacing-4, 1rem);
+}
+
+.mb-2 {
+  margin-bottom: var(--spacing-2, 0.5rem);
+}
+
+.mb-4 {
+  margin-bottom: var(--spacing-4, 1rem);
+}
+
+/* Widget styles */
+.widget {
+  border-radius: var(--radius, 0.75rem);
+  background-color: var(--surface-color);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+.widget:hover {
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.widget-header {
+  padding: var(--spacing-4, 1rem);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.widget-title {
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: 600;
+  margin: 0;
+}
+
+.widget-content {
+  padding: var(--spacing-4, 1rem);
+}
+
+.widget-footer {
+  padding: var(--spacing-4, 1rem);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

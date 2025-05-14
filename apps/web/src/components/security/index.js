@@ -8,3 +8,5 @@
 export { default as SecurityWidget } from './SecurityWidget';
 export { default as AuthStatusIndicator } from './AuthStatusIndicator';
 export { default as SecurityDashboardPage } from './SecurityDashboardPage';
+export { default as DNSSecurityStatus } from './DNSSecurityStatus';
+export { default as A2AMissionAuthWidget } from './A2AMissionAuthWidget';

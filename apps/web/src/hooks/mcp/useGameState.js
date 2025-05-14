@@ -33,10 +33,69 @@ export function useMcpGameState() {
           } else {
             // Initialize default state if no saved state exists
             setGameState({
-              level: 1,
-              score: 0,
-              inventory: [],
-              lastUpdated: new Date().toISOString()
+              level: 3,
+              xp: 450,
+              nextLevelXp: 1000,
+              totalXp: 2450,
+              currentMission: {
+                id: "mission-123",
+                name: "Mission: Saarland-Wanderweg digitalisieren",
+                description: "Erstelle eine digitale Karte des Saarland-Wanderwegs",
+                progress: 45,
+                steps: [
+                  "Daten sammeln",
+                  "GPS-Koordinaten extrahieren",
+                  "Karte erstellen"
+                ],
+                rewards: {
+                  xp: 250,
+                  badges: ["Kartograph", "Wanderer"]
+                }
+              },
+              completedMissions: [
+                {
+                  id: "mission-101",
+                  name: "Setup: KI-Arbeitsumgebung einrichten",
+                  progress: 100,
+                  completed: "2025-05-01T10:15:00Z"
+                },
+                {
+                  id: "mission-102",
+                  name: "Erste Schritte mit Llama 3.2",
+                  progress: 100,
+                  completed: "2025-05-05T14:30:00Z"
+                }
+              ],
+              availableMissions: [
+                {
+                  id: "mission-124",
+                  name: "KI-Chatbot für Tourismus",
+                  description: "Erstelle einen Chatbot für Tourismusinformationen",
+                  difficulty: "medium",
+                  rewards: {
+                    xp: 350,
+                    badges: ["KI-Entwickler", "Tourismus-Experte"]
+                  }
+                },
+                {
+                  id: "mission-125",
+                  name: "Saarbrücker Sehenswürdigkeiten",
+                  description: "Erstelle eine KI-App für Sehenswürdigkeiten",
+                  difficulty: "hard",
+                  rewards: {
+                    xp: 500,
+                    badges: ["App-Entwickler", "Stadtkenner"]
+                  }
+                }
+              ],
+              badges: [
+                "Einsteiger",
+                "KI-Enthusiast",
+                "Setpper",
+                "Kartograph"
+              ],
+              streakDays: 5,
+              lastActive: new Date().toISOString()
             });
           }
         } else {
@@ -48,10 +107,69 @@ export function useMcpGameState() {
         
         // Fallback to default state
         setGameState({
-          level: 1,
-          score: 0,
-          inventory: [],
-          lastUpdated: new Date().toISOString()
+          level: 3,
+          xp: 450,
+          nextLevelXp: 1000,
+          totalXp: 2450,
+          currentMission: {
+            id: "mission-123",
+            name: "Mission: Saarland-Wanderweg digitalisieren",
+            description: "Erstelle eine digitale Karte des Saarland-Wanderwegs",
+            progress: 45,
+            steps: [
+              "Daten sammeln",
+              "GPS-Koordinaten extrahieren",
+              "Karte erstellen"
+            ],
+            rewards: {
+              xp: 250,
+              badges: ["Kartograph", "Wanderer"]
+            }
+          },
+          completedMissions: [
+            {
+              id: "mission-101",
+              name: "Setup: KI-Arbeitsumgebung einrichten",
+              progress: 100,
+              completed: "2025-05-01T10:15:00Z"
+            },
+            {
+              id: "mission-102",
+              name: "Erste Schritte mit Llama 3.2",
+              progress: 100,
+              completed: "2025-05-05T14:30:00Z"
+            }
+          ],
+          availableMissions: [
+            {
+              id: "mission-124",
+              name: "KI-Chatbot für Tourismus",
+              description: "Erstelle einen Chatbot für Tourismusinformationen",
+              difficulty: "medium",
+              rewards: {
+                xp: 350,
+                badges: ["KI-Entwickler", "Tourismus-Experte"]
+              }
+            },
+            {
+              id: "mission-125",
+              name: "Saarbrücker Sehenswürdigkeiten",
+              description: "Erstelle eine KI-App für Sehenswürdigkeiten",
+              difficulty: "hard",
+              rewards: {
+                xp: 500,
+                badges: ["App-Entwickler", "Stadtkenner"]
+              }
+            }
+          ],
+          badges: [
+            "Einsteiger",
+            "KI-Enthusiast",
+            "Setpper",
+            "Kartograph"
+          ],
+          streakDays: 5,
+          lastActive: new Date().toISOString()
         });
       } finally {
         setIsLoading(false);
@@ -117,12 +235,131 @@ export function useMcpGameState() {
     return await saveGameState(newState);
   };
 
-  // Add to inventory
-  const addToInventory = async (item) => {
+  // Update mission progress
+  const updateMissionProgress = async (missionId, progress) => {
+    if (!gameState || !gameState.currentMission) return false;
+    
+    // Only update if this is the current mission
+    if (gameState.currentMission.id !== missionId) return false;
+    
+    const updatedMission = {
+      ...gameState.currentMission,
+      progress: Math.min(100, Math.max(0, progress)) // Ensure progress is between 0-100
+    };
+    
+    const newState = {
+      ...gameState,
+      currentMission: updatedMission
+    };
+    
+    return await saveGameState(newState);
+  };
+  
+  // Start a new mission
+  const startMission = async (missionId) => {
     if (!gameState) return false;
     
-    const newInventory = [...gameState.inventory, item];
-    const newState = { ...gameState, inventory: newInventory };
+    // Find mission in available missions
+    const missionToStart = gameState.availableMissions.find(m => m.id === missionId);
+    if (!missionToStart) return false;
+    
+    // Move current mission to available if not completed
+    let updatedAvailableMissions = [...gameState.availableMissions];
+    if (gameState.currentMission) {
+      const currentMission = gameState.currentMission;
+      if (currentMission.progress < 100) {
+        updatedAvailableMissions = [
+          ...updatedAvailableMissions.filter(m => m.id !== missionId),
+          {
+            ...currentMission,
+            progress: Math.min(currentMission.progress, 99) // Cap at 99% if in progress
+          }
+        ];
+      }
+    }
+    
+    // Set new current mission
+    const newCurrentMission = {
+      ...missionToStart,
+      progress: 0,
+      steps: missionToStart.steps || ['Mission starten', 'Weitere Schritte folgen'],
+      startedAt: new Date().toISOString()
+    };
+    
+    const newState = {
+      ...gameState,
+      currentMission: newCurrentMission,
+      availableMissions: updatedAvailableMissions.filter(m => m.id !== missionId)
+    };
+    
+    return await saveGameState(newState);
+  };
+  
+  // Complete mission
+  const completeMission = async (missionId) => {
+    if (!gameState || !gameState.currentMission) return false;
+    
+    // Only complete the current mission
+    if (gameState.currentMission.id !== missionId) return false;
+    
+    const completedMission = {
+      ...gameState.currentMission,
+      progress: 100,
+      completed: new Date().toISOString()
+    };
+    
+    // Add XP reward
+    const xpReward = completedMission.rewards?.xp || 0;
+    const newXp = gameState.xp + xpReward;
+    const newTotalXp = gameState.totalXp + xpReward;
+    
+    // Check for level up
+    let newLevel = gameState.level;
+    let newNextLevelXp = gameState.nextLevelXp;
+    
+    if (newXp >= gameState.nextLevelXp) {
+      newLevel++;
+      newNextLevelXp = Math.round(gameState.nextLevelXp * 1.5); // Increase XP requirement
+    }
+    
+    // Add badges
+    const newBadges = [...gameState.badges];
+    if (completedMission.rewards?.badges) {
+      completedMission.rewards.badges.forEach(badge => {
+        if (!newBadges.includes(badge)) {
+          newBadges.push(badge);
+        }
+      });
+    }
+    
+    // Move completed mission to completedMissions
+    const newCompletedMissions = [...gameState.completedMissions, completedMission];
+    
+    // Choose next available mission if any
+    let newCurrentMission = null;
+    if (gameState.availableMissions.length > 0) {
+      // Just take the first available mission
+      newCurrentMission = {
+        ...gameState.availableMissions[0],
+        progress: 0,
+        startedAt: new Date().toISOString()
+      };
+    }
+    
+    const newState = {
+      ...gameState,
+      xp: newXp,
+      totalXp: newTotalXp,
+      level: newLevel,
+      nextLevelXp: newNextLevelXp,
+      badges: newBadges,
+      currentMission: newCurrentMission,
+      completedMissions: newCompletedMissions,
+      availableMissions: newCurrentMission 
+        ? gameState.availableMissions.slice(1) 
+        : gameState.availableMissions,
+      lastActive: new Date().toISOString()
+    };
     
     return await saveGameState(newState);
   };
@@ -131,9 +368,26 @@ export function useMcpGameState() {
   const resetGameState = async () => {
     const defaultState = {
       level: 1,
-      score: 0,
-      inventory: [],
-      lastUpdated: new Date().toISOString()
+      xp: 0,
+      nextLevelXp: 500,
+      totalXp: 0,
+      currentMission: null,
+      completedMissions: [],
+      availableMissions: [
+        {
+          id: "mission-101",
+          name: "Setup: KI-Arbeitsumgebung einrichten",
+          description: "Richte deine lokale KI-Entwicklungsumgebung ein",
+          difficulty: "easy",
+          rewards: {
+            xp: 150,
+            badges: ["Einsteiger"]
+          }
+        }
+      ],
+      badges: [],
+      streakDays: 0,
+      lastActive: new Date().toISOString()
     };
     
     return await saveGameState(defaultState);
@@ -145,7 +399,9 @@ export function useMcpGameState() {
     error,
     updateScore,
     levelUp,
-    addToInventory,
+    updateMissionProgress,
+    startMission,
+    completeMission,
     resetGameState,
     saveGameState
   };
