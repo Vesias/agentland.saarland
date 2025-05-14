@@ -1,3 +1,4 @@
+
 /**
  * Sequential Planner Service
  * 
@@ -37,7 +38,7 @@ type McpPlanStep = Partial<Omit<PlanStep, 'description' | 'id' | 'number' | 'sta
   estimatedDuration?: string;
   dependencies?: string[];
   notes?: string;
-  data?: any;
+  data?: unknown;
 };
 
 export class SequentialPlanner {
@@ -111,8 +112,10 @@ export class SequentialPlanner {
       logger.info(`Plan generated successfully via MCP for goal "${goal.substring(0,100)}"`, { stepCount: steps.length, firstStep: steps[0]?.description.substring(0,100) });
       return steps;
 
-    } catch (err: any) {
-      logger.error('Error generating plan via MCP invoke', { error: err.message, stack: err.stack, goal });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      const errorStack = err instanceof Error ? err.stack : undefined;
+      logger.error('Error generating plan via MCP invoke', { error: errorMessage, stack: errorStack, goal });
       logger.info('Falling back to local plan generation due to MCP error.');
       return this._generateFallbackPlan(goal, options.initialSteps || 3);
     }
@@ -194,8 +197,10 @@ export class SequentialPlanner {
       logger.info('Plan continued successfully via MCP', { newStepCount: newSteps.length, firstNewStep: newSteps[0]?.description.substring(0,100) });
       return newSteps;
 
-    } catch (err: any) {
-      logger.error('Error continuing plan via MCP invoke', { error: err.message, stack: err.stack });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      const errorStack = err instanceof Error ? err.stack : undefined;
+      logger.error('Error continuing plan via MCP invoke', { error: errorMessage, stack: errorStack });
       logger.info('Falling back to local plan continuation due to MCP error.');
       return this._generateFallbackContinuation(currentPlan);
     }
@@ -233,7 +238,7 @@ export class SequentialPlanner {
     try {
       logger.info('Executing context step via MCP Context7', { searchTerm: searchTerm.substring(0,100), libraryNameToResolve });
       
-      let contextData: any = `No specific context found for "${searchTerm}".`;
+      let contextData: unknown = `No specific context found for "${searchTerm}".`;
       let sources: string[] = [];
       let success = false;
       let stepSummary = "";
@@ -285,17 +290,19 @@ export class SequentialPlanner {
         success,
         data: { searchTerm, libraryResolved: libraryNameToResolve, context: contextData, sources },
         summary: stepSummary,
-        error: success ? undefined : contextData
+        error: success ? undefined : String(contextData)
       };
 
-    } catch (err: any) {
-      logger.error('Unexpected error executing context step', { error: err.message, stack: err.stack, searchTerm, libraryNameToResolve });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      const errorStack = err instanceof Error ? err.stack : undefined;
+      logger.error('Unexpected error executing context step', { error: errorMessage, stack: errorStack, searchTerm, libraryNameToResolve });
       return {
         type: 'context',
         success: false,
-        error: `Unexpected error during context search for "${searchTerm}": ${err.message}`,
+        error: `Unexpected error during context search for "${searchTerm}": ${err instanceof Error ? err.message : String(err)}`,
         summary: `Context search for "${searchTerm}" failed due to an unexpected error.`,
-        data: { searchTerm, libraryNameToResolve, error: err.message }
+        data: { searchTerm, libraryNameToResolve, error: err instanceof Error ? err.message : String(err) }
       };
     }
   }
@@ -351,14 +358,16 @@ export class SequentialPlanner {
         summary
       };
 
-    } catch (err: any) {
-      logger.error('Unexpected error executing UI step via MCP', { error: err.message, stack: err.stack, componentSpec });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      const errorStack = err instanceof Error ? err.stack : undefined;
+      logger.error('Unexpected error executing UI step via MCP', { error: errorMessage, stack: errorStack, componentSpec });
       return {
         type: 'ui',
         success: false,
-        error: `Unexpected error generating UI component for "${componentSpec.searchQuery}": ${err.message}`,
+        error: `Unexpected error generating UI component for "${componentSpec.searchQuery}": ${err instanceof Error ? err.message : String(err)}`,
         summary: `UI component generation for "${componentSpec.searchQuery}" failed due to an unexpected error.`,
-        data: { componentSpec, error: err.message }
+        data: { componentSpec, error: err instanceof Error ? err.message : String(err) }
       };
     }
   }
@@ -392,8 +401,10 @@ export class SequentialPlanner {
       logger.info('Summary generated successfully via MCP', { summaryLength: summaryText.length });
       return summaryText;
 
-    } catch (err: any) {
-      logger.error('Unexpected error generating summary via MCP', { error: err.message, stack: err.stack });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      const errorStack = err instanceof Error ? err.stack : undefined;
+      logger.error('Unexpected error generating summary via MCP', { error: errorMessage, stack: errorStack });
       logger.info('Falling back to local summary generation due to unexpected MCP error.');
       return this._generateFallbackSummary(executedSteps);
     }

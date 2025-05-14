@@ -15,12 +15,25 @@ import chalk from 'chalk';
 import { v4 as uuidv4 } from 'uuid';
 import { Command } from 'commander';
 
+// Import security middleware
+import A2ASecurityMiddleware from './security/a2a-security-middleware';
+import A2APriorityManager from './security/a2a-priority-manager';
+import { 
+  AgentAccessLevel, 
+  MessagePriority, 
+  SecureA2AMessage,
+  A2ASecurityConfig
+} from './security/a2a-security.types';
+
+// Import logger
+import { Logger } from '../../core/src/logging/logger';
+
 // Agent modules
 // @ts-ignore
 import * as gitAgent from '../mcp/src/services/git_agent';
 
 // Agent registry
-const AGENT_REGISTRY = {
+const AGENT_REGISTRY: Record<string, (message: SecureA2AMessage) => Promise<any>> = {
   'git-agent': gitAgent.handleA2AMessage
 };
 
@@ -28,10 +41,87 @@ const AGENT_REGISTRY = {
  * A2A Manager class
  */
 class A2AManager {
-  private conversations: Map<string, Array<{ timestamp: Date; message: any }>>;
+  private conversations: Map<string, Array<{ timestamp: Date; message: SecureA2AMessage | unknown }>>; // message can be SecureA2AMessage or a more generic unknown for flexibility
+  private securityMiddleware: A2ASecurityMiddleware;
+  private priorityManager: A2APriorityManager;
+  private logger: Logger;
+  private processingInterval: NodeJS.Timeout | null = null;
 
-  constructor() {
-    this.conversations = new Map<string, Array<{ timestamp: Date; message: any }>>();
+  constructor(securityConfig: Partial<A2ASecurityConfig> = {}) {
+    this.conversations = new Map<string, Array<{ timestamp: Date; message: SecureA2AMessage | unknown }>>();
+    this.securityMiddleware = new A2ASecurityMiddleware(securityConfig);
+    this.priorityManager = new A2APriorityManager();
+    this.logger = new Logger('a2a-manager');
+      
+    // Setup system agents with default access
+    this.registerSystemAgents();
+    
+    // Start message processing loop if prioritization is enabled
+    if (securityConfig.enablePrioritization !== false) {
+      this.startMessageProcessing();
+    }
+    
+    this.logger.info('A2A Manager initialized with security middleware and priority manager');
+  }
+  
+  /**
+   * Start message processing loop for prioritized messages
+   * @private
+   */
+  private startMessageProcessing(): void {
+    if (this.processingInterval) {
+      return;
+    }
+    
+    this.processingInterval = setInterval(() => {
+      this.processNextMessageInQueue();
+    }, 50); // Process every 50ms
+  }
+  
+  /**
+   * Stop message processing loop
+   * @private
+   */
+  private stopMessageProcessing(): void {
+    if (this.processingInterval) {
+      clearInterval(this.processingInterval);
+      this.processingInterval = null;
+    }
+  }
+  
+  /**
+   * Process the next message in the priority queue
+   * @private
+   */
+  private async processNextMessageInQueue(): Promise<void> {
+    // Get highest priority message from priority manager
+    const message = this.priorityManager.dequeueMessage();
+    
+    if (!message) {
+      return; // No messages in queues
+    }
+    
+    try {
+      // Get target agent
+      const targetAgent = message.to;
+      const handler = AGENT_REGISTRY[targetAgent];
+      
+      if (!handler) {
+        this.logger.warn(`Agent not found: ${targetAgent}`);
+        return;
+      }
+      
+      // Process message
+      const response = await handler(message);
+      if (response) {
+        this.storeMessage(response);
+      }
+    } catch (error) {
+      this.logger.error('Error processing queued message', {
+        error,
+        message
+      });
+    }
   }
 
   /**
@@ -39,11 +129,62 @@ class A2AManager {
    * @param {String} agentId - Agent identifier
    * @param {Function} handler - A2A message handler function
    */
-  registerAgent(agentId, handler) {
+  registerAgent(agentId: string, handler: (message: SecureA2AMessage) => Promise<any>): void {
     AGENT_REGISTRY[agentId] = handler;
+    this.logger.info(`Agent registered: ${agentId}`);
+  }
+  
+  /**
+   * Register agent with API key
+   * @param {String} agentId - Agent identifier
+   * @param {String} apiKey - API key
+   * @param {AgentAccessLevel} accessLevel - Access level
+   * @param {String[]} roles - Agent roles
+   */
+  registerAgentWithApiKey(
+    agentId: string, 
+    apiKey: string, 
+    accessLevel: AgentAccessLevel = AgentAccessLevel.PUBLIC,
+    roles: string[] = []
+  ): void {
+    // Register agent API key with security middleware
+    this.securityMiddleware.registerAgentApiKey(agentId, apiKey, accessLevel, roles);
+    this.logger.info(`Agent API key registered: ${agentId}`, { accessLevel, roles });
   }
 
-  private _prepareMessage(message: any): any {
+  /**
+   * Register system agents with default access levels
+   * @private
+   */
+  private async registerSystemAgents(): Promise<void> {
+    // System agents with private access
+    const systemAgents = [
+      { id: 'a2a-manager', accessLevel: AgentAccessLevel.RESTRICTED, roles: ['system', 'admin'] },
+      { id: 'git-agent', accessLevel: AgentAccessLevel.PRIVATE, roles: ['system', 'git'] }
+    ];
+    
+    // Generate API keys and register agents
+    for (const agent of systemAgents) {
+      try {
+        const apiKey = await this.securityMiddleware.registerAgentApiKey(
+          agent.id, 
+          undefined, // Generate a new key
+          agent.accessLevel, 
+          agent.roles,
+          0 // Never expires
+        );
+        
+        this.logger.info(`Registered system agent: ${agent.id}`, { 
+          accessLevel: agent.accessLevel, 
+          roles: agent.roles 
+        });
+      } catch (error) {
+        this.logger.error(`Failed to register system agent: ${agent.id}`, { error });
+      }
+    }
+  }
+
+  private _prepareMessage(message: SecureA2AMessage): SecureA2AMessage {
     this.validateMessage(message);
     if (!message.conversationId) {
       message.conversationId = uuidv4();
@@ -52,8 +193,8 @@ class A2AManager {
     return message;
   }
 
-  private _handleAgentNotFound(message: any, targetAgent: string): any {
-    const notFoundResponse = {
+  private _handleAgentNotFound(message: SecureA2AMessage, targetAgent: string): SecureA2AMessage {
+    const notFoundResponse: SecureA2AMessage = {
       to: message.from,
       from: 'a2a-manager',
       conversationId: message.conversationId,
@@ -68,7 +209,33 @@ class A2AManager {
     return notFoundResponse;
   }
 
-  private async _routeMessageToAgent(message: any, targetAgent: string): Promise<any> {
+  private async _routeMessageToAgent(message: SecureA2AMessage, targetAgent: string): Promise<SecureA2AMessage> {
+    // Route message based on priority
+    if (message.priority !== undefined && message.priority !== MessagePriority.NORMAL) {
+      // Add to priority queue using priority manager
+      const enqueued = this.priorityManager.enqueueMessage(message);
+      
+      if (enqueued) {
+        // For high priority messages, we return a confirmation immediately
+        if (message.priority >= MessagePriority.HIGH) {
+          return {
+            to: message.from,
+            from: 'a2a-manager',
+            conversationId: message.conversationId,
+            task: 'confirmation',
+            params: {
+              status: 'queued',
+              priority: message.priority,
+              message: 'Message queued for high-priority processing'
+            }
+          };
+        }
+      } else {
+        this.logger.warn(`Failed to enqueue message with priority ${MessagePriority[message.priority || MessagePriority.NORMAL]}`);
+      }
+    }
+    
+    // For normal priority or if priority queuing is disabled, process now
     const response = await AGENT_REGISTRY[targetAgent](message);
     if (!response || !response.to || !response.from) {
       throw new Error('Invalid response from agent');
@@ -77,8 +244,8 @@ class A2AManager {
     return response;
   }
 
-  private _handleAgentError(message: any, targetAgent: string, error: Error): any {
-    const errorResponse = {
+  private _handleAgentError(message: SecureA2AMessage, targetAgent: string, error: Error): SecureA2AMessage {
+    const errorResponse: SecureA2AMessage = {
       to: message.from,
       from: targetAgent,
       conversationId: message.conversationId,
@@ -93,7 +260,7 @@ class A2AManager {
     return errorResponse;
   }
 
-  private _handleManagerError(message: any, error: Error): any {
+  private _handleManagerError(message: SecureA2AMessage | Partial<SecureA2AMessage>, error: Error): SecureA2AMessage {
     return {
       to: message.from || 'unknown',
       from: 'a2a-manager',
@@ -112,10 +279,28 @@ class A2AManager {
    * @param {Object} message - A2A message to send
    * @returns {Promise<Object>} - Agent response
    */
-  async sendMessage(message: any): Promise<any> {
-    let preparedMessage;
+  async sendMessage(message: SecureA2AMessage): Promise<SecureA2AMessage> {
+    let preparedMessage: SecureA2AMessage | undefined = undefined;
     try {
-      preparedMessage = this._prepareMessage(message);
+      // Pass message through security middleware
+      const secureMessage = await this.securityMiddleware.processMessage(message);
+      
+      // If message was rejected by security middleware
+      if (!secureMessage) {
+        return {
+          to: message.from,
+          from: 'a2a-manager',
+          conversationId: message.conversationId || uuidv4(),
+          task: 'error',
+          params: {
+            status: 'error',
+            error: 'Message rejected by security middleware',
+            code: 403
+          }
+        };
+      }
+      
+      preparedMessage = this._prepareMessage(secureMessage);
       const targetAgent = preparedMessage.to;
 
       if (!AGENT_REGISTRY[targetAgent]) {
@@ -124,13 +309,16 @@ class A2AManager {
 
       try {
         return await this._routeMessageToAgent(preparedMessage, targetAgent);
-      } catch (agentError: any) {
-        return this._handleAgentError(preparedMessage, targetAgent, agentError);
+      } catch (agentError: unknown) {
+        const errorToHandle = agentError instanceof Error ? agentError : new Error(String(agentError));
+        // preparedMessage will be defined here if the error is from _routeMessageToAgent
+        return this._handleAgentError(preparedMessage!, targetAgent, errorToHandle);
       }
-    } catch (managerError: any) {
-      // Ensure message is defined for _handleManagerError, even if _prepareMessage failed early
-      const msgForErrorHandler = preparedMessage || message || {};
-      return this._handleManagerError(msgForErrorHandler, managerError);
+    } catch (managerError: unknown) {
+      const errorToHandle = managerError instanceof Error ? managerError : new Error(String(managerError));
+      // Use original message if preparedMessage is not available (e.g., error in _prepareMessage)
+      const msgForErrorHandler = preparedMessage || message;
+      return this._handleManagerError(msgForErrorHandler, errorToHandle);
     }
   }
 
@@ -139,7 +327,7 @@ class A2AManager {
    * @param {Object} message - A2A message to validate
    * @throws {Error} - If message is invalid
    */
-  validateMessage(message) {
+  validateMessage(message: SecureA2AMessage): void {
     // Required fields
     if (!message.to) {
       throw new Error('Missing required field: to');
@@ -164,8 +352,12 @@ class A2AManager {
    * Store a message in the conversation history
    * @param {Object} message - A2A message to store
    */
-  storeMessage(message) {
+  storeMessage(message: SecureA2AMessage): void {
     const { conversationId } = message;
+    
+    if (!conversationId) {
+      return; // Skip messages without conversation ID
+    }
     
     if (!this.conversations.has(conversationId)) {
       this.conversations.set(conversationId, []);
@@ -182,7 +374,7 @@ class A2AManager {
    * @param {String} conversationId - Conversation identifier
    * @returns {Array} - Conversation history
    */
-  getConversation(conversationId) {
+  getConversation(conversationId: string): Array<{ timestamp: Date; message: SecureA2AMessage | unknown }> {
     return this.conversations.get(conversationId) || [];
   }
 
@@ -190,7 +382,7 @@ class A2AManager {
    * List available agents
    * @returns {Array} - List of available agent IDs
    */
-  listAgents() {
+  listAgents(): string[] {
     return Object.keys(AGENT_REGISTRY);
   }
 }
@@ -208,7 +400,8 @@ interface CliOptions {
   params: string;
   conversationId?: string;
   listAgents?: boolean;
-  [key: string]: any;
+  priority?: string; // Explicitly define priority as it's used
+  [key: string]: unknown; // Keep for other potential CLI options
 }
 
 function _parseCliOptions(): { options: CliOptions, program: Command } {
@@ -221,6 +414,7 @@ function _parseCliOptions(): { options: CliOptions, program: Command } {
     .option('--from <agent-id>', 'Source agent identifier', 'user-agent')
     .option('--params <json-string>', 'JSON string containing parameters', '{}')
     .option('--conversationId <id>', 'Conversation identifier for related messages')
+    .option('--priority <level>', 'Message priority (1-5, higher is more important)', '3')
     .option('--list-agents', 'List available agents');
   program.parse(process.argv);
   return { options: program.opts() as CliOptions, program };
@@ -247,32 +441,38 @@ function _validateRequiredCliOptions(options: CliOptions, program: Command): boo
   return false; // Indicates validation passed
 }
 
-function _buildMessageFromCliOptions(options: CliOptions): any {
-  const message: {
-    to?: string;
-    task?: string;
-    from: string;
-    params: any;
-    conversationId?: string;
-  } = {
+function _buildMessageFromCliOptions(options: CliOptions): SecureA2AMessage {
+  const message: SecureA2AMessage = {
+    to: options.to || '',
+    task: options.task || '',
     from: options.from,
     params: {},
   };
 
-  if (options.to) message.to = options.to;
-  if (options.task) message.task = options.task;
   if (options.conversationId) message.conversationId = options.conversationId;
+  
+  // Add priority if specified
+  if (options.priority) {
+    const priorityNum = typeof options.priority === 'string' ? parseInt(options.priority, 10) : NaN;
+    if (!isNaN(priorityNum) && priorityNum >= 1 && priorityNum <= 5) {
+      message.priority = priorityNum as MessagePriority;
+    }
+  }
 
   try {
     message.params = JSON.parse(options.params);
-  } catch (error: any) {
-    console.error(chalk.red('Error parsing params JSON:'), error.message);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(chalk.red('Error parsing params JSON:'), error.message);
+    } else {
+      console.error(chalk.red('Error parsing params JSON:'), String(error));
+    }
     process.exit(1);
   }
   return message;
 }
 
-async function _sendAndPrintResponse(manager: A2AManager, message: any): Promise<void> {
+async function _sendAndPrintResponse(manager: A2AManager, message: SecureA2AMessage): Promise<void> {
   try {
     const response = await manager.sendMessage(message);
 
@@ -286,21 +486,19 @@ async function _sendAndPrintResponse(manager: A2AManager, message: any): Promise
       console.log(response.params.output);
     }
 
-    // In the original code, response.error was checked.
-    // The refactored sendMessage now wraps agent errors and manager errors
-    // into a consistent error structure within response.params.error.
     if (response.task === 'error' && response.params?.error) {
       console.error(chalk.red(`Error: ${response.params.error}`));
       // Determine exit code based on error code if available, otherwise default to 1
       const exitCode = typeof response.params.code === 'number' && response.params.code >= 400 ? 1 : 0;
       if (exitCode !== 0) process.exit(exitCode); // Exit only on actual errors
-    } else if (response.error) { // Fallback for older error format if any
-        console.error(chalk.red(`Error: ${response.error}`));
-        process.exit(1);
     }
 
-  } catch (error: any) { // Catch errors from sendMessage itself, though it's designed to return error objects
-    console.error(chalk.red(`Critical A2A Manager Error: ${error.message}`));
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(chalk.red(`Critical A2A Manager Error: ${error.message}`));
+    } else {
+      console.error(chalk.red('Critical A2A Manager Error:'), String(error));
+    }
     process.exit(1);
   }
 }

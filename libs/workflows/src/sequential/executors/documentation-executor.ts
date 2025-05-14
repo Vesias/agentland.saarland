@@ -1,3 +1,4 @@
+
 import { PlanStep, ExecutionResult } from "../types";
 import { BaseExecutor } from './base-executor';
 import configManager, { ConfigType } from '../../../../core/src/config/config-manager';
@@ -5,9 +6,84 @@ import { ClaudeError } from '../../../../core/src/error/error-handler';
 import { glob } from 'glob';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import fetch from 'node-fetch'; // Import für HTTP-Anfragen in validateDocumentation
 // Für AST-Parsing könnte man Bibliotheken wie @babel/parser, typescript oder esprima verwenden.
 // import { parse } from '@babel/parser';
 // import * as ts from 'typescript';
+
+interface DocElementTag {
+  tag: string;
+  type?: string;
+  name?: string;
+  description?: string;
+}
+
+interface DocElementParam {
+  name: string;
+  type?: string;
+  optional?: boolean;
+  default?: string;
+  description?: string;
+}
+
+interface DocElementReturn {
+  type?: string;
+  description?: string;
+}
+
+interface DocElement {
+  itemType: 'jsdoc' | 'function' | 'class' | 'interface' | 'export' | 'todo' | 'comment_block' | string;
+  name?: string;
+  line: number;
+  description?: string;
+  content?: string;
+  tags?: DocElementTag[];
+  raw?: string;
+  params?: DocElementParam[]; // Geändert von parameters zu params für Konsistenz
+  isAsync?: boolean; // Hinzugefügt für Funktionen
+  returnType?: string;
+  returns?: DocElementReturn;
+  extends?: string | null;
+  filePath?: string;
+  associatedElementName?: string;
+  exportType?: string;
+}
+
+interface OpenApiInfo {
+  title?: string;
+  version?: string;
+  description?: string;
+}
+
+interface OpenApiParameter {
+    name: string;
+    in: string;
+    schema?: { type?: string };
+    description?: string;
+}
+
+interface OpenApiOperation {
+    summary?: string;
+    description?: string;
+    parameters?: OpenApiParameter[];
+    responses?: Record<string, { description?: string }>;
+    // Weitere OpenAPI Operation Eigenschaften
+}
+
+interface OpenApiPathItem {
+    [method: string]: OpenApiOperation;
+}
+
+interface OpenApiSpec {
+  openapi?: string;
+  swagger?: string;
+  info?: OpenApiInfo;
+  paths?: Record<string, OpenApiPathItem>;
+  components?: Record<string, unknown>;
+  rawContent?: string;
+  format?: 'json' | 'yaml_raw';
+}
+
 
 /**
  * Documentation-specific execution implementation.
@@ -62,12 +138,21 @@ export class DocumentationExecutor extends BaseExecutor {
   /**
    * Analyzes the codebase to identify components requiring documentation
    */
-  private async analyzeCodebase(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> { // any zu unknown
+  private async analyzeCodebase(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> {
     const patterns: string[] = step.data?.patterns || ['**/*.ts', '**/*.tsx', '!**/*.spec.ts', '!**/node_modules/**'];
-    const basePath = step.data?.basePath || '.'; // Base path for glob patterns
-    this.logger.info('Analyzing codebase structure', { patterns, basePath });
+    const basePath = step.data?.basePath || '.';
+    this.logger.info('Analyzing codebase structure with enhanced regex', { patterns, basePath });
 
-    let analyzedFiles: { path: string, type: string, lastModified?: string, needsDocumentation: boolean, coverage?: number, elements?: any[], elementsCount?: number, error?: string }[] = [];
+    let analyzedFiles: {
+      path: string,
+      type: string,
+      lastModified?: string,
+      needsDocumentation: boolean,
+      coverage?: number,
+      elements: DocElement[], // To store extracted JSDoc, functions, classes, etc.
+      elementsCount?: number,
+      error?: string
+    }[] = [];
     let filesFoundCount = 0;
     let filesRequiringDocsCount = 0;
 
@@ -84,51 +169,123 @@ export class DocumentationExecutor extends BaseExecutor {
           if (['.ts', '.js'].includes(fileExtension)) type = 'module';
           if (['.tsx', '.jsx'].includes(fileExtension)) type = 'component';
           
-                          this.logger.debug(`Analyzing file ${fullPath} for documentation needs using heuristic methods.`);
-                          // Basic analysis to determine `needsDocumentation` and `coverage`.
-                          // This is a simplification; full AST parsing (e.g. with TypeScript API or Babel) would be more robust.
-                          let fileContentForAnalysis = "";
-                          try {
-                            fileContentForAnalysis = await fs.readFile(fullPath, 'utf-8');
-                          } catch (readError: any) {
-                            this.logger.warn(`Could not read file ${fullPath} for analysis: ${readError.message}`);
-                            // Skip further analysis for this file if content cannot be read
-                            analyzedFiles.push({ path: filePath, type, lastModified: stats.mtime.toISOString(), needsDocumentation: true, coverage: 0, elementsCount: 0, error: 'File read error' });
-                            filesRequiringDocsCount++; // Assume it needs docs if unreadable
-                            continue;
-                          }
-                
-                          // Check for common indicators of documentation or need thereof
-                          const hasDocComments = /\/\*\*\s*([\s\S]*?)\s*\*\//.test(fileContentForAnalysis); // JSDoc/TSDoc style
-                          const hasTodoDocument = /\/\/\s*TODO:\s*(Document|Add docs|document this)/i.test(fileContentForAnalysis);
-                          const exportCount = (fileContentForAnalysis.match(/export\s+(default\s+)?(async\s+)?(class|function|const|let|var|type|interface|enum)/g) || []).length;
-                          
-                          let needsDoc = false;
-                          let estimatedCoverage = 0.5; // Default heuristic value
-                
-                          if (exportCount > 0) { // Only consider files with exports for detailed coverage heuristics
-                            if (hasTodoDocument) {
-                              needsDoc = true;
-                              estimatedCoverage = 0.1; // Very low coverage if explicitly marked with TODO
-                              this.logger.debug(`File ${filePath} marked with TODO for documentation.`);
-                            } else if (hasDocComments) {
-                              // Simple heuristic: count JSDoc blocks vs exports.
-                              // A real system would parse AST to map comments to specific exports.
-                              const commentBlockCount = (fileContentForAnalysis.match(/\/\*\*\s*([\s\S]*?)\s*\*\//g) || []).length;
-                              estimatedCoverage = Math.min(1, commentBlockCount / exportCount); // Ensure exportCount is not zero
-                              needsDoc = estimatedCoverage < (step.data?.coverageTarget || 0.7); // Needs more docs if coverage is below target (default 70%)
-                              this.logger.debug(`File ${filePath} has ${commentBlockCount} doc comment(s) and ${exportCount} export(s). Estimated coverage: ${estimatedCoverage.toFixed(2)}. Needs docs: ${needsDoc}`);
-                            } else {
-                              needsDoc = true; // No doc comments but has exports
-                              estimatedCoverage = 0.0;
-                              this.logger.debug(`File ${filePath} has ${exportCount} export(s) but no doc comments. Needs docs.`);
-                            }
-                          } else {
-                            needsDoc = false; // No exports, heuristic assumes it doesn't need top-level file docs in the same way
-                            estimatedCoverage = 1.0; // Or N/A, depending on definition. For simplicity, assume covered.
-                            this.logger.debug(`File ${filePath} has no exports. Assuming no specific documentation needed via this heuristic.`);
-                          }
+          this.logger.debug(`Analyzing file ${fullPath} for documentation needs.`);
+          let fileContentForAnalysis = "";
+          try {
+            fileContentForAnalysis = await fs.readFile(fullPath, 'utf-8');
+          } catch (readError: unknown) {
+            const readErrorMsg = readError instanceof Error ? readError.message : String(readError);
+            this.logger.warn(`Could not read file ${fullPath} for analysis: ${readErrorMsg}`);
+            analyzedFiles.push({ path: filePath, type, lastModified: stats.mtime.toISOString(), needsDocumentation: true, coverage: 0, elements: [], elementsCount: 0, error: 'File read error' });
+            filesRequiringDocsCount++;
+            continue;
+          }
 
+          const fileElements: DocElement[] = [];
+          let match;
+
+          // Regex for JSDoc blocks (captures content including tags)
+          const jsdocRegex = /\/\*\*\s*([\s\S]*?)\s*\*\//g;
+          // Regex for single-line comments
+          const singleLineCommentRegex = /\/\/\s*(.*)/g;
+          // Regex for TODOs specifically
+          const todoRegex = /\/\/\s*TODO[:\s](.*)/gi;
+          // Improved function regex: captures async, name, parameters (more robustly), and return type hint
+          const functionRegex = /(async\s+)?function\s+([a-zA-Z0-9_]+)\s*\(([\s\S]*?)\)\s*(?::\s*([^{;]*?)\s*)?(?:\{|\=\>)/g;
+          // Class regex: captures name, extends
+          const classRegex = /class\s+([a-zA-Z0-9_]+)(?:\s+extends\s+([a-zA-Z0-9_<>,\s]+))?\s*\{/g;
+          // Interface regex: captures name
+          const interfaceRegex = /interface\s+([a-zA-Z0-9_]+)\s*\{/g;
+          const importRegex = /import\s+(?:(?:\{[^}]+\})|\w+|\*)\s+from\s+['"]([^'"]+)['"];/g;
+          const exportRegex = /export\s+(?:async\s+)?(const|let|var|function|class|interface|type|enum)\s+([a-zA-Z0-9_]+)/g;
+
+          // Extract JSDoc blocks
+          while ((match = jsdocRegex.exec(fileContentForAnalysis)) !== null) {
+            const jsdocContent = match[1].trim();
+            interface JSDocTag {
+              tag: string;
+              type?: string;
+              name?: string;
+              description?: string;
+            }
+            const tags: JSDocTag[] = [];
+            const tagRegex = /@(\w+)\s*(?:\{([^}]+)\})?\s*([a-zA-Z0-9_$.[\]]+)?\s*([^-][\s\S]*?)?(?=\s*@|$)/g;
+            let tagMatch;
+            while((tagMatch = tagRegex.exec(jsdocContent)) !== null) {
+              tags.push({
+                  tag: tagMatch[1],
+                  type: tagMatch[2] ? tagMatch[2].trim() : undefined,
+                  name: tagMatch[3] ? tagMatch[3].trim() : undefined,
+                  description: tagMatch[4] ? tagMatch[4].trim().replace(/^-/, '').trim() : undefined,
+              });
+            }
+            const description = jsdocContent.split('@')[0].trim().replace(/^\s*\*\s?/gm, '').trim();
+            fileElements.push({ itemType: 'jsdoc', description, tags, raw: jsdocContent, line: fileContentForAnalysis.substring(0, match.index).split('\n').length });
+          }
+          
+          // Extract TODOs
+          while ((match = todoRegex.exec(fileContentForAnalysis)) !== null) {
+              fileElements.push({ itemType: 'todo', content: match[1].trim(), line: fileContentForAnalysis.substring(0, match.index).split('\n').length });
+          }
+
+          // Extract functions
+          while ((match = functionRegex.exec(fileContentForAnalysis)) !== null) {
+            const paramsString = match[3] || '';
+            const parameters = paramsString.split(',')
+              .map(p => {
+                  const parts = p.trim().split(':');
+                  const nameWithType = parts[0].trim();
+                  const name = nameWithType.replace(/\??\s*=.*/, '').trim(); // Remove optional marker and default value for name
+                  const type = parts[1] ? parts[1].trim().split('=')[0].trim() : 'any'; // Get type before default value
+                  const optional = nameWithType.includes('?') || nameWithType.includes('=');
+                  const defaultValue = nameWithType.includes('=') ? nameWithType.split('=')[1]?.trim() : undefined;
+                  return { name, type, optional, default: defaultValue };
+              })
+              .filter(p => p.name);
+            fileElements.push({ itemType: 'function', name: match[2], params: parameters, isAsync: !!match[1], returnType: match[4] ? match[4].trim() : undefined, line: fileContentForAnalysis.substring(0, match.index).split('\n').length });
+          }
+          
+          // Extract classes
+          while ((match = classRegex.exec(fileContentForAnalysis)) !== null) {
+              fileElements.push({ itemType: 'class', name: match[1], extends: match[2] ? match[2].trim() : null, line: fileContentForAnalysis.substring(0, match.index).split('\n').length });
+          }
+
+          // Extract interfaces
+          while ((match = interfaceRegex.exec(fileContentForAnalysis)) !== null) {
+              fileElements.push({ itemType: 'interface', name: match[1], line: fileContentForAnalysis.substring(0, match.index).split('\n').length });
+          }
+          
+          // Extract exports (simplified, might overlap with functions/classes if they are exported)
+          while ((match = exportRegex.exec(fileContentForAnalysis)) !== null) {
+            // Avoid double-counting if already captured as function/class/interface
+            if (!fileElements.some(el => el.name === match[2] && (el.itemType === match[1] || (el.itemType === 'jsdoc' && el.line && fileContentForAnalysis.substring(el.line).startsWith(match[0]))))) {
+                 fileElements.push({ itemType: 'export', exportType: match[1], name: match[2], line: fileContentForAnalysis.substring(0, match.index).split('\n').length });
+            }
+          }
+          
+          const exportCount = fileElements.filter(el => el.itemType === 'export' || ((el.itemType === 'function' || el.itemType === 'class' || el.itemType === 'interface') && el.name && el.line && fileContentForAnalysis.substring(0, fileContentForAnalysis.indexOf(el.name, (el.line-1)*20)).includes(`export ${el.itemType} ${el.name}`))).length; // Approximate
+          const docCommentCount = fileElements.filter(el => el.itemType === 'jsdoc' && el.description && el.description.length > 10).length; // Count substantial JSDoc blocks
+          const hasTodoForDoc = fileElements.some(el => el.itemType === 'todo' && el.content && /document/i.test(el.content));
+
+          let needsDoc = false;
+          let estimatedCoverage = 0.5;
+
+          if (exportCount > 0) {
+            if (hasTodoForDoc) {
+              needsDoc = true;
+              estimatedCoverage = 0.1;
+            } else if (docCommentCount > 0) {
+              estimatedCoverage = Math.min(1, docCommentCount / exportCount);
+              needsDoc = estimatedCoverage < (step.data?.coverageTarget || 0.7);
+            } else {
+              needsDoc = true;
+              estimatedCoverage = 0.0;
+            }
+          } else {
+            needsDoc = false; // No exports, heuristic assumes no top-level docs needed
+            estimatedCoverage = 1.0;
+          }
+          
           if (needsDoc) filesRequiringDocsCount++;
 
           analyzedFiles.push({
@@ -137,15 +294,16 @@ export class DocumentationExecutor extends BaseExecutor {
             lastModified: stats.mtime.toISOString(),
             needsDocumentation: needsDoc,
             coverage: parseFloat(estimatedCoverage.toFixed(2)),
-            elementsCount: exportCount // Store count of exported elements found
+            elements: fileElements, // Store all extracted elements
+            elementsCount: fileElements.length
           });
-        } catch (fileStatError: unknown) { // any zu unknown
+        } catch (fileStatError: unknown) {
           const statErrorMsg = fileStatError instanceof Error ? fileStatError.message : 'Unknown stat error';
           this.logger.warn(`Could not stat file ${fullPath}: ${statErrorMsg}`);
         }
       }
       
-      const message = `Codebase analysis complete. Found ${filesFoundCount} files matching patterns. ${filesRequiringDocsCount} files identified as potentially requiring documentation.`;
+      const message = `Codebase analysis complete with enhanced regex. Found ${filesFoundCount} files. ${filesRequiringDocsCount} files identified as potentially requiring documentation.`;
       return {
         type: 'analyze-codebase',
         success: true,
@@ -154,7 +312,7 @@ export class DocumentationExecutor extends BaseExecutor {
         summary: message,
         data: { analysisResults: { files: analyzedFiles, patternsUsed: patterns, basePath } },
       };
-    } catch (error: unknown) { // any zu unknown
+    } catch (error: unknown) {
       const globErrorMsg = error instanceof Error ? error.message : 'Unknown glob error';
       this.logger.error('Error during codebase analysis with glob', { error: globErrorMsg });
       return {
@@ -172,150 +330,127 @@ export class DocumentationExecutor extends BaseExecutor {
   /**
    * Extracts documentation from code comments and structure
    */
-  private async extractDocumentation(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> { // any zu unknown
-    const extractExamples = step.data?.extractExamples === true;
-    const commentTypes = step.data?.commentTypes || ['JSDoc', 'TSDoc']; // Specify which comment types to look for
-    this.logger.info('Extracting documentation from code', { extractExamples, commentTypes });
+  private async extractDocumentation(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> {
+    const extractExamples = step.data?.extractExamples === true; // This flag is not fully utilized yet
+    this.logger.info('Extracting documentation from analyzed code elements', { extractExamples });
 
     const previousAnalysisStep = Object.values(context).find(s => (s as ExecutionResult).type === 'analyze-codebase') as ExecutionResult | undefined;
-    const filesToProcess: { path: string, needsDocumentation?: boolean, elements?: any[] }[] = previousAnalysisStep?.data?.analysisResults?.files || [];
-    const basePath = previousAnalysisStep?.data?.analysisResults?.basePath || '.';
-
-
-    if (!filesToProcess || filesToProcess.length === 0) {
-      const errorMsg = 'No files data available from codebase analysis step for documentation extraction.';
-      this.logger.warn(errorMsg, { analysisContext: previousAnalysisStep });
-      return { type: 'extract-documentation', success: true, stepId: step.id, message: errorMsg, summary: errorMsg, data: { message: 'No files to process.', extractedDocItems: [] } };
-    }
     
-    const extractedItemsOverall: any[] = [];
+    if (!previousAnalysisStep?.data?.analysisResults?.files) {
+        const errorMsg = 'No analysis results available from codebase analysis step for documentation extraction.';
+        this.logger.warn(errorMsg, { analysisContext: previousAnalysisStep });
+        return { type: 'extract-documentation', success: true, stepId: step.id, message: errorMsg, summary: errorMsg, data: { message: 'No analysis results to process.', extractedDocItems: [] } };
+    }
+
+    const filesFromAnalysis: {
+        path: string,
+        needsDocumentation?: boolean,
+        elements?: DocElement[]
+    }[] = previousAnalysisStep.data.analysisResults.files;
+    
+    const extractedItemsOverall: DocElement[] = [];
     let filesProcessedCount = 0;
     let elementsExtractedCount = 0;
 
-    for (const fileInfo of filesToProcess) {
-      // Ensure fileInfo and fileInfo.path are defined
-      if (!fileInfo || typeof fileInfo.path !== 'string') {
-        this.logger.warn('Skipping invalid fileInfo object in filesToProcess', { fileInfo });
+    for (const fileInfo of filesFromAnalysis) {
+      if (!fileInfo || typeof fileInfo.path !== 'string' || !Array.isArray(fileInfo.elements)) {
+        this.logger.warn('Skipping invalid fileInfo object or fileInfo without elements array', { fileInfo });
         continue;
       }
 
-      if (!fileInfo.needsDocumentation && !step.data?.forceExtractAll) continue;
-
-      const fullPath = path.join(basePath, fileInfo.path);
-      this.logger.debug(`Extracting from: ${fullPath}`);
+      if (!fileInfo.needsDocumentation && !step.data?.forceExtractAll) {
+          this.logger.debug(`Skipping file ${fileInfo.path} as it does not require documentation and forceExtractAll is not set.`);
+          continue;
+      }
+      
+      this.logger.debug(`Extracting from analyzed elements of: ${fileInfo.path}`);
       filesProcessedCount++;
-      try {
-        const fileContent = await fs.readFile(fullPath, 'utf-8');
-        
-        const extractedElements: any[] = [];
-        // NOTE: The following documentation extraction uses regular expressions.
-        // This is a simplification and can be error-prone for complex code structures or nested comments.
-        // A more robust solution would involve using an Abstract Syntax Tree (AST) parser
-        // (e.g., TypeScript API, Babel, esprima) to accurately identify code elements and their associated comments.
-        this.logger.debug(`Using regex-based comment extraction for ${fullPath}. For complex scenarios, consider AST parsing.`);
 
-        // Improved Regex for JSDoc/TSDoc blocks and associated code structure
-        // This regex tries to capture the comment block and the line(s) following it to infer name and type
-        const jsdocRegex = /\/\*\*\s*([\s\S]*?)\s*\*\/\s*([\s\S]*?)(?=(\/\*\*|$|\n\s*(?:export|class|interface|type|const|let|var|function|async function|private|public|protected|static)))/g;
-        let match;
-        while((match = jsdocRegex.exec(fileContent)) !== null) {
-            const commentBlockContent = match[1].trim();
-            const followingCode = match[2].trim();
-            
-            let elementName = "UnnamedElement";
-            let elementType = "unknown";
+      for (const element of fileInfo.elements) {
+        const currentElement = element as DocElement; // Cast to DocElement for easier access
+        if (currentElement.itemType === 'jsdoc') {
+            const associatedElement = fileInfo.elements?.find(elUntyped => {
+                const el = elUntyped as DocElement;
+                return (el.itemType === 'function' || el.itemType === 'class' || el.itemType === 'interface') &&
+                el.line > currentElement.line && el.line < currentElement.line + 5; // Heuristic
+            }) as DocElement | undefined;
 
-            // Attempt to infer name and type from the following code
-            const firstCodeLine = followingCode.split('\n')[0].trim();
-            const nameTypeMatch = /^(?:export\s+)?(?:default\s+)?(?:async\s+)?(class|interface|type|const|let|var|function)\s+([a-zA-Z0-9_]+)/.exec(firstCodeLine);
-            if (nameTypeMatch) {
-                elementType = nameTypeMatch[1];
-                elementName = nameTypeMatch[2];
-            } else {
-                // Fallback for function expressions, arrow functions, etc.
-                const assignmentMatch = /^(?:export\s+)?(?:const|let|var)\s+([a-zA-Z0-9_]+)\s*[:=]/.exec(firstCodeLine);
-                if (assignmentMatch) {
-                    elementName = assignmentMatch[1];
-                    if (firstCodeLine.includes('function') || firstCodeLine.includes('=>')) {
-                        elementType = 'function';
-                    } else if (firstCodeLine.includes('{')) {
-                        elementType = 'object';
-                    }
-                }
-            }
-
-            let description = "";
-            const descMatch = /@description\s+([^*](?:[^*]|\*(?!\/))*)/s.exec(commentBlockContent); // More robust description extraction
-            if (descMatch) description = descMatch[1].replace(/\n\s*\*/g, '\n').trim(); // Clean up multiline descriptions
-            else {
-                const firstAt = commentBlockContent.indexOf('@');
-                description = (firstAt === -1 ? commentBlockContent : commentBlockContent.substring(0, firstAt))
-                              .replace(/^\s*\*\s?/gm, '') // Remove leading asterisks and spaces per line
-                              .trim();
-            }
-
-            const params: any[] = [];
-            const paramRegex = /@param\s+(?:\{([^}]+)\}\s+)?([a-zA-Z0-9_.]+)\s*(?:-\s*)?((?:[^*]|\*(?!\/))*)/g;
-            let paramMatch;
-            while((paramMatch = paramRegex.exec(commentBlockContent)) !== null) {
-                params.push({ name: paramMatch[2], type: paramMatch[1] || 'any', description: paramMatch[3]?.replace(/\n\s*\*/g, '\n').trim() });
-            }
-            
-            const returnsMatch = /@returns?\s+(?:\{([^}]+)\}\s*)?((?:[^*]|\*(?!\/))*)/s.exec(commentBlockContent);
-            const returns = returnsMatch ? { type: returnsMatch[1] || 'any', description: returnsMatch[2]?.replace(/\n\s*\*/g, '\n').trim() } : undefined;
-
-            extractedElements.push({
-                type: elementType,
-                name: elementName === "UnnamedElement" ? `${elementName}_${elementsExtractedCount}` : elementName,
-                description,
-                params,
-                returns,
+            extractedItemsOverall.push({
+                itemType: associatedElement ? associatedElement.itemType : 'comment_block',
+                name: associatedElement?.name || `JSDoc_L${currentElement.line}`,
+                description: currentElement.description,
+                params: currentElement.tags?.filter(t => t.tag === 'param').map(t => ({ name: t.name as string, type: t.type, description: t.description })) || [],
+                returns: currentElement.tags?.find(t => t.tag === 'returns' || t.tag === 'return')
+                         ? { type: currentElement.tags.find(t => t.tag === 'returns' || t.tag === 'return')?.type, description: currentElement.tags.find(t => t.tag === 'returns' || t.tag === 'return')?.description }
+                         : undefined,
+                tags: currentElement.tags,
                 filePath: fileInfo.path,
-                commentBlock: `/**\n${commentBlockContent}\n */`, // Reconstruct for storage
-                followingCodeSnippet: firstCodeLine // Store the line used for inference
+                raw: currentElement.raw, // Changed from rawComment
+                line: currentElement.line,
+                associatedElementName: associatedElement?.name,
+            });
+            elementsExtractedCount++;
+        } else if (currentElement.itemType === 'function' || currentElement.itemType === 'class' || currentElement.itemType === 'interface') {
+            const hasAssociatedJSDoc = extractedItemsOverall.some(item =>
+                item.filePath === fileInfo.path &&
+                item.associatedElementName === currentElement.name &&
+                item.line < currentElement.line
+            );
+
+            if (!hasAssociatedJSDoc) {
+                 extractedItemsOverall.push({
+                    itemType: currentElement.itemType,
+                    name: currentElement.name,
+                    description: 'No JSDoc comment found or not associated.',
+                    params: currentElement.params || [], // Geändert von parameters
+                    returns: currentElement.returnType ? { type: currentElement.returnType, description: '' } : undefined,
+                    extends: currentElement.extends,
+                    filePath: fileInfo.path,
+                    line: currentElement.line,
+                });
+                elementsExtractedCount++;
+            }
+        } else if (currentElement.itemType === 'todo') {
+            extractedItemsOverall.push({
+                itemType: 'todo',
+                name: `TODO_L${currentElement.line}`,
+                description: currentElement.content, // Changed from content
+                filePath: fileInfo.path,
+                line: currentElement.line,
             });
             elementsExtractedCount++;
         }
-        
-        if(extractedElements.length === 0 && fileInfo.needsDocumentation) {
-             extractedElements.push({ type: 'file_placeholder', name: fileInfo.path, description: 'File marked for documentation, but no specific JSDoc/TSDoc elements extracted via current regex.', filePath: fileInfo.path });
-             elementsExtractedCount++;
-        }
-
-        if (extractedElements.length > 0) {
-          extractedItemsOverall.push(...extractedElements);
-        }
-      } catch (error: unknown) { // any zu unknown
-        const extractErrorMsg = error instanceof Error ? error.message : 'Unknown extraction error';
-        this.logger.error(`Failed to extract documentation from ${fullPath}: ${extractErrorMsg}`);
+      }
+      
+      if (fileInfo.elements.length === 0 && fileInfo.needsDocumentation) {
+        extractedItemsOverall.push({ itemType: 'file_placeholder', name: fileInfo.path, description: 'File marked for documentation, but no specific elements found by analyzer.', filePath: fileInfo.path, line: 0 });
+        elementsExtractedCount++;
       }
     }
     
-    const message = `Successfully processed ${filesProcessedCount} files for documentation extraction. Extracted ${elementsExtractedCount} documentation elements.`;
+    const message = `Successfully processed ${filesProcessedCount} analyzed files. Extracted ${elementsExtractedCount} documentation-relevant items.`;
     return {
       type: 'extract-documentation',
       success: true,
       stepId: step.id,
       message,
       summary: message,
-      data: { extractedDocItems: extractedItemsOverall, examplesExtracted: extractExamples, filesProcessedCount },
+      data: { extractedDocItems: extractedItemsOverall, filesProcessedCount }, // Removed examplesExtracted as it's not used
     };
   }
 
   /**
    * Generates documentation files based on extracted information
    */
-  private async generateDocumentation(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> { // any zu unknown
-    const outputFormat = step.data?.format || 'markdown'; // e.g., markdown, html
+  private async generateDocumentation(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> {
+    const outputFormat = step.data?.format || 'markdown';
     const outputDir = step.data?.outputDir || 'docs/generated';
-    const templateName = step.data?.template || 'default'; // Allow specifying a template
+    const templateName = step.data?.template || 'default';
     this.logger.info('Generating documentation', { outputFormat, outputDir, templateName });
 
     const previousExtractStep = Object.values(context).find(s => (s as ExecutionResult).type === 'extract-documentation') as ExecutionResult | undefined;
-    const extractedDocItems: any[] = previousExtractStep?.data?.extractedDocItems || [];
-    const basePath = previousExtractStep?.data?.analysisResults?.basePath || '.';
-
-
+    const extractedDocItems: DocElement[] = (previousExtractStep?.data as { extractedDocItems: DocElement[] })?.extractedDocItems || [];
+    
     if (extractedDocItems.length === 0) {
       const msg = 'No extracted documentation items available for generation.';
       this.logger.info(msg, { extractContext: previousExtractStep });
@@ -325,9 +460,8 @@ export class DocumentationExecutor extends BaseExecutor {
     await fs.mkdir(outputDir, { recursive: true });
     const generatedFiles: { sourceFilePath?: string, outputFilePath: string, sizeBytes: number, status: string, error?: string }[] = [];
 
-    // Group items by file path for per-file documentation
-    const itemsByFile: Record<string, any[]> = extractedDocItems.reduce((acc, item) => {
-      const key = item.filePath || 'unknown_file';
+    const itemsByFile = extractedDocItems.reduce((acc: Record<string, DocElement[]>, item: DocElement) => {
+      const key = item.filePath || 'unknown_file_source';
       if (!acc[key]) acc[key] = [];
       acc[key].push(item);
       return acc;
@@ -342,80 +476,87 @@ generatedAt: ${new Date().toISOString()}
 format: ${outputFormat}
 ---
 # Documentation for ${filePath}\n\n`;
-      // NOTE: For more complex documentation structures or custom theming,
-      // consider using a templating engine (e.g., Handlebars, EJS, Nunjucks)
-      // instead of direct string concatenation.
+
       if (outputFormat === 'markdown') {
         for (const item of items) {
-          docContent += `## \`${item.name || 'Unnamed Element'}\` (${item.type || 'N/A'})\n\n`;
-          docContent += `${item.description || 'No description.'}\n\n`;
-          if (item.params && item.params.length > 0) {
+          const currentItem = item as DocElement; // Cast for easier access
+          docContent += `## \`${currentItem.name || 'Unnamed Element'}\` (${currentItem.itemType || 'N/A'})\n\n`;
+          docContent += `${currentItem.description || 'No description available.'}\n\n`;
+          
+          const paramsToRender = currentItem.params;
+          if (paramsToRender && paramsToRender.length > 0) {
             docContent += `### Parameters\n`;
-            item.params.forEach((p: any) => {
-              docContent += `- \`${p.name}\` (\`${p.type || 'any'}\`): ${p.description || 'No description.'}\n`;
+            docContent += `| Name | Type | Optional | Default | Description |\n`;
+            docContent += `|------|------|----------|---------|-------------|\n`;
+            paramsToRender.forEach(p => {
+              docContent += `| \`${p.name}\` | \`${p.type || 'any'}\` | ${p.optional ? 'Yes' : 'No'} | ${p.default !== undefined ? `\`${p.default}\`` : '-'} | ${p.description || 'No description.'} |\n`;
             });
             docContent += `\n`;
           }
-          if (item.returns) {
+
+          if (currentItem.returns) {
             docContent += `### Returns\n`;
-            docContent += `- (\`${item.returns.type || 'any'}\`): ${item.returns.description || 'No description.'}\n\n`;
+            docContent += `**Type:** \`${currentItem.returns.type || 'any'}\`\n\n`;
+            docContent += `${currentItem.returns.description || 'No return description.'}\n\n`;
+          }
+
+          if (currentItem.tags && currentItem.tags.length > 0) {
+            const otherTags = currentItem.tags.filter(t => t.tag !== 'param' && t.tag !== 'returns' && t.tag !== 'description');
+            if (otherTags.length > 0) {
+                docContent += `### Other Tags\n`;
+                otherTags.forEach(t => {
+                    docContent += `- **@${t.tag}**: ${t.name ? `\`${t.name}\` ` : ''}${t.type ? `{\`${t.type}\`} ` : ''}${t.description || ''}\n`;
+                });
+                docContent += `\n`;
+            }
+          }
+          if (currentItem.raw) { // Changed from rawComment
+             docContent += `\n<details>\n<summary>Raw JSDoc Comment</summary>\n\n\`\`\`javascript\n${currentItem.raw}\n\`\`\`\n\n</details>\n\n`;
           }
           docContent += `---\n`;
         }
       } else if (outputFormat === 'html') {
-        // Basic HTML structure - a real implementation would use a templating engine
-        docContent = `<html><head><title>Docs for ${filePath}</title></head><body><h1>Documentation for ${filePath}</h1>`;
+        docContent = `<html><head><title>Docs for ${filePath}</title><style>body{font-family:sans-serif; margin:20px;} table{border-collapse:collapse; width:100%;} th,td{border:1px solid #ddd;padding:8px;text-align:left;} th{background-color:#f2f2f2;}</style></head><body><h1>Documentation for ${filePath}</h1>`;
         for (const item of items) {
-          docContent += `<div><h2><code>${item.name || 'Unnamed Element'}</code> (${item.type || 'N/A'})</h2>`;
-          docContent += `<p>${item.description || 'No description.'}</p>`;
-          if (item.params && item.params.length > 0) {
-            docContent += `<h3>Parameters</h3><ul>`;
-            item.params.forEach((p: any) => {
-              docContent += `<li><b>${p.name}</b> (<code>${p.type || 'any'}</code>): ${p.description || 'No description.'}</li>`;
+          const currentItem = item as DocElement;
+          docContent += `<div><h2><code>${currentItem.name || 'Unnamed Element'}</code> (${currentItem.itemType || 'N/A'})</h2>`;
+          docContent += `<p>${currentItem.description || 'No description available.'}</p>`;
+          const paramsToRender = currentItem.params;
+          if (paramsToRender && paramsToRender.length > 0) {
+            docContent += `<h3>Parameters</h3><table><tr><th>Name</th><th>Type</th><th>Optional</th><th>Default</th><th>Description</th></tr>`;
+            paramsToRender.forEach(p => {
+              docContent += `<tr><td><code>${p.name}</code></td><td><code>${p.type || 'any'}</code></td><td>${p.optional ? 'Yes' : 'No'}</td><td>${p.default !== undefined ? `<code>${p.default}</code>` : '-'}</td><td>${p.description || 'No description.'}</td></tr>`;
             });
-            docContent += `</ul>`;
+            docContent += `</table>`;
           }
-          if (item.returns) {
-            docContent += `<h3>Returns</h3><p>(<code>${item.returns.type || 'any'}</code>): ${item.returns.description || 'No description.'}</p>`;
+          if (currentItem.returns) {
+            docContent += `<h3>Returns</h3><p><strong>Type:</strong> <code>${currentItem.returns.type || 'any'}</code></p><p>${currentItem.returns.description || 'No return description.'}</p>`;
           }
           docContent += `</div><hr/>`;
         }
         docContent += `</body></html>`;
       } else {
-        // Placeholder for other formats
         docContent = JSON.stringify(items, null, 2);
       }
       
-      // Sanitize filePath for use as a filename
       const safeFileName = filePath.replace(/[^a-zA-Z0-9_.-]/g, '_');
       const outputFilePath = path.join(outputDir, `${safeFileName}.${outputFormat === 'markdown' ? 'md' : outputFormat}`);
       
       try {
         await fs.writeFile(outputFilePath, docContent);
         const stats = await fs.stat(outputFilePath);
-        generatedFiles.push({
-          sourceFilePath: filePath,
-          outputFilePath,
-          sizeBytes: stats.size,
-          status: 'success',
-        });
+        generatedFiles.push({ sourceFilePath: filePath, outputFilePath, sizeBytes: stats.size, status: 'success' });
       } catch (error: unknown) {
         const writeErrorMsg = error instanceof Error ? error.message : 'Unknown error writing documentation file';
         this.logger.error(`Failed to write documentation file ${outputFilePath}: ${writeErrorMsg}`);
-        generatedFiles.push({
-          sourceFilePath: filePath,
-          outputFilePath,
-          sizeBytes: 0,
-          status: 'failed',
-          error: writeErrorMsg,
-        });
+        generatedFiles.push({ sourceFilePath: filePath, outputFilePath, sizeBytes: 0, status: 'failed', error: writeErrorMsg });
       }
     }
     
     const message = `Successfully generated ${generatedFiles.filter(f=>f.status === 'success').length} documentation files in ${outputFormat} format to ${outputDir}.`;
     return {
       type: 'generate-documentation',
-      success: true,
+      success: generatedFiles.some(f => f.status === 'success'), // Success if at least one file generated
       stepId: step.id,
       message,
       summary: message,
@@ -444,7 +585,7 @@ format: ${outputFormat}
     let brokenLinksFound = 0;
     let coverageGapsFound = 0;
     let filesValidatedCount = 0;
-    const validationIssues: any[] = [];
+    const validationIssues: unknown[] = [];
     
     // Declare previousAnalysisStep earlier as it's used in the loop for sourceFilePath context
     // and also later for coverage calculation.
@@ -462,61 +603,63 @@ format: ${outputFormat}
           while ((match = markdownLinkRegex.exec(content)) !== null) {
             const link = match[1];
             if (link.startsWith('http')) {
-                // For external links, a real check would involve an HTTP request.
-                // This is a SIMULATION. A production system would use a library to make HEAD or GET requests.
-                this.logger.debug(`Simulating check for external link: ${link} in ${docFile.outputFilePath}`);
-                if (link.includes('example.com/broken-link-test-simulation')) { // More specific simulation trigger
+                this.logger.debug(`Checking external link: ${link} in ${docFile.outputFilePath}`);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), step.data?.externalLinkTimeout || 5000); // Default 5s timeout
+                try {
+                    const response = await fetch(link, { method: 'HEAD', signal: controller.signal, redirect: 'follow' });
+                    clearTimeout(timeoutId);
+                    if (!response.ok) {
+                        brokenLinksFound++;
+                        validationIssues.push({ file: docFile.outputFilePath, type: 'broken_external_link', link, status: response.status, message: `External link returned status ${response.status}` });
+                        this.logger.warn(`Broken external link found: ${link} (status ${response.status}) in ${docFile.outputFilePath}`);
+                    }
+                } catch (fetchError: unknown) {
+                    clearTimeout(timeoutId);
                     brokenLinksFound++;
-                    validationIssues.push({ file: docFile.outputFilePath, type: 'broken_external_link_simulated', link, message: "Simulated broken external link." });
-                    this.logger.warn(`Simulated broken external link found: ${link} in ${docFile.outputFilePath}`);
+                    const typedFetchError = fetchError as { name?: string; message?: string };
+                    const errorMessage = typedFetchError.name === 'AbortError' ? 'Request timed out' : (typedFetchError.message || String(fetchError));
+                    validationIssues.push({ file: docFile.outputFilePath, type: 'broken_external_link', link, message: `Failed to fetch external link: ${errorMessage}` });
+                    this.logger.warn(`Failed to fetch external link ${link} in ${docFile.outputFilePath}: ${errorMessage}`);
                 }
             } else if (!link.startsWith('#') && !link.startsWith('mailto:')) {
-                // Handle relative local links
                 this.logger.debug(`Checking local link: ${link} in ${docFile.outputFilePath}`);
                 const outputDir = previousGenerateStep?.data?.outputDirectory || 'docs/generated';
-                let targetPath = path.resolve(path.dirname(docFile.outputFilePath), link);
+                const currentDocDir = path.dirname(docFile.outputFilePath);
                 
-                // If link seems to be to another generated doc, try to resolve it within outputDir
-                // e.g. [My Component](./my-component.md)
-                const isLikelyInternalDocLink = /\.(md|html)$/i.test(link);
-                if (isLikelyInternalDocLink && !link.startsWith('/') && !path.isAbsolute(link)) {
-                    // This logic assumes links are relative to the current doc file's location within outputDir
-                } else if (!isLikelyInternalDocLink && !link.startsWith('/') && !path.isAbsolute(link)) {
-                    // Could be a link to a source file or other asset, resolve relative to project root or source file location
-                    // This part is complex as "correct" base for relative links depends on documentation tool and setup
-                    // For now, assume relative to the doc file itself.
-                }
-
-
+                // Attempt 1: Relative to the current document's directory
+                let targetPath = path.resolve(currentDocDir, link);
+                
                 try {
                     await fs.access(targetPath);
                 } catch (e1) {
-                    // Try resolving relative to the root of the generated docs output directory
+                    // Attempt 2: Relative to the root of the generated docs output directory
                     const targetPathFromDocsRoot = path.resolve(outputDir, link.startsWith('./') ? link.substring(2) : link);
                     try {
                         await fs.access(targetPathFromDocsRoot);
                     } catch (e2) {
-                        // Final check: if it's a link to a source file (e.g. from generated doc to original .ts)
-                        // This is a heuristic and might need refinement based on actual link patterns
+                        // Attempt 3: If it might be a link to a source file (heuristic)
                         const sourceFileBaseDir = docFile.sourceFilePath ? path.dirname(path.resolve(previousAnalysisStep?.data?.analysisResults?.basePath || '.', docFile.sourceFilePath)) : null;
-                        if (sourceFileBaseDir) {
+                        if (sourceFileBaseDir && !/\.(md|html)$/i.test(link)) { // Heuristic: if not ending in .md or .html, could be source
                             const targetPathFromSource = path.resolve(sourceFileBaseDir, link);
                              try {
                                 await fs.access(targetPathFromSource);
                              } catch (e3) {
                                 brokenLinksFound++;
-                                validationIssues.push({ file: docFile.outputFilePath, type: 'broken_local_link', link, attemptedPaths: [targetPath, targetPathFromDocsRoot, targetPathFromSource] });
+                                validationIssues.push({ file: docFile.outputFilePath, type: 'broken_local_link', link, message: 'Local link target not found.', attemptedPaths: [targetPath, targetPathFromDocsRoot, targetPathFromSource] });
+                                this.logger.warn(`Broken local link found: ${link} in ${docFile.outputFilePath}. Attempted: ${targetPath}, ${targetPathFromDocsRoot}, ${targetPathFromSource}`);
                              }
                         } else {
                              brokenLinksFound++;
-                             validationIssues.push({ file: docFile.outputFilePath, type: 'broken_local_link', link, attemptedPaths: [targetPath, targetPathFromDocsRoot] });
+                             validationIssues.push({ file: docFile.outputFilePath, type: 'broken_local_link', link, message: 'Local link target not found.', attemptedPaths: [targetPath, targetPathFromDocsRoot] });
+                             this.logger.warn(`Broken local link found: ${link} in ${docFile.outputFilePath}. Attempted: ${targetPath}, ${targetPathFromDocsRoot}`);
                         }
                     }
                 }
             }
           }
         }
-      } catch (error: unknown) { // any zu unknown
+      } catch (error: unknown) {
         const readDocErrorMsg = error instanceof Error ? error.message : 'Unknown error reading generated doc file';
         this.logger.warn(`Could not read generated file ${docFile.outputFilePath} for validation: ${readDocErrorMsg}`);
       }
@@ -580,90 +723,167 @@ format: ${outputFormat}
   /**
    * Generates API documentation
    */
-  private async generateApiDocs(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> { // any zu unknown
-    const outputFormat = step.data?.format || 'html'; // e.g., html, openapi_json, markdown
+  private async generateApiDocs(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> {
+    const outputFormat = step.data?.format || 'markdown'; // Default to markdown for better utility
     const outputDir = step.data?.outputDir || 'docs/api';
-    const apiSpecPath = step.data?.apiSpecPath; // Path to an OpenAPI/Swagger spec file
-    const useExtractedItems = step.data?.useExtractedItems !== false; // Default to using extracted items if no spec path
+    const apiSpecPath = step.data?.apiSpecPath as string | undefined;
+    const useExtractedItems = step.data?.useExtractedItems !== false;
     this.logger.info('Generating API documentation', { outputFormat, outputDir, apiSpecPath, useExtractedItems });
 
     let sourceDescription = "";
-    let itemsToProcess: any[] = [];
+    let apiSpecContent: OpenApiSpec | null = null; // Will hold parsed spec if available
 
     if (apiSpecPath) {
       sourceDescription = `API specification file: ${apiSpecPath}`;
       try {
-        const fullSpecPath = path.resolve(apiSpecPath); // Ensure path is absolute or resolved correctly
-        const specContent = await fs.readFile(fullSpecPath, 'utf-8');
-        if (specContent.includes('openapi:') || specContent.includes('swagger:')) { // Basic check
-             itemsToProcess = [{ name: 'API Overview from Spec', type: 'api_spec', description: `Full API documentation based on ${apiSpecPath}`, filePath: apiSpecPath, content: specContent }];
+        const fullSpecPath = path.resolve(apiSpecPath);
+        const specFileContent = await fs.readFile(fullSpecPath, 'utf-8');
+        if (apiSpecPath.endsWith('.json')) {
+            apiSpecContent = JSON.parse(specFileContent);
+        } else if (apiSpecPath.endsWith('.yaml') || apiSpecPath.endsWith('.yml')) {
+            // For YAML, a parser like 'js-yaml' would be needed.
+            // import * as yaml from 'js-yaml'; apiSpecContent = yaml.load(specFileContent);
+            this.logger.warn(`YAML spec processing for ${apiSpecPath} is a TODO. Attempting to treat as JSON for now or use raw content.`);
+            try { apiSpecContent = JSON.parse(specFileContent); } catch { apiSpecContent = { rawContent: specFileContent, format: 'yaml_raw' }; }
         } else {
-            throw new Error('Invalid API specification file format or content.');
+            throw new Error('Unsupported API specification file format (expected .json, .yaml, or .yml).');
         }
-      } catch (error: unknown) { // any zu unknown
+        if (apiSpecContent && !apiSpecContent.openapi && !apiSpecContent.swagger) {
+             this.logger.warn(`File ${apiSpecPath} does not seem to be a valid OpenAPI/Swagger spec (missing openapi/swagger root property). Processing will be limited.`);
+        }
+      } catch (error: unknown) {
         const loadSpecErrorMsg = error instanceof Error ? error.message : 'Unknown error loading API spec';
-        this.logger.error(`Failed to load API spec file ${apiSpecPath}: ${loadSpecErrorMsg}`);
+        this.logger.error(`Failed to load or parse API spec file ${apiSpecPath}: ${loadSpecErrorMsg}`);
         return { type: 'generate-api-docs', success: false, stepId: step.id, message: `Error loading API spec: ${loadSpecErrorMsg}`, summary: 'API spec loading failed.', data: { error: loadSpecErrorMsg, apiSpecPath } };
       }
-    } else if (useExtractedItems) {
-      const previousExtractStep = Object.values(context).find(s => (s as ExecutionResult).type === 'extract-documentation') as ExecutionResult | undefined;
-      itemsToProcess = previousExtractStep?.data?.extractedDocItems || [];
-      sourceDescription = "extracted code comments";
-      if (itemsToProcess.length === 0) {
-        const msg = 'No extracted documentation items available and no API spec path provided for API documentation generation.';
-        this.logger.warn(msg, { extractContext: previousExtractStep });
-        return { type: 'generate-api-docs', success: true, stepId: step.id, message: msg, summary: msg, data: { message: msg, apiDocFiles: [] } };
-      }
-    } else {
-      const errorMsg = 'No API spec path provided and useExtractedItems is false. Cannot generate API docs.';
-      this.logger.warn(errorMsg);
-      return { type: 'generate-api-docs', success: false, stepId: step.id, message: errorMsg, summary: errorMsg, data: { error: errorMsg } };
+    }
+    
+    let itemsFromCode: DocElement[] = [];
+    if (useExtractedItems && !apiSpecPath) { // Only use extracted items if no spec path is given
+        const previousExtractStep = Object.values(context).find(s => (s as ExecutionResult).type === 'extract-documentation') as ExecutionResult | undefined;
+        itemsFromCode = (previousExtractStep?.data as { extractedDocItems: DocElement[] })?.extractedDocItems || [];
+        sourceDescription = "extracted code comments (heuristic for API endpoints)";
+        if (itemsFromCode.length === 0) {
+            const msg = 'No API spec path provided and no extracted documentation items available for API documentation generation.';
+            this.logger.warn(msg);
+            return { type: 'generate-api-docs', success: true, stepId: step.id, message: msg, summary: msg, data: { message: msg, apiDocFiles: [] } };
+        }
+    }
+
+    if (!apiSpecContent && itemsFromCode.length === 0) {
+        const errorMsg = 'No API specification or extracted code elements to process for API documentation.';
+        this.logger.error(errorMsg);
+        return { type: 'generate-api-docs', success: false, stepId: step.id, message: errorMsg, summary: errorMsg, data: { error: errorMsg } };
     }
     
     await fs.mkdir(outputDir, { recursive: true });
     const apiDocFiles: { source: string, outputFilePath: string, sizeBytes: number, status: string, error?: string }[] = [];
-
     let apiDocContent = ``;
-    if (outputFormat === 'html') {
-        apiDocContent = `<html><head><title>API Reference</title><style>body{font-family:sans-serif;} pre{background:#f4f4f4;padding:1em;overflow:auto;}</style></head><body><h1>API Reference</h1><p>Source: ${sourceDescription}</p><hr/>`;
-    } else if (outputFormat === 'markdown') {
+
+    // Header for Markdown and HTML
+    if (outputFormat === 'markdown') {
         apiDocContent = `# API Reference\n\nSource: ${sourceDescription}\n\n---\n\n`;
+    } else if (outputFormat === 'html') {
+        apiDocContent = `<html><head><title>API Reference</title><style>body{font-family:sans-serif; margin:20px;} pre{background:#f4f4f4;padding:1em;overflow:auto;border-radius:5px;} table{border-collapse:collapse; width:auto; margin-bottom:1em;} th,td{border:1px solid #ddd;padding:8px;text-align:left;} th{background-color:#f2f2f2;}</style></head><body><h1>API Reference</h1><p>Source: ${sourceDescription}</p><hr/>`;
     }
 
-
-    if (apiSpecPath && itemsToProcess.length > 0 && itemsToProcess[0].type === 'api_spec') {
-        // If we have a spec file, the "generation" might be just copying it or using a dedicated tool.
-        // This is a SIMPLIFIED placeholder. For production, use tools like Swagger UI, Redocly, or similar
-        // to generate rich, interactive API documentation from an OpenAPI/Swagger spec.
-        this.logger.warn(`Processing API spec file ${apiSpecPath} with simplified placeholder logic. Consider dedicated tools for production.`);
+    if (apiSpecContent) {
+        this.logger.info(`Generating API documentation from specification: ${apiSpecPath}`);
         if (outputFormat === 'openapi_json') {
-            apiDocContent = itemsToProcess[0].content; // Directly use the spec content if JSON output is requested
-        } else if (outputFormat === 'html') {
-            // Basic HTML rendering of a supposed spec. Real tools would generate interactive UIs.
-            apiDocContent += `<h2>API Specification (from ${itemsToProcess[0].filePath})</h2>
-                              <p><strong>Note:</strong> This is a basic rendering. For interactive API docs, use tools like Swagger UI or Redocly.</p>
-                              <pre><code>${itemsToProcess[0].content.replace(/</g, "<").replace(/>/g, ">")}</code></pre>`;
+            apiDocContent = JSON.stringify(apiSpecContent, null, 2);
         } else if (outputFormat === 'markdown') {
-            apiDocContent += `## API Specification (from ${itemsToProcess[0].filePath})\n\n
-**Note:** This is a basic rendering. For interactive API docs, consider dedicated tools.\n\n
-\`\`\`json\n${itemsToProcess[0].content}\n\`\`\`\n`;
-        } else {
-            this.logger.warn(`Unsupported output format '${outputFormat}' for API spec. Defaulting to raw content.`);
-            apiDocContent += `Raw API Spec Content from ${itemsToProcess[0].filePath}:\n\n${itemsToProcess[0].content}`;
+            apiDocContent += `## API Specification Overview (from ${apiSpecPath})\n\n`;
+            apiDocContent += `**Title:** ${apiSpecContent.info?.title || 'N/A'}\n`;
+            apiDocContent += `**Version:** ${apiSpecContent.info?.version || 'N/A'}\n`;
+            apiDocContent += `**Description:** ${apiSpecContent.info?.description || 'No description.'}\n\n`;
+            if (apiSpecContent.paths) {
+                apiDocContent += `### Endpoints\n\n`;
+                for (const [pathKey, pathItemUntyped] of Object.entries(apiSpecContent.paths || {})) {
+                  const pathItem = pathItemUntyped as OpenApiPathItem;
+                  apiDocContent += `#### \`${pathKey}\`\n\n`;
+                  for (const [method, operation] of Object.entries(pathItem)) {
+                    apiDocContent += `**${method.toUpperCase()}**: ${operation.summary || operation.description || 'No summary.'}\n`;
+                    if (operation.parameters && operation.parameters.length > 0) {
+                        apiDocContent += `Parameters:\n`;
+                        operation.parameters.forEach(param => {
+                            apiDocContent += `- \`${param.name}\` (${param.in}, ${param.schema?.type || 'N/A'}): ${param.description || ''}\n`;
+                        });
+                        }
+                        apiDocContent += `\n`;
+                    }
+                }
+            }
+            if (apiSpecContent.rawContent && apiSpecContent.format === 'yaml_raw') {
+                 apiDocContent += `\n<details>\n<summary>Raw YAML Spec Content</summary>\n\n\`\`\`yaml\n${apiSpecContent.rawContent}\n\`\`\`\n\n</details>\n\n`;
+            } else {
+                 apiDocContent += `\n<details>\n<summary>Raw JSON Spec Content</summary>\n\n\`\`\`json\n${JSON.stringify(apiSpecContent, null, 2)}\n\`\`\`\n\n</details>\n\n`;
+            }
+        } else if (outputFormat === 'html') {
+            apiDocContent += `<h2>API Specification Overview (from ${apiSpecPath})</h2>`;
+            apiDocContent += `<p><strong>Title:</strong> ${apiSpecContent.info?.title || 'N/A'}</p>`;
+            apiDocContent += `<p><strong>Version:</strong> ${apiSpecContent.info?.version || 'N/A'}</p>`;
+            apiDocContent += `<p><strong>Description:</strong> ${apiSpecContent.info?.description || 'No description.'}</p>`;
+            if (apiSpecContent.paths) {
+                apiDocContent += `<h3>Endpoints</h3>`;
+                for (const [pathKey, pathItemUntyped] of Object.entries(apiSpecContent.paths || {})) {
+                    const pathItem = pathItemUntyped as OpenApiPathItem;
+                    apiDocContent += `<h4><code>${pathKey}</code></h4>`;
+                    for (const [method, operation] of Object.entries(pathItem)) {
+                        apiDocContent += `<p><strong>${method.toUpperCase()}</strong>: ${operation.summary || operation.description || 'No summary.'}</p>`;
+                         if (operation.parameters && operation.parameters.length > 0) {
+                            apiDocContent += `<h5>Parameters:</h5><ul>`;
+                            operation.parameters.forEach(param => {
+                                apiDocContent += `<li><code>${param.name}</code> (${param.in}, ${param.schema?.type || 'N/A'}): ${param.description || ''}</li>`;
+                            });
+                            apiDocContent += `</ul>`;
+                        }
+                    }
+                }
+            }
+            apiDocContent += `<h3>Raw Specification</h3><pre><code>${JSON.stringify(apiSpecContent, null, 2).replace(/</g, "<").replace(/>/g, ">")}</code></pre>`;
         }
-    } else { // Generating from extracted items (less common for formal API docs but supported as fallback)
-        this.logger.info(`Generating API documentation from extracted code comments. For formal API docs, an OpenAPI/Swagger spec is recommended.`);
-        itemsToProcess.forEach(item => {
-          if (outputFormat === 'markdown') {
-            apiDocContent += `## \`${item.name || 'Unnamed'}\` (${item.type || 'N/A'})\n\n${item.description || ''}\n\n`;
-            // Add params, returns etc. for markdown if available
-          } else if (outputFormat === 'html') {
-            apiDocContent += `<div><h2><code>${item.name || 'Unnamed'}</code> (${item.type || 'N/A'})</h2><p>${item.description || ''}</p></div>`;
-          } else {
-            apiDocContent += JSON.stringify(item, null, 2) + '\n';
-          }
+    } else if (useExtractedItems && itemsFromCode.length > 0) {
+        this.logger.info(`Generating API documentation from ${itemsFromCode.length} extracted code comments (heuristic).`);
+        // Heuristic: filter for items that might be API endpoints (e.g., functions with @route tags or specific naming)
+        const apiEndpoints = itemsFromCode.filter(item =>
+            item.itemType === 'function' &&
+            (item.tags?.some(t => t.tag === 'route' || t.tag === 'path' || t.tag === 'endpoint') || (item.name && /^(get|post|put|delete|patch)[A-Z]/.test(item.name)))
+        );
+        if (apiEndpoints.length === 0) {
+            apiDocContent += "No specific API endpoints identified from extracted code comments based on current heuristics.\n";
+        }
+        apiEndpoints.forEach(item => {
+            const routeTag = item.tags?.find(t => t.tag === 'route' || t.tag === 'path');
+            const endpointPath = routeTag?.description?.split(' ')[1] || item.name;
+            const httpMethod = routeTag?.description?.split(' ')[0]?.toUpperCase() || 'GET'; // Default to GET
+
+            if (outputFormat === 'markdown') {
+                apiDocContent += `### \`${httpMethod} ${endpointPath}\` (from ${item.filePath})\n\n`;
+                apiDocContent += `**Function:** \`${item.name}\`\n\n`;
+                apiDocContent += `${item.description || 'No description.'}\n\n`;
+                if (item.params && item.params.length > 0) {
+                    apiDocContent += `**Parameters:**\n`;
+                    item.params?.forEach(p => {
+                        apiDocContent += `- \`${p.name}\` (\`${p.type || 'any'}\`): ${p.description || ''}\n`;
+                    });
+                    apiDocContent += `\n`;
+                }
+            } else if (outputFormat === 'html') {
+                apiDocContent += `<div><h3><code>${httpMethod} ${endpointPath}</code> (from ${item.filePath})</h3>`;
+                apiDocContent += `<p><strong>Function:</strong> <code>${item.name}</code></p>`;
+                apiDocContent += `<p>${item.description || 'No description.'}</p>`;
+                 if (item.params && item.params.length > 0) {
+                    apiDocContent += `<strong>Parameters:</strong><ul>`;
+                    item.params?.forEach(p => {
+                        apiDocContent += `<li><code>${p.name}</code> (<code>${p.type || 'any'}</code>): ${p.description || ''}</li>`;
+                    });
+                    apiDocContent += `</ul>`;
+                }
+                apiDocContent += `</div><hr/>`;
+            }
         });
     }
+
     if (outputFormat === 'html') apiDocContent += `</body></html>`;
 
     const outputFileName = `api_reference.${outputFormat === 'openapi_json' ? 'json' : (outputFormat === 'markdown' ? 'md' : 'html')}`;
@@ -673,7 +893,7 @@ format: ${outputFormat}
       await fs.writeFile(outputFilePath, apiDocContent);
       const stats = await fs.stat(outputFilePath);
       apiDocFiles.push({
-        source: apiSpecPath || (itemsToProcess.length > 0 && itemsToProcess[0].filePath ? itemsToProcess[0].filePath : 'extracted_items'),
+        source: apiSpecPath || (itemsFromCode.length > 0 && itemsFromCode[0].filePath ? itemsFromCode[0].filePath : 'extracted_code_elements'),
         outputFilePath,
         sizeBytes: stats.size,
         status: 'success',
@@ -682,11 +902,11 @@ format: ${outputFormat}
       const writeApiDocErrorMsg = error instanceof Error ? error.message : 'Unknown error writing API documentation file';
       this.logger.error(`Failed to write API documentation file ${outputFilePath}: ${writeApiDocErrorMsg}`);
       apiDocFiles.push({
-        source: apiSpecPath || (itemsToProcess.length > 0 && itemsToProcess[0].filePath ? itemsToProcess[0].filePath : 'extracted_items'), // Sicherstellen, dass source einen Wert hat
+        source: apiSpecPath || (itemsFromCode.length > 0 && itemsFromCode[0].filePath ? itemsFromCode[0].filePath : 'extracted_code_elements'),
         outputFilePath,
         sizeBytes: 0,
         status: 'failed',
-        error: writeApiDocErrorMsg, // Korrekt hier
+        error: writeApiDocErrorMsg,
       });
     }
     
@@ -698,7 +918,7 @@ format: ${outputFormat}
       stepId: step.id,
       message: resultMessage,
       summary: resultMessage,
-      data: { apiDocFiles, outputFormat, outputDirectory: outputDir, sourceUsed: apiSpecPath ? 'api_spec' : (useExtractedItems ? 'extracted_items' : 'none') },
+      data: { apiDocFiles, outputFormat, outputDirectory: outputDir, sourceUsed: apiSpecPath ? 'api_spec' : (useExtractedItems ? 'extracted_code_elements' : 'none') },
     };
   }
 }

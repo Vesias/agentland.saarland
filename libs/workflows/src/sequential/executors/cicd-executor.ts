@@ -7,6 +7,46 @@ import fetch from 'node-fetch';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
+interface EslintFileResult {
+  filePath: string;
+  messages: { line?: number; column?: number; severity?: number; message?: string; ruleId?: string }[];
+  errorCount: number;
+  warningCount: number;
+  fixableErrorCount?: number;
+  fixableWarningCount?: number;
+  source?: string;
+}
+
+interface HealthCheckDetail {
+  endpoint: string;
+  url: string;
+  status?: number;
+  success: boolean;
+  duration?: number;
+  error?: string;
+}
+
+interface HealthCheckResults {
+  passed: number;
+  failed: number;
+  checked: number;
+  details: HealthCheckDetail[];
+  message?: string;
+  success?: boolean; // Added for clarity, though calculated externally
+}
+
+interface SmokeTestResultsData {
+  success: boolean;
+  message: string;
+  rawStdout: string;
+  rawStderr: string;
+  exitCode: number;
+  testsRun: number;
+  passed: number;
+  failed: number;
+  error?: string;
+}
+
 /**
  * CI/CD-specific execution implementation.
  * Handles the execution of continuous integration and deployment steps.
@@ -92,7 +132,7 @@ export class CICDExecutor extends BaseExecutor {
             this.logger.warn(`Linter ${linter} stderr:`, { stderr });
           }
 
-          let lintResults: any = {};
+          let lintResults: Record<string, unknown> = {};
           let filesWithIssues = 0;
           let errors = 0;
           let warnings = 0;
@@ -101,7 +141,8 @@ export class CICDExecutor extends BaseExecutor {
           try {
             const parsedOutput = JSON.parse(stdout);
             // Assuming ESLint JSON format: Array of objects, each with filePath, messages, errorCount, warningCount, fixableErrorCount, fixableWarningCount
-            parsedOutput.forEach((fileResult: any) => {
+            parsedOutput.forEach((fileResultUntyped: Record<string, unknown>) => {
+              const fileResult = fileResultUntyped as unknown as EslintFileResult;
               if (fileResult.errorCount > 0 || fileResult.warningCount > 0) {
                 filesWithIssues++;
               }
@@ -222,12 +263,12 @@ export class CICDExecutor extends BaseExecutor {
             this.logger.warn(`Test runner ${testCommand} stderr:`, { stderr });
           }
 
-          let testResults: any = {};
+          let testResults: Record<string, unknown> = {};
           let numTotalTests = 0;
           let numPassedTests = 0;
           let numFailedTests = 0;
           let numPendingTests = 0; // Jest calls skipped tests "pending" in some contexts
-          let coverageData: any = undefined;
+          let coverageData: Record<string, unknown> | undefined = undefined;
 
           // Attempt to read and parse Jest's JSON output
           // Note: Jest with --json might print to stdout or a file. Here we assume file.
@@ -257,8 +298,9 @@ export class CICDExecutor extends BaseExecutor {
                     };
                 }
                 testResults = parsedOutput; // Store the full parsed output
-            } catch (fileError: any) {
-                 this.logger.warn('Could not read or parse test-results.json, attempting to parse stdout for Jest JSON', { fileError: fileError.message, stdout });
+            } catch (fileError: unknown) {
+                 const fileErrorMsg = fileError instanceof Error ? fileError.message : String(fileError);
+                 this.logger.warn('Could not read or parse test-results.json, attempting to parse stdout for Jest JSON', { fileError: fileErrorMsg, stdout });
                  // Fallback to parsing stdout if file read fails
                  if (stdout.trim()) {
                     try {
@@ -274,8 +316,9 @@ export class CICDExecutor extends BaseExecutor {
                             };
                         }
                         testResults = parsedStdout;
-                    } catch(stdoutParseError: any) {
-                        this.logger.error('Failed to parse test runner stdout as JSON', { stdout, error: stdoutParseError.message });
+                    } catch(stdoutParseError: unknown) {
+                        const stdoutParseErrorMsg = stdoutParseError instanceof Error ? stdoutParseError.message : String(stdoutParseError);
+                        this.logger.error('Failed to parse test runner stdout as JSON', { stdout, error: stdoutParseErrorMsg });
                     }
                  } else {
                     this.logger.info('No test-results.json found and stdout is empty.');
@@ -283,8 +326,9 @@ export class CICDExecutor extends BaseExecutor {
             }
 
 
-          } catch (e: any) {
-            this.logger.error('Failed to parse test runner output as JSON', { rawJsonOutput, stdout, error: e.message });
+          } catch (e: unknown) {
+            const errorMsg = e instanceof Error ? e.message : String(e);
+            this.logger.error('Failed to parse test runner output as JSON', { rawJsonOutput, stdout, error: errorMsg });
             // If JSON parsing fails, rely on exit code and stderr
           }
 
@@ -472,15 +516,19 @@ export class CICDExecutor extends BaseExecutor {
   /**
    * Deploys the project to target environment
    */
-  private async deployProject(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> { // context: Record<string, any> zu Record<string, unknown>
+  private async deployProject(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> {
     const environment = step.data?.environment || 'staging';
-    const strategy = step.data?.strategy || 'blue-green'; // Example strategy
-    const deployCommand = step.data?.deployCommand || 'echo'; // Placeholder: use a real deploy command/script
-    const deployArgs = step.data?.deployArgs || [`Deploying to ${environment} via ${strategy}`]; // Placeholder args
+    const strategy = step.data?.strategy || 'default'; // Default strategy
+    // Default to saar.sh script, can be overridden by step.data
+    const deployCommand = step.data?.deployCommand || './saar.sh';
+    // Default args for saar.sh, can be overridden. Example: ['setup', '--env', environment]
+    const defaultArgs = step.data?.defaultDeployArgs || ['setup', '--environment', environment];
+    const deployArgs = step.data?.deployArgs || defaultArgs;
+    const expectedUrlPattern = step.data?.expectedUrlPattern as string | undefined; // e.g., "Deployment URL: (https?://[^\\s]+)"
 
     this.logger.info('Deploying project', { environment, strategy, command: deployCommand, args: deployArgs });
 
-    const previousBuildStep = Object.values(context).find(s => (s as ExecutionResult).type ==='build') as ExecutionResult | undefined;
+    const previousBuildStep = Object.values(context).find(s => (s as ExecutionResult).type === 'build') as ExecutionResult | undefined;
     if (!previousBuildStep || !previousBuildStep.success || !previousBuildStep.data?.buildResults?.success) {
       const errorMsg = 'Cannot deploy: previous build step failed or build artifacts are missing.';
       this.logger.error(errorMsg, { buildContext: previousBuildStep });
@@ -510,61 +558,82 @@ export class CICDExecutor extends BaseExecutor {
         };
     }
 
-    // Actual deployment logic would involve using these artifacts
-    this.logger.info('Artifacts to deploy:', { artifactsToDeploy });
+    this.logger.info('Artifacts to deploy (from build step):', { artifacts: artifactsToDeploy.map((art: { name: string }) => art.name) });
 
     const startTime = Date.now();
 
     try {
-      // This is a placeholder. Real deployment would involve complex interactions.
-      // For example, uploading files, running remote commands, etc.
-      // We'll simulate a command execution.
-      const process = spawn(deployCommand, deployArgs);
+      const process = spawn(deployCommand, deployArgs, { shell: deployCommand.endsWith('.sh') || deployCommand.endsWith('.bat') }); // Use shell for .sh scripts
       let stdout = '';
       let stderr = '';
 
       process.stdout.on('data', (data) => {
-        stdout += data.toString();
-        this.logger.debug('Deploy stdout:', data.toString());
+        const outData = data.toString();
+        stdout += outData;
+        this.logger.debug('Deploy stdout:', outData);
       });
 
       process.stderr.on('data', (data) => {
-        stderr += data.toString();
-        this.logger.debug('Deploy stderr:', data.toString());
+        const errData = data.toString();
+        stderr += errData;
+        this.logger.debug('Deploy stderr:', errData);
       });
 
       return new Promise((resolve) => {
         process.on('close', (code) => {
           const duration = (Date.now() - startTime) / 1000;
-          const deploymentUrl = `https://${environment}.example.com/app-v${Date.now()}`; // Simulated URL
+          let deploymentUrl: string | undefined = step.data?.fixedDeploymentUrl as string | undefined;
 
           if (code !== 0) {
-            const deployErrorMessage = `Deployment to ${environment} failed with code ${code}.`;
+            const deployErrorMessage = `Deployment to ${environment} using ${deployCommand} failed with code ${code}.`;
             this.logger.error(deployErrorMessage, { stderr, stdout });
             resolve({
               type: 'deploy',
               success: false,
               stepId: step.id,
               message: deployErrorMessage,
-              error: stderr || 'Deployment process encountered an error.',
+              error: stderr || stdout || 'Deployment process encountered an error.', // Include stdout if stderr is empty
               summary: deployErrorMessage,
-              data: { deployResults: { success: false, environment, duration, strategy }, rawStdout: stdout, rawStderr: stderr, exitCode: code }
+              data: { deployResults: { success: false, environment, duration, strategy, command: `${deployCommand} ${deployArgs.join(' ')}` }, rawStdout: stdout, rawStderr: stderr, exitCode: code }
             });
             return;
           }
+
+          // Try to extract URL from stdout if a pattern is provided and no fixed URL
+          if (!deploymentUrl && expectedUrlPattern && stdout) {
+            try {
+                const urlMatch = stdout.match(new RegExp(expectedUrlPattern));
+                if (urlMatch && urlMatch[1]) {
+                    deploymentUrl = urlMatch[1];
+                    this.logger.info(`Extracted deployment URL from stdout: ${deploymentUrl}`);
+                } else {
+                    this.logger.warn(`Expected URL pattern "${expectedUrlPattern}" not found in stdout. Deployment URL might be missing.`);
+                }
+            } catch (regexError: unknown) {
+                const regexErrorMsg = regexError instanceof Error ? regexError.message : String(regexError);
+                this.logger.error(`Invalid regex for expectedUrlPattern: ${expectedUrlPattern}`, { error: regexErrorMsg });
+            }
+          }
+          
+          if (!deploymentUrl) {
+             this.logger.warn(`Deployment URL could not be determined for environment ${environment}. Verification steps might be limited.`);
+             // deploymentUrl = `unknown-url-for-${environment}-${Date.now()}`; // Fallback if needed
+          }
+
 
           const deployResults = {
             success: true,
             environment,
             strategy,
             timestamp: new Date().toISOString(),
-            deploymentId: `deploy-${Date.now()}`,
+            deploymentId: `deploy-${environment}-${Date.now()}`,
             duration,
-            url: deploymentUrl, // This would come from the actual deployment process
-            artifactsDeployed: artifactsToDeploy.map((art: any) => art.name),
+            url: deploymentUrl,
+            artifactsDeployed: artifactsToDeploy.map((art: { name: string }) => art.name),
+            commandExecuted: `${deployCommand} ${deployArgs.join(' ')}`,
           };
 
-          const deploySuccessMessage = `Successfully deployed to ${deployResults.environment} using ${deployResults.strategy} strategy in ${deployResults.duration.toFixed(2)}s. URL: ${deployResults.url}`;
+          const deploySuccessMessage = `Successfully deployed to ${deployResults.environment} using ${deployResults.strategy} strategy in ${deployResults.duration.toFixed(2)}s. ${deployResults.url ? `URL: ${deployResults.url}` : 'URL not determined.'}`;
           this.logger.info(deploySuccessMessage, { deployResults });
           resolve({
             type: 'deploy',
@@ -586,7 +655,7 @@ export class CICDExecutor extends BaseExecutor {
             message: `Failed to start deploy command ${deployCommand}: ${err.message}`,
             summary: `Failed to start deploy command ${deployCommand}.`,
             error: err.message,
-            data: { error: err, duration }
+            data: { error: err, duration, command: `${deployCommand} ${deployArgs.join(' ')}` }
           });
         });
       });
@@ -600,7 +669,7 @@ export class CICDExecutor extends BaseExecutor {
         stepId: step.id,
         error: errorMessage,
         summary: `Error setting up deploy step: ${errorMessage}`,
-        data: { error, duration }
+        data: { error, duration, command: `${deployCommand} ${deployArgs.join(' ')}` }
       };
     }
   }
@@ -608,14 +677,16 @@ export class CICDExecutor extends BaseExecutor {
   /**
    * Verifies the deployment was successful
    */
-  private async verifyDeployment(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> { // context: Record<string, any> zu Record<string, unknown>
+  private async verifyDeployment(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> {
     const performHealthChecks = step.data?.healthChecks !== false; // Default to true
-    const healthCheckEndpoints = step.data?.healthCheckEndpoints || ['/health']; // Default health endpoint
+    const healthCheckEndpoints = step.data?.healthCheckEndpoints || ['/health'];
+    const healthCheckTimeout = step.data?.healthCheckTimeout || 5000; // Default 5 seconds timeout
     const performSmokeTests = step.data?.smokeTests !== false;   // Default to true
-    const smokeTestCommand = step.data?.smokeTestCommand || 'echo'; // Placeholder
-    const smokeTestArgs = step.data?.smokeTestArgs || ['Simulating smoke tests...']; // Placeholder
+    // Allow smokeTestCommand and smokeTestArgs to be undefined if performSmokeTests is false or not configured
+    const smokeTestCommand = step.data?.smokeTestCommand as string | undefined;
+    const smokeTestArgs = step.data?.smokeTestArgs as string[] | undefined || [];
 
-    this.logger.info('Verifying deployment', { performHealthChecks, healthCheckEndpoints, performSmokeTests });
+    this.logger.info('Verifying deployment', { performHealthChecks, healthCheckEndpoints, healthCheckTimeout, performSmokeTests, smokeTestCommand, smokeTestArgs });
 
     const previousDeployStep = Object.values(context).find(s => (s as ExecutionResult).type === 'deploy') as ExecutionResult | undefined;
     if (!previousDeployStep || !previousDeployStep.success || !previousDeployStep.data?.deployResults?.success) {
@@ -625,24 +696,27 @@ export class CICDExecutor extends BaseExecutor {
     }
     
     const deploymentUrl = previousDeployStep.data?.deployResults?.url;
-    if (!deploymentUrl) {
-      const errorMsg = 'Cannot verify deployment: deployment URL not found in context.';
+    if (performHealthChecks && !deploymentUrl) { // Only critical if health checks are to be performed
+      const errorMsg = 'Cannot perform health checks: deployment URL not found in context.';
       this.logger.error(errorMsg, { deployContextData: previousDeployStep.data });
-       return { type: 'verify', success: false, stepId: step.id, error: errorMsg, message: errorMsg, summary: errorMsg, data: { error: errorMsg } };
+       return { type: 'verify', success: false, stepId: step.id, error: errorMsg, message: errorMsg, summary: errorMsg, data: { error: errorMsg, reason: 'Missing deploymentUrl for health checks' } };
     }
     
-    let healthCheckResults: any = { passed: 0, failed: 0, checked: 0, details: [] };
-    if (performHealthChecks) {
+    let healthCheckResults: HealthCheckResults = { passed: 0, failed: 0, checked: 0, details: [] };
+    if (performHealthChecks && deploymentUrl) { // Ensure deploymentUrl exists for health checks
       this.logger.info(`Performing health checks on ${deploymentUrl}`, { endpoints: healthCheckEndpoints });
       for (const endpoint of healthCheckEndpoints) {
         const url = new URL(endpoint, deploymentUrl).toString();
         healthCheckResults.checked++;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), healthCheckTimeout);
+        
         try {
           const startTime = Date.now();
-          // Make sure 'fetch' is imported if you are in a Node.js environment (e.g., import fetch from 'node-fetch';)
-          // TODO: Timeout-Logik korrekt implementieren (z.B. mit AbortController), step.data?.healthCheckTimeout || 5000
-          const response = await fetch(url); 
+          const response = await fetch(url, { signal: controller.signal });
+          clearTimeout(timeoutId);
           const duration = Date.now() - startTime;
+
           if (response.ok) {
             healthCheckResults.passed++;
             healthCheckResults.details.push({ endpoint, url, status: response.status, success: true, duration });
@@ -652,41 +726,52 @@ export class CICDExecutor extends BaseExecutor {
             healthCheckResults.details.push({ endpoint, url, status: response.status, success: false, duration, error: `Status ${response.status}` });
             this.logger.warn(`Health check failed for ${url}`, { status: response.status });
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
+          clearTimeout(timeoutId);
           healthCheckResults.failed++;
-          healthCheckResults.details.push({ endpoint, url, success: false, error: error.message });
-          this.logger.error(`Health check error for ${url}`, { error: error.message });
+          let errorMessage: string;
+          if (error instanceof Error) {
+            errorMessage = error.name === 'AbortError' ? `Request timed out after ${healthCheckTimeout}ms` : error.message;
+          } else {
+            errorMessage = String(error);
+          }
+          healthCheckResults.details.push({ endpoint, url, success: false, error: errorMessage });
+          this.logger.error(`Health check error for ${url}`, { error: errorMessage });
         }
       }
+    } else if (performHealthChecks && !deploymentUrl) {
+        this.logger.warn('Skipping health checks as deployment URL is not available.');
+        healthCheckResults.message = 'Skipped due to missing deployment URL.';
     }
 
-    let smokeTestResultsData: any = { success: true, message: 'Smoke tests not performed or passed.', rawStdout: '', rawStderr: '', exitCode: 0 };
-    if (performSmokeTests) {
+    let smokeTestResultsData: SmokeTestResultsData = { success: true, message: 'Smoke tests not configured or not performed.', rawStdout: '', rawStderr: '', exitCode: 0, testsRun: 0, passed: 0, failed: 0, error: undefined };
+    if (performSmokeTests && smokeTestCommand) { // Only run if command is provided
       this.logger.info('Performing smoke tests', { command: smokeTestCommand, args: smokeTestArgs });
-      // This is a placeholder for actual smoke test execution
-      // You would typically run a command (e.g., a small E2E test suite)
-      const smokeProcess = spawn(smokeTestCommand, smokeTestArgs);
+      
+      const smokeProcess = spawn(smokeTestCommand, smokeTestArgs, { shell: smokeTestCommand.endsWith('.sh') || smokeTestCommand.endsWith('.bat') });
       let smokeStdout = '';
       let smokeStderr = '';
       smokeProcess.stdout.on('data', (data) => smokeStdout += data.toString());
       smokeProcess.stderr.on('data', (data) => smokeStderr += data.toString());
 
-      smokeTestResultsData = await new Promise<any>(resolve => {
+      smokeTestResultsData = await new Promise<SmokeTestResultsData>(resolve => {
         smokeProcess.on('close', code => {
+          // Basic parsing for "X tests, Y passed, Z failed" could be added here if stdout format is known
           resolve({
             success: code === 0,
             message: code === 0 ? 'Smoke tests passed.' : `Smoke tests failed with code ${code}.`,
             rawStdout: smokeStdout,
             rawStderr: smokeStderr,
-            exitCode: code,
-            testsRun: smokeTestCommand === 'echo' ? 0 : 1, // Simplistic, real count would be from output
-            passed: smokeTestCommand === 'echo' ? 0 : (code === 0 ? 1: 0),
-            failed: smokeTestCommand === 'echo' ? 0 : (code !== 0 ? 1: 0),
+            exitCode: code ?? -1, // Handle null exit code
+            // These are placeholders, real counts would need parsing from stdout
+            testsRun: smokeStdout.toLowerCase().includes('test') ? 1 : 0, // very basic heuristic
+            passed: code === 0 && smokeStdout.toLowerCase().includes('test') ? 1 : 0,
+            failed: code !== 0 && smokeStdout.toLowerCase().includes('test') ? 1 : 0,
           });
         });
         smokeProcess.on('error', err => {
           this.logger.error('Failed to start smoke test command', { error: err });
-          resolve({ success: false, message: `Failed to start smoke tests: ${err.message}`, error: err.message, testsRun: 0, passed: 0, failed: 0 });
+          resolve({ success: false, message: `Failed to start smoke tests: ${err.message}`, error: err.message, testsRun: 0, passed: 0, failed: 0, rawStdout: '', rawStderr: '', exitCode: 1 });
         });
       });
       if (!smokeTestResultsData.success) {
@@ -694,6 +779,10 @@ export class CICDExecutor extends BaseExecutor {
       } else {
           this.logger.info('Smoke tests completed', { results: smokeTestResultsData });
       }
+    } else if (performSmokeTests && !smokeTestCommand) {
+        this.logger.warn('Smoke tests were configured to run, but no smokeTestCommand was provided. Skipping.');
+        smokeTestResultsData.message = 'Smoke tests configured but no command provided.';
+        smokeTestResultsData.success = true; // Consider it success if no command means nothing to fail
     }
     
     const overallSuccess =
@@ -701,11 +790,14 @@ export class CICDExecutor extends BaseExecutor {
       (!performSmokeTests || smokeTestResultsData.success);
 
     let message = 'Deployment verification: ';
-    if (performHealthChecks && healthCheckResults.checked > 0) {
-      message += `${healthCheckResults.passed}/${healthCheckResults.checked} health checks passed. `;
-    } else if (performHealthChecks) {
-      message += `No health checks performed or endpoints specified. `;
+    if (performHealthChecks) {
+        if (healthCheckResults.checked > 0) {
+            message += `${healthCheckResults.passed}/${healthCheckResults.checked} health checks passed. `;
+        } else {
+            message += `No health checks performed (checked: ${healthCheckResults.checked}, message: ${healthCheckResults.message || 'details not available'}). `;
+        }
     }
+
 
     if (performSmokeTests) {
       message += smokeTestResultsData.message;
@@ -721,7 +813,7 @@ export class CICDExecutor extends BaseExecutor {
     
     return {
       type: 'verify',
-      success: overallSuccess,
+      success: !!overallSuccess, // Ensure it's a boolean
       stepId: step.id,
       message,
       summary: message,
@@ -736,17 +828,17 @@ export class CICDExecutor extends BaseExecutor {
   /**
    * Sends notifications about pipeline results
    */
-  private async sendNotifications(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> { // context: Record<string, any> zu Record<string, unknown>
-    const channels = step.data?.channels || ['email', 'slack']; // e.g., ['email', 'slack']
+  private async sendNotifications(step: PlanStep, context: Record<string, unknown>): Promise<ExecutionResult> {
+    const channels: string[] = step.data?.channels || ['email']; // Default to email
     const onlyOnFailure = step.data?.onlyOnFailure === true;
-    const recipientsByChannel = step.data?.recipientsByChannel || { // More granular control
-      email: ['dev-team@example.com', 'product-manager@example.com'],
-      slack: ['#cicd-alerts', '#dev-channel'],
-    };
-    const defaultRecipients = step.data?.defaultRecipients || ['default-notification-group@example.com'];
+    
+    // Configuration for recipients should come from step.data or a dedicated notifications config.
+    const emailRecipients: string[] = step.data?.emailRecipients || [];
+    const slackWebhookUrl: string | undefined = step.data?.slackWebhookUrl;
+    const slackChannels: string[] = step.data?.slackChannels || [];
+    const defaultEmailRecipientOnError = 'dev-team@example.com'; // Fallback if no recipients configured for email
 
-
-    this.logger.info('Preparing to send notifications', { channels, onlyOnFailure, recipientsByChannel });
+    this.logger.info('Preparing to send notifications', { channels, onlyOnFailure, stepEmailRecipients: step.data?.emailRecipients, stepSlackWebhookUrl: step.data?.slackWebhookUrl, stepSlackChannels: step.data?.slackChannels });
     
     const pipelineSteps = Object.values(context).filter(s => (s as ExecutionResult).type !== 'notify' && (s as ExecutionResult).stepId) as ExecutionResult[];
     const overallSuccess = pipelineSteps.every(s => s.success);
@@ -770,69 +862,80 @@ export class CICDExecutor extends BaseExecutor {
       return summary;
     }).join('\n');
 
-    const notificationSubject = `CI/CD Pipeline Report (${step.data?.pipelineName || 'Unnamed Pipeline'}): ${overallSuccess ? 'Succeeded' : 'Failed'}`;
-    const notificationBody = `Pipeline Status: ${overallSuccess ? 'SUCCESS' : 'FAILURE'}\n\nStep Summary:\n${messageSummary}\n\nFull Context (JSON):\n${JSON.stringify(context, null, 2)}`;
+    const pipelineName = step.data?.pipelineName || 'Unnamed Pipeline';
+    const notificationSubject = `CI/CD Pipeline Report (${pipelineName}): ${overallSuccess ? 'Succeeded' : 'Failed'}`;
+    // Consider providing a link to the pipeline run if available in context
+    const pipelineRunLink = (context.pipelineInfo as any)?.runUrl || 'N/A';
+    const notificationBody = `Pipeline Status: ${overallSuccess ? 'SUCCESS' : 'FAILURE'}
+Pipeline Name: ${pipelineName}
+Run Link: ${pipelineRunLink}
+
+Step Summary:
+${messageSummary}
+
+Full Context (JSON extract for brevity):
+${JSON.stringify(pipelineSteps.map(s => ({id: s.stepId, type: s.type, success: s.success, summary: s.summary?.substring(0,100)})), null, 2)}`;
 
     this.logger.info(`Notification details:`, { subject: notificationSubject, channels });
 
     let allNotificationsSentSuccessfully = true;
-    const sentDetails: any[] = [];
+    const sentDetails: unknown[] = [];
 
     for (const channel of channels) {
-      const recipients = recipientsByChannel[channel] || defaultRecipients;
-      if (!recipients || recipients.length === 0) {
-        this.logger.warn(`No recipients configured for channel: ${channel}. Skipping.`);
-        sentDetails.push({ channel, success: false, error: 'No recipients configured' });
-        allNotificationsSentSuccessfully = false;
-        continue;
-      }
-
-      this.logger.info(`Attempting to send notification via ${channel} to:`, { recipients });
-      // This section demonstrates where actual integrations would go.
-      // For a real implementation, you would use libraries like:
-      // - Nodemailer for email (e.g., await emailService.send({ to: recipients, subject: notificationSubject, body: notificationBody });)
-      // - @slack/web-api for Slack (e.g., await slackService.postMessage({ channels: recipients, text: notificationBody });)
-      // These would require proper setup, API keys, and error handling.
-
       let sendSuccess = false;
       let sendError: string | undefined;
+      let currentRecipients: string | string[] = 'N/A';
 
       try {
         switch (channel.toLowerCase()) {
           case 'email':
-            // Placeholder for email sending logic
-            this.logger.info(`Simulating email notification to: ${recipients.join(', ')} for subject: "${notificationSubject}"`);
+            if (!emailRecipients || emailRecipients.length === 0) {
+                this.logger.warn('Email channel selected, but no recipients configured.');
+                sendError = 'No email recipients configured.';
+                break;
+            }
+            currentRecipients = emailRecipients.join(', ');
+            this.logger.info(`Attempting to send email to: ${currentRecipients} for subject: "${notificationSubject}"`);
+            // TODO: Implement actual email sending logic using a library like Nodemailer.
+            // Example:
+            // const emailService = new EmailService(configManager.getConfig(ConfigType.NOTIFICATIONS).emailSettings);
+            // await emailService.send({ to: emailRecipients, subject: notificationSubject, htmlBody: notificationBody.replace(/\n/g, '<br>') });
+            this.logger.warn('Email sending is a TODO. Simulating success for now.');
             sendSuccess = true; // Simulate success
             break;
           case 'slack':
-            // Placeholder for Slack sending logic
-            this.logger.info(`Simulating Slack notification to: ${recipients.join(', ')} with body starting: "${notificationBody.substring(0, 50)}..."`);
+            if (!slackWebhookUrl && (!slackChannels || slackChannels.length === 0)) {
+                this.logger.warn('Slack channel selected, but no webhook URL or channels configured.');
+                sendError = 'No Slack webhook URL or channels configured.';
+                break;
+            }
+            currentRecipients = slackWebhookUrl ? `Webhook: ${slackWebhookUrl.substring(0,30)}...` : `Channels: ${slackChannels.join(', ')}`;
+            this.logger.info(`Attempting to send Slack notification to: ${currentRecipients}`);
+            // TODO: Implement actual Slack sending logic using @slack/web-api or a webhook.
+            // Example (webhook):
+            // await fetch(slackWebhookUrl, { method: 'POST', body: JSON.stringify({ text: notificationBody }), headers: { 'Content-Type': 'application/json' } });
+            // Example (API):
+            // const slackService = new SlackService(configManager.getConfig(ConfigType.NOTIFICATIONS).slackSettings);
+            // await slackService.postMessage({ channels: slackChannels, text: notificationBody });
+            this.logger.warn('Slack sending is a TODO. Simulating success for now.');
             sendSuccess = true; // Simulate success
             break;
           default:
             this.logger.warn(`Notification channel '${channel}' not implemented. Skipping.`);
             sendError = `Channel '${channel}' not implemented.`;
-            sendSuccess = false;
         }
-        // Simulate potential random failure for demonstration if not explicitly handled above
-        if (sendSuccess && Math.random() < 0.05) { // 5% chance of random simulated failure
-             sendSuccess = false;
-             sendError = `Simulated random failure for channel ${channel}.`;
-             this.logger.warn(sendError);
-        }
-
-      } catch (e: any) {
-        this.logger.error(`Error sending notification via ${channel}: ${e.message}`, { error: e });
-        sendSuccess = false;
-        sendError = e.message;
+      } catch (e: unknown) {
+        const errorMsg = e instanceof Error ? e.message : String(e);
+        this.logger.error(`Error sending notification via ${channel}: ${errorMsg}`, { error: e });
+        sendError = e instanceof Error ? e.message : String(e);
       }
 
       if (sendSuccess) {
-        this.logger.info(`Successfully processed notification for channel ${channel}.`);
-        sentDetails.push({ channel, success: true, recipients });
+        this.logger.info(`Successfully processed (simulated) notification for channel ${channel}.`);
+        sentDetails.push({ channel, success: true, recipients: currentRecipients });
       } else {
         this.logger.error(`Failed to process notification for channel ${channel}.`, { error: sendError });
-        sentDetails.push({ channel, success: false, error: sendError || `Processing failed for ${channel}`, recipients });
+        sentDetails.push({ channel, success: false, error: sendError || `Processing failed for ${channel}`, recipients: currentRecipients });
         allNotificationsSentSuccessfully = false;
       }
     }
@@ -846,16 +949,16 @@ export class CICDExecutor extends BaseExecutor {
     };
     
     const finalMessage = allNotificationsSentSuccessfully
-      ? `Notifications processed. Status: ${notificationResults.messageType}. See details in data.`
-      : `Some notifications failed to send. Status: ${notificationResults.messageType}. See details in data.`;
+      ? `Notifications processed (simulated). Status: ${notificationResults.messageType}. See details in data.`
+      : `Some notifications failed to send (or are simulated). Status: ${notificationResults.messageType}. See details in data.`;
 
     return {
       type: 'notify',
-      success: allNotificationsSentSuccessfully,
+      success: allNotificationsSentSuccessfully, // This reflects if the processing loop had errors, not necessarily if all external services succeeded.
       stepId: step.id,
       message: finalMessage,
       summary: finalMessage,
-      error: !allNotificationsSentSuccessfully ? 'One or more notification channels failed.' : undefined,
+      error: !allNotificationsSentSuccessfully ? 'One or more notification channels failed or were not fully implemented.' : undefined,
       data: { notificationResults },
     };
   }
@@ -904,19 +1007,21 @@ export class CICDExecutor extends BaseExecutor {
                             path: relativeFilePath
                         });
                         this.logger.debug(`Found artifact: ${relativeFilePath}, Size: ${stats.size} bytes`);
-                    } catch (statError: any) {
-                        this.logger.warn(`Could not stat file ${filePath}: ${statError.message}`);
+                    } catch (statError: unknown) {
+                        const statErrorMsg = statError instanceof Error ? statError.message : String(statError);
+                        this.logger.warn(`Could not stat file ${filePath}: ${statErrorMsg}`);
                     }
                 }
             }
             // If artifacts are found in one of the common directories, we can decide to stop or continue.
             // For now, let's continue to gather from all common dirs, could be configurable.
             // if (foundArtifacts.length > 0) break;
-        } catch (error: any) {
-            if (error.code === 'ENOENT') {
+        } catch (error: unknown) {
+            if ((error as { code?: string })?.code === 'ENOENT') {
                 this.logger.debug(`Directory ${artifactDir} not found.`);
             } else {
-                this.logger.warn(`Error accessing directory ${artifactDir}: ${error.message}`);
+                const errorMsg = error instanceof Error ? error.message : String(error);
+                this.logger.warn(`Error accessing directory ${artifactDir}: ${errorMsg}`);
             }
         }
     }

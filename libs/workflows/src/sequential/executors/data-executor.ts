@@ -7,6 +7,7 @@ import * as path from 'path';
 import fetch from 'node-fetch'; // Import für API-Aufrufe hinzufügen
 import Ajv, { ValidateFunction } from 'ajv'; // Import für JSON-Schema-Validierung und ValidateFunction
 import addFormats from 'ajv-formats'; // Import für zusätzliche Formate in Ajv
+import * as zlib from 'zlib'; // Import für Komprimierung
 // Potenziell CSV-Parser-Bibliothek importieren, falls CSV-Verarbeitung implementiert wird
 // import Papa from 'papaparse';
 
@@ -66,7 +67,18 @@ export class DataExecutor extends BaseExecutor {
    * Collects data from specified sources
    */
   private async collectData(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
-    const sources: { type: string, path?: string, url?: string, query?: string, format?: string }[] = step.data?.sources || [];
+    const sources: {
+      type: string,
+      path?: string,
+      url?: string,
+      query?: string,
+      format?: string,
+      // DB specific fields
+      dbType?: string,
+      connectionDetails?: any, // Can be a connection string or object
+      // Allow other data fields for specific source types
+      [key: string]: any;
+    }[] = step.data?.sources || [];
     // Default formats can be overridden by source-specific format
     const defaultFormats = step.data?.defaultFormats || ['json', 'csv'];
     this.logger.info('Collecting data', { sources, defaultFormats });
@@ -158,16 +170,37 @@ export class DataExecutor extends BaseExecutor {
           allRawData.push(...sourceData);
           totalRecordsCollected += sourceRecordCount;
           status = 'success';
-        } else if (source.type === 'database' && source.query) {
-          // TODO: Implement Database querying logic. This requires a specific DB driver.
-          // Example structure:
-          // const dbConnection = await getDbConnection(source.connectionDetails); // Hypothetical function
-          // sourceData = await dbConnection.query(source.query);
-          // await dbConnection.close();
-          status = 'skipped_not_implemented';
-          errorMsg = `Database collection for query "${source.query}" not yet implemented. Requires specific database driver and connection details.`;
-          this.logger.warn(errorMsg);
-          collectionErrors.push({ source: `db_query: ${source.query}`, error: errorMsg });
+        } else if (source.type === 'database') {
+          const { query, dbType, connectionDetails } = source;
+          if (!query || !dbType || !connectionDetails) {
+            errorMsg = `Database source type requires 'query', 'dbType', and 'connectionDetails' directly on the source object.`;
+            this.logger.error(errorMsg, { source });
+            status = 'failed_missing_config';
+            collectionErrors.push({ source: `db_query: ${query || 'N/A'}`, error: errorMsg });
+          } else {
+            // TODO: Implement Database querying logic for various dbTypes.
+            // This requires specific DB drivers (e.g., 'pg' for PostgreSQL, 'mysql2' for MySQL, 'mongodb' for MongoDB).
+            // Example structure:
+            // switch (dbType) {
+            //   case 'postgres':
+            //     // const pgClient = new pg.Client(connectionDetails); await pgClient.connect();
+            //     // const res = await pgClient.query(query); sourceData = res.rows; await pgClient.end();
+            //     break;
+            //   case 'mongodb':
+            //     // const mongoClient = new MongoClient(connectionDetails.uri); await mongoClient.connect();
+            //     // const db = mongoClient.db(connectionDetails.database);
+            //     // sourceData = await db.collection(connectionDetails.collection).find(JSON.parse(query || '{}')).toArray(); // Query might be a JSON string for Mongo
+            //     // await mongoClient.close();
+            //     break;
+            //   default:
+            //     errorMsg = `Unsupported database type: ${dbType}.`;
+            // }
+            // For now, mark as not implemented.
+            status = 'skipped_not_implemented';
+            errorMsg = `Database collection for dbType "${dbType}" with query "${query}" not yet implemented. Requires specific database driver integration.`;
+            this.logger.warn(errorMsg, { source });
+            collectionErrors.push({ source: `db_query (${dbType}): ${query}`, error: errorMsg });
+          }
         } else {
           throw new Error(`Unsupported source type or missing parameters: ${JSON.stringify(source)}`);
         }
@@ -423,59 +456,119 @@ export class DataExecutor extends BaseExecutor {
               throw new Error("Invalid parameters for renameField: requires 'fields' (array with one old name) and 'newField'.");
             }
             break;
-          case 'calculateField':
-            this.logger.warn(`Transformation type '${transform.type}' with expression ('${transform.expression}') is a placeholder and NOT SECURE for production. It needs a proper expression parser/evaluator.`);
-            if (transform.newField && transform.expression) {
-              // UNSAFE PLACEHOLDER - DO NOT USE IN PRODUCTION WITHOUT A SECURE EXPRESSION EVALUATOR
-              // This is a highly simplified and potentially unsafe example.
-              // For a real implementation, use a library like 'expr-eval' or similar.
-              transformedData.forEach(record => {
-                try {
-                  // Example: if expression is "record.price * 1.1"
-                  // This is just a conceptual placeholder, direct evaluation of arbitrary expressions is dangerous.
-                  if (transform.expression === 'record.price * 1.1' && record.price !== undefined) {
-                     record[transform.newField!] = parseFloat(record.price) * 1.1;
-                     recordsAffectedThisTransform++;
-                  } else if (transform.expression === 'record.quantity + 1' && record.quantity !== undefined) {
-                     record[transform.newField!] = parseInt(record.quantity, 10) + 1;
-                     recordsAffectedThisTransform++;
-                  } else {
-                     this.logger.warn(`Unsupported or unsafe expression for calculateField: ${transform.expression}. Field not calculated.`);
-                  }
-                } catch (e: any) {
-                  this.logger.error(`Error evaluating calculateField expression '${transform.expression}' for record: ${e.message}`);
-                }
-              });
-            } else {
-              throw new Error("Invalid parameters for calculateField: requires 'newField' and 'expression'.");
+          case 'calculateField': {
+            // Expects transform.options: { fieldToCalculate: string, operation: 'add'|'subtract'|'multiply'|'divide'|'set', value?: any, operandField?: string }
+            const opts = transform.options;
+            if (!opts || !opts.fieldToCalculate || !opts.operation) {
+              throw new Error("calculateField requires 'options' with 'fieldToCalculate' and 'operation'.");
             }
-            break;
-          case 'filterRecords':
-            this.logger.warn(`Transformation type '${transform.type}' with expression ('${transform.expression}') is a placeholder and NOT SECURE for production. It needs a proper expression parser/evaluator.`);
-            if (transform.expression) {
-              // UNSAFE PLACEHOLDER - DO NOT USE IN PRODUCTION WITHOUT A SECURE EXPRESSION EVALUATOR
-              const originalLength = transformedData.length;
-              // Example: if expression is "record.isActive === true"
-              // This is just a conceptual placeholder.
-              transformedData = transformedData.filter(record => {
-                try {
-                  if (transform.expression === 'record.isActive === true') {
-                    return record.isActive === true;
-                  } else if (transform.expression === 'record.value > 100' && record.value !== undefined) {
-                    return parseFloat(record.value) > 100;
-                  }
-                  this.logger.warn(`Unsupported or unsafe expression for filterRecords: ${transform.expression}. Record not filtered.`);
-                  return true; // Keep record if expression is not understood/unsafe
-                } catch (e: any) {
-                  this.logger.error(`Error evaluating filterRecords expression '${transform.expression}' for record: ${e.message}`);
-                  return true; // Keep record on error to be safe
-                }
-              });
-              recordsAffectedThisTransform = originalLength - transformedData.length;
-            } else {
-              throw new Error("Invalid parameters for filterRecords: requires 'expression'.");
+            if (opts.operation !== 'set' && (opts.value === undefined && !opts.operandField)) {
+                throw new Error("calculateField operations (add, subtract, etc.) require 'value' or 'operandField'.");
             }
+
+            transformedData.forEach(record => {
+              try {
+                const baseValue = opts.operandField ? parseFloat(record[opts.operandField]) : parseFloat(record[opts.fieldToCalculate]); // Use fieldToCalculate if operandField is not given for unary-like ops
+                const operationValue = opts.value !== undefined ? parseFloat(opts.value) : (opts.operandField && record[opts.operandField] !== undefined ? parseFloat(record[opts.operandField]) : undefined);
+
+
+                if (opts.operation === 'set') {
+                    record[opts.fieldToCalculate] = opts.value;
+                    recordsAffectedThisTransform++;
+                    return;
+                }
+
+                // Ensure baseValue is a number for arithmetic operations if it's the target field
+                if (opts.operandField === undefined && isNaN(baseValue) && record[opts.fieldToCalculate] !== undefined) {
+                     this.logger.warn(`Field '${opts.fieldToCalculate}' is not a number for record. Skipping calculation.`);
+                     return;
+                }
+                 // Ensure operationValue is a number if value is provided
+                if (opts.value !== undefined && isNaN(operationValue as number) && opts.operation !== 'set') {
+                    this.logger.warn(`Provided 'value' for operation '${opts.operation}' is not a number. Skipping calculation for record.`);
+                    return;
+                }
+                 // Ensure operandField's value is a number if provided
+                if (opts.operandField && record[opts.operandField] !== undefined && isNaN(parseFloat(record[opts.operandField]))) {
+                    this.logger.warn(`Operand field '${opts.operandField}' is not a number for record. Skipping calculation.`);
+                    return;
+                }
+
+
+                let result;
+                const valToOperate = operationValue !== undefined ? operationValue : (opts.operandField ? parseFloat(record[opts.operandField]) : undefined);
+                const targetVal = parseFloat(record[opts.fieldToCalculate]);
+
+
+                if (valToOperate === undefined && opts.operation !== 'set') {
+                    this.logger.warn(`No value or valid operandField for operation '${opts.operation}' on field '${opts.fieldToCalculate}'. Skipping.`);
+                    return;
+                }
+
+
+                switch (opts.operation) {
+                  case 'add': result = targetVal + valToOperate!; break;
+                  case 'subtract': result = targetVal - valToOperate!; break;
+                  case 'multiply': result = targetVal * valToOperate!; break;
+                  case 'divide':
+                    if (valToOperate === 0) { this.logger.warn(`Division by zero for field '${opts.fieldToCalculate}'. Skipping.`); return; }
+                    result = targetVal / valToOperate!;
+                    break;
+                  default: this.logger.warn(`Unsupported operation '${opts.operation}' for calculateField.`); return;
+                }
+                if (result !== undefined && !isNaN(result)) {
+                    record[opts.fieldToCalculate] = result;
+                    recordsAffectedThisTransform++;
+                } else if (result !== undefined && isNaN(result)) {
+                    this.logger.warn(`Calculation for field '${opts.fieldToCalculate}' resulted in NaN. Original value kept.`);
+                }
+
+              } catch (e: any) {
+                this.logger.error(`Error evaluating calculateField for record: ${e.message}`, { record, transform });
+              }
+            });
             break;
+          }
+          case 'filterRecords': {
+            // Expects transform.options: { field: string, operation: 'equals'|'notEquals'|'greaterThan'|'lessThan'|'contains'|'startsWith'|'endsWith'|'matchesRegex', value?: any, regex?: string }
+            const opts = transform.options;
+            if (!opts || !opts.field || !opts.operation) {
+              throw new Error("filterRecords requires 'options' with 'field' and 'operation'.");
+            }
+            if (opts.operation !== 'matchesRegex' && opts.value === undefined) {
+                throw new Error("filterRecords operations (except matchesRegex) require 'value'.");
+            }
+            if (opts.operation === 'matchesRegex' && !opts.regex) {
+                throw new Error("filterRecords operation 'matchesRegex' requires 'regex'.");
+            }
+
+            const originalLength = transformedData.length;
+            transformedData = transformedData.filter(record => {
+              try {
+                const recordValue = record[opts.field];
+                if (recordValue === undefined && opts.operation !== 'equals' && opts.operation !== 'notEquals') { // Allow checking for undefined/null with equals/notEquals
+                    return false; // Or true, depending on desired behavior for missing fields in other ops
+                }
+
+                switch (opts.operation) {
+                  case 'equals': return recordValue == opts.value; // Use == for type coercion flexibility if desired, or === for strict
+                  case 'notEquals': return recordValue != opts.value;
+                  case 'greaterThan': return parseFloat(recordValue) > parseFloat(opts.value);
+                  case 'lessThan': return parseFloat(recordValue) < parseFloat(opts.value);
+                  case 'contains': return String(recordValue).toLowerCase().includes(String(opts.value).toLowerCase());
+                  case 'startsWith': return String(recordValue).toLowerCase().startsWith(String(opts.value).toLowerCase());
+                  case 'endsWith': return String(recordValue).toLowerCase().endsWith(String(opts.value).toLowerCase());
+                  case 'matchesRegex': return new RegExp(opts.regex!).test(String(recordValue));
+                  default: this.logger.warn(`Unsupported operation '${opts.operation}' for filterRecords.`); return true; // Keep record if op unknown
+                }
+              } catch (e: any) {
+                this.logger.error(`Error evaluating filterRecords for record: ${e.message}`, { record, transform });
+                return true; // Keep record on error to be safe
+              }
+            });
+            recordsAffectedThisTransform = originalLength - transformedData.length;
+            break;
+          }
           case 'removeFields':
             if (transform.fields && Array.isArray(transform.fields)) {
                 let affectedCount = 0;
@@ -617,27 +710,69 @@ export class DataExecutor extends BaseExecutor {
                  taskResult = { ...taskResult, status: 'skipped', message: 'No fields specified or no data for descriptive_stats.' };
             }
             break;
-          case 'correlation_analysis':
-            this.logger.warn(`Analysis task '${task.type}' for fields '${task.fields?.join(', ')}' is a placeholder and not fully implemented. It requires a statistical library for actual calculation.`);
-            if (task.fields && task.fields.length >= 2 && processedDataArray.length > 0) {
-                // Placeholder for actual correlation logic (e.g. Pearson).
-                // A real implementation would require a library like 'simple-statistics' or similar.
-                const field1 = task.fields[0];
-                const field2 = task.fields[1];
-                const simulatedCorrelation = (Math.random() * 1.8 - 0.9).toFixed(3); // Random value between -0.9 and 0.9
-                const message = `Simulated correlation between '${field1}' & '${field2}': ${simulatedCorrelation}. NOTE: This is a placeholder value.`;
-                this.logger.info(message);
-                taskResult = {
-                    ...taskResult,
-                    status: 'success_placeholder', // Indicate it's a placeholder success
-                    correlation: { [`${field1}_vs_${field2}`]: simulatedCorrelation },
-                    message
-                };
-                overallAnalysisResults.keyInsights.push({ description: message, type: task.type, fields: task.fields});
+          case 'correlation_analysis': {
+            if (!task.fields || task.fields.length < 2) {
+              taskResult = { ...taskResult, status: 'failed', error: 'Correlation analysis requires at least two fields in task.fields.' };
+              allTasksSuccessful = false;
+              break;
+            }
+            if (processedDataArray.length === 0) {
+                taskResult = { ...taskResult, status: 'skipped', message: 'No data to analyze for correlation.' };
+                break;
+            }
+
+            const field1Name = task.fields[0];
+            const field2Name = task.fields[1];
+            
+            const values1 = processedDataArray.map(r => parseFloat(r[field1Name])).filter(v => !isNaN(v));
+            const values2 = processedDataArray.map(r => parseFloat(r[field2Name])).filter(v => !isNaN(v));
+
+            if (values1.length !== values2.length || values1.length === 0) {
+              const errorDetail = values1.length !== values2.length ? `Field arrays have different lengths after filtering non-numeric values (${values1.length} vs ${values2.length}).` : 'No valid numeric data pairs found for correlation.';
+              this.logger.warn(`Cannot calculate correlation for ${field1Name} and ${field2Name}: ${errorDetail}`);
+              taskResult = { ...taskResult, status: 'failed', error: `Insufficient or mismatched valid numeric data for ${field1Name} and ${field2Name}. ${errorDetail}` };
+              allTasksSuccessful = false;
+              break;
+            }
+
+            // Calculate Pearson correlation coefficient
+            const n = values1.length;
+            const sumX = values1.reduce((s, v) => s + v, 0);
+            const sumY = values2.reduce((s, v) => s + v, 0);
+            const sumXY = values1.reduce((s, v, i) => s + v * values2[i], 0);
+            const sumX2 = values1.reduce((s, v) => s + v * v, 0);
+            const sumY2 = values2.reduce((s, v) => s + v * v, 0);
+
+            const numerator = n * sumXY - sumX * sumY;
+            const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+
+            if (denominator === 0) {
+              taskResult = { ...taskResult, status: 'success', correlation: { [`${field1Name}_vs_${field2Name}`]: 'N/A (denominator is zero)' }, message: `Correlation between ${field1Name} and ${field2Name} cannot be calculated (denominator is zero, likely constant values).` };
             } else {
-                 taskResult = { ...taskResult, status: 'skipped', message: 'Requires at least two fields specified in task.fields and non-empty data for correlation_analysis.' };
+              const correlation = (numerator / denominator).toFixed(4);
+              let interpretation = "weak";
+              const absCorr = Math.abs(parseFloat(correlation));
+              if (absCorr >= 0.7) interpretation = "strong";
+              else if (absCorr >= 0.4) interpretation = "moderate";
+              
+              if (parseFloat(correlation) < -0.00001) interpretation += " negative"; // check for actual negative, not just floating point noise around 0
+              else if (parseFloat(correlation) > 0.00001) interpretation += " positive"; // check for actual positive
+              else interpretation = "no linear"; // if very close to zero
+              
+              const message = `Correlation between '${field1Name}' & '${field2Name}': ${correlation} (${interpretation} correlation). Based on ${n} valid data pairs.`;
+              this.logger.info(message);
+              taskResult = {
+                  ...taskResult,
+                  status: 'success',
+                  correlation: { [`${field1Name}_vs_${field2Name}`]: correlation },
+                  interpretation,
+                  sampleSize: n,
+                  message
+              };
+              overallAnalysisResults.keyInsights.push({ description: message, type: task.type, fields: [field1Name, field2Name], value: correlation });
             }
             break;
+          }
           default:
             this.logger.warn(`Unknown analysis task type: ${task.type}. Skipping.`);
             taskResult = { ...taskResult, status: 'skipped', error: 'Unknown type' };
@@ -713,28 +848,58 @@ export class DataExecutor extends BaseExecutor {
       this.logger.debug(`Creating visualization: ${task.type} - ${task.outputName}`, { task });
       let taskResult: any = { name: task.outputName, type: task.type, status: 'pending' };
       try {
-        this.logger.warn(`Visualization task '${task.type}' for output '${task.outputName}' is a SIMULATION. Actual chart generation requires a charting library.`);
-        // Placeholder for actual visualization generation
-        if (!analysisData.summaryStatistics && !analysisData.keyInsights && !(analysisData.inputRecords > 0) ) { // Check if there's any data to visualize
-            this.logger.warn(`No suitable data in analysisResults for visualization task ${task.type} for output ${task.outputName}. Skipping file creation.`);
-            taskResult = { ...taskResult, status: 'skipped_no_data', message: 'No data from analysis to visualize.'};
-            allTasksSuccessful = false; // Or consider this a partial success depending on requirements
+        let vizContent: string = '';
+        let vizFormat = (task.options?.format || 'svg').toLowerCase();
+        let vizSizeBytes = 0;
+        let taskStatus = 'pending';
+
+        // Ensure analysisData has the necessary structure
+        const dataForViz = task.dataKey ? analysisData[task.dataKey] : analysisData.summaryStatistics || analysisData.keyInsights || analysisData;
+
+        if (!dataForViz || (Array.isArray(dataForViz) && dataForViz.length === 0) || (typeof dataForViz === 'object' && Object.keys(dataForViz).length === 0 && analysisData.inputRecords === 0) ) {
+            this.logger.warn(`No suitable data in analysisResults (key: ${task.dataKey || 'default'}) for visualization task ${task.type} for output ${task.outputName}. Skipping.`);
+            taskResult = { ...taskResult, status: 'skipped_no_data', message: `No data from analysis (key: ${task.dataKey || 'default'}) to visualize.`};
+            allTasksSuccessful = false; // Or true if skipping is acceptable
         } else {
-            const vizFileName = `${task.outputName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${Date.now()}.${task.options?.format || 'png'}`;
+            this.logger.info(`Generating visualization for ${task.type} - ${task.outputName} using dataKey: ${task.dataKey || 'summaryStatistics (default)' }`);
+            switch (task.type.toLowerCase()) {
+              case 'barchart_svg':
+                // Expects dataForViz to be an object like { categoryA: 10, categoryB: 20 } or an array of {label: string, value: number}
+                vizContent = this.generateSimpleBarChartSVG(dataForViz, task.options);
+                vizFormat = 'svg';
+                taskStatus = 'success';
+                break;
+              case 'text_summary':
+                vizContent = `Text Summary for ${task.outputName}:\n${JSON.stringify(dataForViz, null, 2)}`;
+                vizFormat = 'txt';
+                taskStatus = 'success';
+                break;
+              default:
+                this.logger.warn(`Unsupported visualization type: ${task.type}. Creating a placeholder JSON dump.`);
+                vizContent = `Placeholder for ${task.type} - ${task.outputName}\nData:\n${JSON.stringify(dataForViz, null, 2)}`;
+                vizFormat = 'txt';
+                taskStatus = 'success_placeholder'; // Indicates it's a placeholder
+            }
+
+            const vizFileName = `${task.outputName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${Date.now()}.${vizFormat}`;
             const vizPath = `visualizations/${vizFileName}`;
-            const simulatedSizeBytes = Math.floor(Math.random() * 200000) + 50000; // 50KB - 250KB
-
-            await fs.mkdir('visualizations', { recursive: true }); // Ensure directory exists
-            // Simulate file creation - in a real scenario, a charting library would output a file or buffer
-            const placeholderContent = `SIMULATED VISUALIZATION\nType: ${task.type}\nOutput: ${task.outputName}\nData Key Used (simulated): ${task.dataKey || 'summaryStatistics'}\nTimestamp: ${new Date().toISOString()}\n\nNOTE: This is a placeholder file. Actual chart generation is not implemented.`;
-            await fs.writeFile(vizPath, placeholderContent);
             
-            this.logger.info(`Simulated visualization file created: ${vizPath}`);
-
-            taskResult = { ...taskResult, status: 'success_simulated', path: vizPath, sizeBytes: simulatedSizeBytes, message: 'Visualization file is a simulation.' };
-            overallVisualizationResults.visualizationsCreated.push({ type: task.type, name: vizFileName, path: vizPath, sizeBytes: simulatedSizeBytes, dataKeyUsed: task.dataKey || 'summaryStatistics', statusMessage: 'Simulated' });
+            await fs.mkdir('visualizations', { recursive: true });
+            await fs.writeFile(vizPath, vizContent);
+            const stats = await fs.stat(vizPath);
+            vizSizeBytes = stats.size;
+            
+            this.logger.info(`Generated visualization file: ${vizPath} (${vizSizeBytes} bytes)`);
+            taskResult = { ...taskResult, status: taskStatus, path: vizPath, sizeBytes: vizSizeBytes, format: vizFormat, message: `${task.type} generated.` };
+            overallVisualizationResults.visualizationsCreated.push({
+                type: task.type,
+                name: vizFileName,
+                path: vizPath,
+                sizeBytes: vizSizeBytes,
+                dataKeyUsed: task.dataKey || 'summaryStatistics (default)',
+                statusMessage: taskStatus
+            });
         }
-        
       } catch (error: any) {
         this.logger.error(`Error during (simulated) visualization task ${task.type} (${task.outputName}): ${error.message}`, { task });
         taskResult = { ...taskResult, status: 'failed', error: error.message };
@@ -823,78 +988,81 @@ export class DataExecutor extends BaseExecutor {
     for (const item of itemsToStore) {
       try {
         const itemFormat = item.format || defaultFormat;
-        const itemCompression = item.compression || defaultCompression;
-        if (itemCompression !== 'none') {
-            this.logger.warn(`Compression type '${itemCompression}' for item '${item.name}' is configured but NOT IMPLEMENTED. Data will be stored uncompressed.`);
-            // TODO: Implement compression logic here, e.g., using zlib for gzip
-        }
+        let itemCompression = item.compression || defaultCompression; // Make it let to modify if needed
+        
         let fileName = item.name;
-        if (!path.extname(fileName)) { // Ensure extension
+        if (!path.extname(fileName)) { // Ensure extension based on format
             fileName = `${fileName}.${itemFormat}`;
         }
-        
-        let dataToWrite: string;
-        if (typeof item.data === 'string') { // If data is already a path or string content
-            dataToWrite = item.data; // Could be path or content
-            // Check if item.data is an object and has a path property, and is not a string itself
-            // Check if item.data is an object, has a 'path' property which is a string, and is not a viz/report type where 'data' might be the content itself.
-            if (typeof item.data === 'object' &&
-                item.data !== null &&
-                'path' in item.data && // Ensures 'path' key exists
-                typeof (item.data as any).path === 'string' && // Type assertion after check
-                item.type !== 'visualization' &&
-                item.type !== 'analysisReport') {
-                
-                this.logger.info(`Item ${item.name} (type: ${item.type}) has a path property: ${(item.data as any).path}. Assuming it's metadata, content was already set to dataToWrite if it was a string path, or will be stringified if it's complex object.`);
-                // If dataToWrite is still the object itself (because item.data was not a string initially), stringify it.
-                if (typeof dataToWrite !== 'string') {
-                    dataToWrite = JSON.stringify(item.data, null, 2);
-                }
-                // If item.data.path was the actual content (e.g. a string path to a file to be copied),
-                // then dataToWrite would already be that string.
-                // The current logic doesn't copy files, it writes the content of `dataToWrite`.
-             }
-        } else if (typeof item.data === 'object' &&
-                   item.data !== null &&
-                   (item.data as any).recordCount !== undefined && // Type assertion
-                   Array.isArray((item.data as any).sample)) { // Handle summarized data
-            dataToWrite = JSON.stringify(item.data, null, 2); // Store the summary object
+
+        let dataBuffer: Buffer;
+        let originalDataString: string;
+
+        if (typeof item.data === 'string') {
+            originalDataString = item.data;
+        } else if (typeof item.data === 'object' && item.data !== null && (item.data as any).recordCount !== undefined && Array.isArray((item.data as any).sample)) {
+            originalDataString = JSON.stringify(item.data, null, 2);
         } else if (Array.isArray(item.data) || (typeof item.data === 'object' && item.data !== null)) {
             if (itemFormat === 'json') {
-                dataToWrite = JSON.stringify(item.data, null, 2);
+                originalDataString = JSON.stringify(item.data, null, 2);
             } else if (itemFormat === 'csv' && Array.isArray(item.data)) {
                 const csvString = this.serializeToCsv(item.data);
                 if (csvString === null) {
-                   this.logger.warn(`Could not serialize data to CSV for ${fileName} (data was empty or invalid). Storing as JSON string instead.`);
-                   dataToWrite = JSON.stringify(item.data, null, 2); // Fallback to JSON
+                   this.logger.warn(`Could not serialize data to CSV for ${fileName}. Storing as JSON string instead.`);
+                   originalDataString = JSON.stringify(item.data, null, 2); // Fallback to JSON
                 } else {
-                   dataToWrite = csvString;
-                   this.logger.info(`Serialized ${item.name} to CSV format.`);
+                   originalDataString = csvString;
                 }
-            } else if (itemFormat === 'csv') {
-               this.logger.warn(`Data for ${fileName} is not an array, cannot serialize to CSV. Storing as string. Consider JSON format.`);
-               dataToWrite = String(item.data); // Fallback for non-array data intended for CSV
             } else {
-                 dataToWrite = item.data.toString(); // Fallback for other formats
+                 originalDataString = String(item.data);
             }
         } else {
-            dataToWrite = String(item.data);
+            originalDataString = String(item.data);
         }
+        dataBuffer = Buffer.from(originalDataString, 'utf-8');
 
-
+        if (itemCompression === 'gzip') {
+            try {
+                dataBuffer = zlib.gzipSync(dataBuffer);
+                if (!fileName.endsWith('.gz')) {
+                    fileName += '.gz';
+                }
+                this.logger.info(`Compressed item '${item.name}' using gzip. New filename: ${fileName}`);
+            } catch (compressError: any) {
+                this.logger.error(`Failed to compress item ${item.name} with gzip: ${compressError.message}. Storing uncompressed.`, { error: compressError });
+                itemCompression = 'none'; // Fallback to no compression
+                // dataBuffer remains the original uncompressed buffer
+            }
+        } else if (itemCompression !== 'none') {
+             this.logger.warn(`Unsupported compression type '${itemCompression}' for item '${item.name}'. Storing uncompressed.`);
+             itemCompression = 'none';
+        }
+        
         let filePath = '';
         if (destinationConfig.type === 'filesystem') {
           const basePath = destinationConfig.basePath || 'output/pipeline_results';
           await fs.mkdir(basePath, { recursive: true });
           filePath = path.join(basePath, fileName);
-          await fs.writeFile(filePath, dataToWrite);
+          await fs.writeFile(filePath, dataBuffer); // Write buffer
           const stats = await fs.stat(filePath);
           storageOpResults.filesWrittenDetails.push({ name: fileName, path: filePath, sizeBytes: stats.size, format: itemFormat, type: item.type, compression: itemCompression });
           storageOpResults.totalSizeBytes += stats.size;
         } else if (destinationConfig.type === 's3') {
-          // TODO: Implement S3 upload logic using AWS SDK
-          this.logger.warn(`S3 storage for '${fileName}' to bucket '${destinationConfig.bucket}' is NOT IMPLEMENTED. Skipping S3 upload.`);
-          storageOpResults.filesWrittenDetails.push({ name: fileName, path: `s3://${destinationConfig.bucket}/${destinationConfig.pathPrefix || ''}${fileName}`, status: 'skipped_s3_not_implemented', type: item.type, format: itemFormat, compression: itemCompression });
+          // TODO: Implement S3 upload logic using AWS SDK.
+          // Ensure to pass the `dataBuffer` to the S3 client's PutObjectCommand.
+          // Example:
+          // import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+          // const s3Client = new S3Client({ region: "your-region" }); // Configure client
+          // const putParams = {
+          //   Bucket: destinationConfig.bucket,
+          //   Key: `${destinationConfig.pathPrefix || ''}${fileName}`,
+          //   Body: dataBuffer,
+          //   ContentType: itemFormat === 'json' ? 'application/json' : (itemFormat === 'csv' ? 'text/csv' : 'application/octet-stream'),
+          //   ContentEncoding: itemCompression === 'gzip' ? 'gzip' : undefined
+          // };
+          // await s3Client.send(new PutObjectCommand(putParams));
+          this.logger.warn(`S3 storage for '${fileName}' to bucket '${destinationConfig.bucket || 'N/A'}' is NOT IMPLEMENTED. Skipping S3 upload.`);
+          storageOpResults.filesWrittenDetails.push({ name: fileName, path: `s3://${destinationConfig.bucket || 'unknown-bucket'}/${destinationConfig.pathPrefix || ''}${fileName}`, status: 'skipped_s3_not_implemented', type: item.type, format: itemFormat, compression: itemCompression });
           allStoresSuccessful = false; // Mark as not fully successful if S3 fails/skipped
         } else {
             throw new Error(`Unsupported destination type: ${destinationConfig.type}`);
@@ -957,6 +1125,69 @@ export class DataExecutor extends BaseExecutor {
     return fields;
   }
 
+private generateSimpleBarChartSVG(data: any, options?: any): string {
+    const chartWidth = options?.width || 500;
+    const chartHeight = options?.height || 300;
+    const barColor = options?.barColor || 'steelblue';
+    const padding = { top: 20, right: 20, bottom: 30, left: 40 }; // Adjusted bottom for labels
+
+    let dataPoints: { label: string; value: number }[] = [];
+
+    if (Array.isArray(data)) {
+      // Assuming array of {label: string, value: number}
+      dataPoints = data.filter(item => typeof item.label === 'string' && typeof item.value === 'number');
+    } else if (typeof data === 'object' && data !== null) {
+      // Assuming object like { categoryA: 10, categoryB: 20 }
+      dataPoints = Object.entries(data)
+        .filter(([key, value]) => typeof value === 'number')
+        .map(([key, value]) => ({ label: key, value: value as number }));
+    }
+
+    if (dataPoints.length === 0) {
+      return `<svg width="${chartWidth}" height="${chartHeight}" xmlns="http://www.w3.org/2000/svg"><text x="10" y="20">No data to display for bar chart.</text></svg>`;
+    }
+
+    const values = dataPoints.map(d => d.value);
+    const maxValue = Math.max(0, ...values); // Ensure maxValue is not negative
+    const numBars = dataPoints.length;
+    
+    const plotWidth = chartWidth - padding.left - padding.right;
+    const plotHeight = chartHeight - padding.top - padding.bottom;
+
+    // Ensure barWidth is at least 1, even with many bars or small plotWidth
+    const barWidth = Math.max(1, plotWidth / numBars - (options?.barPadding || 5));
+    const yScale = maxValue > 0 ? plotHeight / maxValue : 0; // Prevent division by zero if maxValue is 0
+
+    let svgElements = `<svg width="${chartWidth}" height="${chartHeight}" xmlns="http://www.w3.org/2000/svg" style="font-family: sans-serif; font-size: 10px;">`;
+    svgElements += `<rect width="100%" height="100%" fill="white"/>`; // Background
+
+    // Bars and Labels
+    dataPoints.forEach((d, i) => {
+      const barHeight = Math.max(0, d.value * yScale); // Ensure barHeight is not negative
+      const x = padding.left + i * (barWidth + (options?.barPadding || 5));
+      const y = padding.top + plotHeight - barHeight;
+
+      svgElements += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="${barColor}" />`;
+      // Label below bar
+      svgElements += `<text x="${x + barWidth / 2}" y="${padding.top + plotHeight + 15}" text-anchor="middle" fill="black">${d.label}</text>`;
+      // Value on top of bar (optional, can be cluttered)
+      if (options?.showValues) {
+         svgElements += `<text x="${x + barWidth / 2}" y="${y - 5}" text-anchor="middle" fill="black" font-size="9px">${d.value}</text>`;
+      }
+    });
+    
+    // Basic Y-Axis (line and max value)
+    svgElements += `<line x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${padding.top + plotHeight}" stroke="black"/>`;
+    svgElements += `<text x="${padding.left - 5}" y="${padding.top}" text-anchor="end" dominant-baseline="middle" fill="black">${maxValue.toFixed(0)}</text>`;
+    svgElements += `<text x="${padding.left - 5}" y="${padding.top + plotHeight}" text-anchor="end" dominant-baseline="middle" fill="black">0</text>`;
+
+    // Basic X-Axis (line)
+    svgElements += `<line x1="${padding.left}" y1="${padding.top + plotHeight}" x2="${padding.left + plotWidth}" y2="${padding.top + plotHeight}" stroke="black"/>`;
+
+
+    svgElements += `</svg>`;
+    return svgElements;
+  }
   /**
    * Serializes an array of objects to a CSV string.
    * @param data Array of objects to serialize.

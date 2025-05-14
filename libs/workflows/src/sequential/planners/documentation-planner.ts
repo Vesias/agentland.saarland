@@ -15,7 +15,7 @@ export class DocumentationPlanner extends BasePlanner {
     this.logger = new Logger('DocumentationPlanner');
   }
 
-  private _addDefaultDocumentationSteps(steps: PlanStep[], params: Record<string, any>, docConfig: any): void {
+  private _addDefaultDocumentationSteps(steps: PlanStep[], params: Record<string, unknown>, docConfig: Record<string, unknown>): void {
     steps.push(
       {
         id: 'analyze',
@@ -74,8 +74,8 @@ export class DocumentationPlanner extends BasePlanner {
     );
   }
 
-  private _addApiDocsStep(steps: PlanStep[], params: Record<string, any>, docConfig: any): void {
-    if (params.includeApi || docConfig.includeApi) {
+  private _addApiDocsStep(steps: PlanStep[], params: Record<string, unknown>, docConfig: Record<string, unknown>): void {
+    if (params.includeApi || (docConfig?.includeApi)) {
       steps.push({
         id: 'api-docs',
         number: steps.length + 1,

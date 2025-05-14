@@ -21,8 +21,8 @@ export class CICDPlanner extends BasePlanner {
    * @param cicdConfig CI/CD specific configuration.
    * @returns The determined pipeline type.
    */
-  private _getPipelineType(params: Record<string, any>, cicdConfig: any): string {
-    return params.pipelineType || cicdConfig.defaultPipelineType || 'standard';
+  private _getPipelineType(params: Record<string, unknown>, cicdConfig: Record<string, unknown>): string {
+    return params.pipelineType as string || cicdConfig.defaultPipelineType as string || 'standard';
   }
 
   /**
@@ -31,7 +31,7 @@ export class CICDPlanner extends BasePlanner {
    * @param params Planning parameters.
    * @param cicdConfig CI/CD specific configuration.
    */
-  private _addDefaultSteps(steps: PlanStep[], params: Record<string, any>, cicdConfig: any): void {
+  private _addDefaultSteps(steps: PlanStep[], params: Record<string, unknown>, cicdConfig: Record<string, unknown>): void {
     steps.push(
       {
         id: 'lint',
@@ -82,7 +82,7 @@ export class CICDPlanner extends BasePlanner {
    * @param params Planning parameters.
    * @param cicdConfig CI/CD specific configuration.
    */
-  private _addDeploymentSteps(steps: PlanStep[], pipelineType: string, params: Record<string, any>, cicdConfig: any): void {
+  private _addDeploymentSteps(steps: PlanStep[], pipelineType: string, params: Record<string, unknown>, cicdConfig: Record<string, unknown>): void {
     if (pipelineType === 'deployment' || pipelineType === 'complete') {
       steps.push(
         {
@@ -122,8 +122,8 @@ export class CICDPlanner extends BasePlanner {
    * @param params Planning parameters.
    * @param cicdConfig CI/CD specific configuration.
    */
-  private _addNotificationStep(steps: PlanStep[], pipelineType: string, params: Record<string, any>, cicdConfig: any): void {
-    if (params.notifications || cicdConfig.notifications) {
+  private _addNotificationStep(steps: PlanStep[], pipelineType: string, params: Record<string, unknown>, cicdConfig: Record<string, unknown>): void {
+    if (params.notifications || cicdConfig.notifications) { // Assuming notifications is boolean or truthy/falsy
       steps.push({
         id: 'notify',
         number: steps.length + 1,

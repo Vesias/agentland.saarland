@@ -15,7 +15,7 @@ interface ComponentSpec {
 
 interface ExecutionContext {
   type: string;
-  data: any;
+  data: unknown;
   summary: string;
 }
 

@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx run-many --target=test --output-style=stream",
+    "startTime": "2025-05-14T05:09:46.857Z",
+    "endTime": "2025-05-14T05:09:47.239Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "@claude-framework/cli:test",
+      "target": "test",
+      "projectName": "@claude-framework/cli",
+      "hash": "12369451484227081287",
+      "startTime": "2025-05-14T05:09:46.871Z",
+      "endTime": "2025-05-14T05:09:47.238Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
+}

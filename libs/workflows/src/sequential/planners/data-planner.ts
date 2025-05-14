@@ -15,11 +15,11 @@ export class DataPlanner extends BasePlanner {
     this.logger = new Logger('DataPlanner');
   }
 
-  private _getWorkflowType(params: Record<string, any>, dataConfig: any): string {
-    return params.workflowType || dataConfig.defaultWorkflowType || 'processing';
+  private _getWorkflowType(params: Record<string, unknown>, dataConfig: Record<string, unknown>): string {
+    return params.workflowType as string || dataConfig.defaultWorkflowType as string || 'processing';
   }
 
-  private _addDefaultDataSteps(steps: PlanStep[], params: Record<string, any>, dataConfig: any): void {
+  private _addDefaultDataSteps(steps: PlanStep[], params: Record<string, unknown>, dataConfig: Record<string, unknown>): void {
     steps.push(
       {
         id: 'collect',
@@ -63,7 +63,7 @@ export class DataPlanner extends BasePlanner {
     );
   }
 
-  private _addAnalysisSteps(steps: PlanStep[], workflowType: string, params: Record<string, any>, dataConfig: any): void {
+  private _addAnalysisSteps(steps: PlanStep[], workflowType: string, params: Record<string, unknown>, dataConfig: Record<string, unknown>): void {
     if (workflowType === 'analysis' || workflowType === 'complete') {
       steps.push(
         {
@@ -96,7 +96,7 @@ export class DataPlanner extends BasePlanner {
     }
   }
 
-  private _addStoreStep(steps: PlanStep[], workflowType: string, params: Record<string, any>, dataConfig: any): void {
+  private _addStoreStep(steps: PlanStep[], workflowType: string, params: Record<string, unknown>, dataConfig: Record<string, unknown>): void {
     steps.push({
       id: 'store',
       number: steps.length + 1,

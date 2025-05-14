@@ -495,7 +495,7 @@ interface ConfigManagerOptions {
  * @returns The loaded configuration
  * @throws {ConfigAccessError} If there's an error reading the file
  */
-function loadJsonConfig(configPath: string, defaultConfig: Record<string, any> = {}): Record<string, any> {
+function loadJsonConfig(configPath: string, defaultConfig: Record<string, unknown> = {}): Record<string, unknown> {
   try {
     if (fs.existsSync(configPath)) {
       const configData = fs.readFileSync(configPath, 'utf8');
@@ -517,7 +517,7 @@ function loadJsonConfig(configPath: string, defaultConfig: Record<string, any> =
  * @returns true on success, false on error
  * @throws {ConfigAccessError} If there's an error writing the file
  */
-function saveJsonConfig(configPath: string, config: Record<string, any>): boolean {
+function saveJsonConfig(configPath: string, config: Record<string, unknown>): boolean {
   try {
     const configDir = path.dirname(configPath);
     if (!fs.existsSync(configDir)) {
@@ -656,7 +656,7 @@ export class ConfigManager {
    * @param configType - Configuration type
    * @param schema - JSON Schema object
    */
-  public setSchema(configType: ConfigType, schema: Record<string, any>): void {
+  public setSchema(configType: ConfigType, schema: Record<string, unknown>): void {
     this.schemas[configType] = schema;
   }
   
@@ -864,7 +864,7 @@ export class ConfigManager {
    * @param config - Configuration object
    * @private
    */
-  private _parseEnvValue(value: string): any {
+  private _parseEnvValue(value: string): unknown {
     try {
       return JSON.parse(value);
     } catch (e) {
@@ -882,7 +882,7 @@ export class ConfigManager {
         const keyPath = key.substring(prefix.length).toLowerCase().replace(/_/g, '.');
         const value = process.env[key]!;
         const parsedValue = this._parseEnvValue(value);
-        this.setConfigValueByPath(config as Record<string, any>, keyPath, parsedValue);
+        this.setConfigValueByPath(config as Record<string, unknown>, keyPath, parsedValue);
       });
   }
   
@@ -894,7 +894,7 @@ export class ConfigManager {
    * @param value - Value to set
    * @private
    */
-  private setConfigValueByPath(config: Record<string, any>, keyPath: string, value: any): void {
+  private setConfigValueByPath(config: Record<string, unknown>, keyPath: string, value: unknown): void {
     const keyParts = keyPath.split('.');
     let target = config;
     
@@ -905,7 +905,7 @@ export class ConfigManager {
         target[part] = {};
       }
       
-      target = target[part];
+      target = target[part] as Record<string, unknown>;
     }
     
     target[keyParts[keyParts.length - 1]] = value;
@@ -939,7 +939,7 @@ export class ConfigManager {
   private _saveGlobalConfigInternal(config: GlobalConfig): void {
     try {
       const globalConfigPath = path.join(this.globalConfigPath, 'config.json');
-      saveJsonConfig(globalConfigPath, config as Record<string, any>);
+      saveJsonConfig(globalConfigPath, config as Record<string, unknown>);
       this.notifyObservers(ConfigType.GLOBAL, config);
     } catch (err) {
       this.logger.error(`Failed to save global configuration`, { error: err });
@@ -950,7 +950,7 @@ export class ConfigManager {
   private _saveUserConfigInternal(config: UserConfig): void {
     try {
       const userConfigPath = path.join(this.globalConfigPath, 'user.about.json');
-      saveJsonConfig(userConfigPath, config as Record<string, any>);
+      saveJsonConfig(userConfigPath, config as Record<string, unknown>);
       this.notifyObservers(ConfigType.USER, config);
     } catch (err) {
       this.logger.error(`Failed to save user configuration`, { error: err });
@@ -963,7 +963,7 @@ export class ConfigManager {
       throw new ConfigError(`Cannot save: No local path defined for ${configType}`);
     }
     try {
-      saveJsonConfig(LOCAL_CONFIG_PATHS[configType], config as Record<string, any>);
+      saveJsonConfig(LOCAL_CONFIG_PATHS[configType], config as Record<string, unknown>);
       this.notifyObservers(configType, config);
     } catch (err) {
       this.logger.error(`Failed to save ${configType} configuration`, { error: err });
@@ -995,14 +995,14 @@ export class ConfigManager {
    * @returns Success
    * @throws {ConfigError} If the configuration type is unknown
    */
-  public updateConfigValue(configType: ConfigType, keyPath: string, value: any): boolean {
+  public updateConfigValue(configType: ConfigType, keyPath: string, value: unknown): boolean {
     const config = this.getConfig(configType);
     
     // Split path into parts
     const keyParts = keyPath.split('.');
     
     // Find reference to target object
-    let target = config as Record<string, any>;
+    let target = config as Record<string, unknown>;
     for (let i = 0; i < keyParts.length - 1; i++) {
       const part = keyParts[i];
       
@@ -1010,7 +1010,7 @@ export class ConfigManager {
         target[part] = {};
       }
       
-      target = target[part];
+      target = target[part] as Record<string, unknown>;
     }
     
     // Set value
@@ -1020,20 +1020,20 @@ export class ConfigManager {
     return this.saveConfig(configType, config);
   }
   
-  private _getValueByPath<T = any>(config: Record<string, any>, keyPath: string, defaultValue?: T): T {
+  private _getValueByPath<T = unknown>(config: Record<string, unknown>, keyPath: string, defaultValue?: T): T {
     const keyParts = keyPath.split('.');
-    let target: any = config;
+    let target: unknown = config;
 
     for (const part of keyParts) {
       if (target === undefined || target === null || typeof target !== 'object' || !(part in target)) {
         return defaultValue as T;
       }
-      target = target[part];
+      target = (target as Record<string, unknown>)[part];
     }
     return target as T;
   }
 
-  private _getGlobalColorSchemaValue<T = any>(keyPath: string, defaultValue?: T): T {
+  private _getGlobalColorSchemaValue<T = unknown>(keyPath: string, defaultValue?: T): T {
     try {
       const colorSchemaConfig = this.getConfig<ColorSchemaConfig>(ConfigType.COLOR_SCHEMA);
       if (keyPath === 'COLOR_SCHEMA') {
@@ -1043,14 +1043,14 @@ export class ConfigManager {
       }
       const subPath = keyPath.substring('COLOR_SCHEMA.'.length);
       // Use _getValueByPath for the sub-config to avoid recursive calls to getConfigValue for the same configType
-      return this._getValueByPath<T>(colorSchemaConfig as Record<string, any>, subPath, defaultValue);
+      return this._getValueByPath<T>(colorSchemaConfig as Record<string, unknown>, subPath, defaultValue);
     } catch (err) {
       this.logger.warn(`Failed to get COLOR_SCHEMA config for global access`, { error: err, keyPath });
       return defaultValue as T;
     }
   }
 
-  private _getGlobalMcpValue<T = any>(keyPath: string, defaultValue?: T): T {
+  private _getGlobalMcpValue<T = unknown>(keyPath: string, defaultValue?: T): T {
     try {
       const mcpConfig = this.getConfig<McpConfig>(ConfigType.MCP);
       if (keyPath === 'MCP') {
@@ -1058,7 +1058,7 @@ export class ConfigManager {
       }
       const subPath = keyPath.substring('MCP.'.length);
       // Use _getValueByPath for the sub-config
-      return this._getValueByPath<T>(mcpConfig as Record<string, any>, subPath, defaultValue);
+      return this._getValueByPath<T>(mcpConfig as Record<string, unknown>, subPath, defaultValue);
     } catch (err) {
       this.logger.warn(`Failed to get MCP config for global access`, { error: err, keyPath });
       return defaultValue as T;
@@ -1074,7 +1074,7 @@ export class ConfigManager {
    * @returns The configuration value or the default value
    * @throws {ConfigError} If the configuration type is unknown
    */
-  public getConfigValue<T = any>(configType: ConfigType, keyPath: string, defaultValue?: T): T {
+  public getConfigValue<T = unknown>(configType: ConfigType, keyPath: string, defaultValue?: T): T {
     try {
       const config = this.getConfig(configType);
 
@@ -1087,7 +1087,7 @@ export class ConfigManager {
         }
       }
       
-      return this._getValueByPath<T>(config as Record<string, any>, keyPath, defaultValue);
+      return this._getValueByPath<T>(config as Record<string, unknown>, keyPath, defaultValue);
     } catch (err) {
       this.logger.warn(`Error in getConfigValue for ${configType}.${keyPath}`, { error: err });
       return defaultValue as T;
@@ -1161,7 +1161,7 @@ export class ConfigManager {
     const config = this.getConfig(configType);
     
     try {
-      saveJsonConfig(exportPath, config as Record<string, any>);
+      saveJsonConfig(exportPath, config as Record<string, unknown>);
       return true;
     } catch (err) {
       this.logger.error(`Failed to export ${configType} configuration`, { error: err });

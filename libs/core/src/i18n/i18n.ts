@@ -47,20 +47,20 @@ export interface I18nOptions {
   locale?: string;
   fallbackLocale?: string;
   debug?: boolean;
-  messages?: Record<string, Record<string, any>>;
+  messages?: Record<string, Record<string, string | Record<string, string>>>;
 }
 
 /**
  * Type for messages
  */
-export type Messages = Record<string, Record<string, any>>;
+export type Messages = Record<string, Record<string, string | Record<string, string>>>;
 
 /**
  * Type for translation parameters
  */
 export interface TranslationParams {
   count?: number;
-  [key: string]: any;
+  [key: string]: string | number | boolean | undefined;
 }
 
 /**
@@ -329,15 +329,24 @@ export class I18n {
     // Handle pluralization
     if (typeof message === 'object' && params.count !== undefined) {
       const rule = this.pluralRules.select(params.count);
-      message = message[rule] || message.other || Object.values(message)[0];
+      message = message[rule] || message.other || Object.values(message)[0] || key; // Fallback to key if no rule matches
+    }
+
+    // If message is still an object here, it means pluralization was expected but not properly applied (e.g. count missing)
+    if (typeof message === 'object') {
+      if (this.debug) {
+        logger.warn(`Message ${key} is a pluralization object but 'count' was not provided or no rule matched. Locale: ${usedLocale}`);
+        return `[${key}_PLURAL_ERROR]`;
+      }
+      return key;
     }
     
     // Interpolate parameters
-    if (params && typeof message === 'string') {
+    if (params && typeof message === 'string') { // message is definitely a string here
       message = this.interpolate(message, params);
     }
     
-    return message;
+    return message; // message is now guaranteed to be a string
   }
   
   /**
