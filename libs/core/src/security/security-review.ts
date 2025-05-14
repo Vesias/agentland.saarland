@@ -32,6 +32,11 @@ import type {
   SecurityReviewReport as SecurityReviewReportType,
 } from './security.types';
 
+// Importiere ZodSecurityConfig für die Typisierung von this.config
+// und validateSecurityConfig für die Laufzeitvalidierung
+import type { ZodSecurityConfig } from './schemas';
+import { validateSecurityConfig } from './schemas';
+
 
 /**
  * Error types for security operations
@@ -94,7 +99,7 @@ export class SecurityReview {
   private i18n: I18n;
   // TODO: Define a specific type for the security configuration
   // once its structure is clearly defined and stable.
-  private config: unknown; // TODO: Typisieren, z.B. mit ZodSecurityConfig aus schemas.ts
+  private config: ZodSecurityConfig; // Typisiert mit ZodSecurityConfig
   private options: SecurityReviewOptionsType; // Verwendung des importierten Typs
   private findings: SecurityFindingType[]; // Verwendung des importierten Typs
   private vulnerabilities: SecurityFindingType[]; // Vulnerabilities sind auch Findings
@@ -116,7 +121,8 @@ export class SecurityReview {
     
     // Load security configuration
     try {
-      this.config = configManager.getConfig(ConfigType.SECURITY);
+      const rawConfig = configManager.getConfig(ConfigType.SECURITY);
+      this.config = validateSecurityConfig(rawConfig); // Validieren und Zuweisen
       
       // Set default options
       this.options = {
@@ -424,21 +430,21 @@ export class SecurityReview {
    */
   private getRecommendationTitle(type: string): string {
     switch (type) {
-      case 'api-key':
+      case 'api-key-exposure':
         return 'Secure API Keys';
-      case 'dependency':
+      case 'secure-dependencies':
         return 'Update Vulnerable Dependencies';
-      case 'config':
+      case 'config-constraints':
         return 'Fix Configuration Issues';
-      case 'permission':
+      case 'file-permissions':
         return 'Secure File Permissions';
-      case 'communication':
+      case 'secure-communication':
         return 'Implement Secure Communication';
-      case 'validation':
+      case 'input-validation':
         return 'Improve Input Validation';
-      case 'authentication':
+      case 'authentication-security':
         return 'Strengthen Authentication';
-      case 'logging':
+      case 'audit-logging':
         return 'Enhance Audit Logging';
       default:
         return `Address ${type} Issues`;
@@ -447,7 +453,7 @@ export class SecurityReview {
   
   /**
    * Get description for a recommendation type
-   * 
+   *
    * @param type - Recommendation type (validator name)
    * @param findings - List of findings
    * @returns Description
@@ -455,11 +461,10 @@ export class SecurityReview {
    */
   private getRecommendationDescription(validatorName: string, findings: SecurityFindingType[]): string {
     // Diese Funktion könnte spezifischere Nachrichten basierend auf dem validatorName generieren
-    const firstFindingType = findings[0]?.type || validatorName;
-    switch (firstFindingType) {
-      case 'api-key': // Annahme, dass validatorName 'api-key-exposure' ist
+    switch (validatorName) { // validatorName direkt verwenden
+      case 'api-key-exposure':
         return `Secure ${findings.length} potential API key exposures by using environment variables or secure storage solutions.`;
-      case 'dependency': // Annahme, dass validatorName 'secure-dependencies' ist
+      case 'secure-dependencies':
         return `Update ${findings.length} dependencies with known vulnerabilities to their latest secure versions.`;
       // Weitere Fälle für andere Validatoren
       default:

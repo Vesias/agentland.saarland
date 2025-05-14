@@ -30,7 +30,17 @@ jest.mock('../config/config-manager', () => ({
     GLOBAL: 'global'
   },
   default: {
-    getConfig: jest.fn().mockReturnValue({ mcp: { allowed_servers: [] } }),
+    getConfig: jest.fn().mockImplementation((configType) => {
+      if (configType === 'security') {
+        return {
+          defaultPolicyLevel: 'strict', // Gültiger PolicyLevel-Wert
+          apiAccessRules: [],
+          enableAuditLog: false,
+          // auditLogPath ist optional
+        };
+      }
+      return { mcp: { allowed_servers: [] } }; // Fallback für andere ConfigTypes
+    }),
     getConfigValue: jest.fn().mockReturnValue('1.0.0')
   }
 }));
@@ -51,6 +61,18 @@ jest.mock('fs', () => ({
 describe('SecurityReview', () => {
   let securityReview: SecurityReview;
   const tempReportPath = path.join(__dirname, 'temp-security-report.json');
+
+  // Hilfsfunktion, um Standard-Validatoren zu deregistrieren
+  const unregisterStandardValidators = (reviewInstance: SecurityReview) => {
+    const standardValidators = [
+      'api-key-exposure', 'secure-dependencies', 'config-constraints',
+      'file-permissions', 'secure-communication', 'input-validation',
+      'authentication-security', 'audit-logging'
+    ];
+    standardValidators.forEach(name => {
+      reviewInstance.unregisterValidator(name);
+    });
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -196,6 +218,7 @@ describe('SecurityReview', () => {
 
   describe('runValidators', () => {
     it('should run all registered validators', async () => {
+      unregisterStandardValidators(securityReview); // Standard-Validatoren entfernen
       // Register custom validators
       const finding1: SecurityFindingType = {
         id: 'finding-1',
@@ -239,25 +262,20 @@ describe('SecurityReview', () => {
     });
 
     it('should handle validator errors gracefully', async () => {
+      unregisterStandardValidators(securityReview); // Standard-Validatoren entfernen
       const failingValidator = jest.fn().mockRejectedValue(new Error('Validator failed'));
       securityReview.registerValidator('failing-validator', failingValidator);
       
       const report: ValidatorResultsType = await securityReview.runValidators();
       
       expect(failingValidator).toHaveBeenCalled();
-      // Da Standard-Validatoren leere Arrays zurückgeben und der eine fehlschlägt,
-      // sollten findings und vulnerabilities leer sein oder nur die der erfolgreichen Standard-Validatoren enthalten.
-      // Da die Standard-Validatoren in der Implementierung aktuell leere Arrays zurückgeben, erwarten wir hier leere Arrays.
+      // Da jetzt alle Standard-Validatoren entfernt wurden, sollten findings und vulnerabilities leer sein.
       expect(report.findings?.length).toBe(0);
       expect(report.vulnerabilities?.length).toBe(0);
     });
 
     it('should calculate security score based on findings and vulnerabilities', async () => {
-      ['api-key-exposure', 'secure-dependencies', 'config-constraints',
-       'file-permissions', 'secure-communication', 'input-validation',
-       'authentication-security', 'audit-logging'].forEach(name => {
-        securityReview.unregisterValidator(name);
-      });
+      unregisterStandardValidators(securityReview); // Standard-Validatoren entfernen
 
       const criticalVuln: SecurityFindingType = { id: 'cv1', title: 'CV', description: 'd', location: 'l', severity: 'critical', type: 'vulnerability', validator: 'mock', timestamp: new Date().toISOString() };
       const highVuln: SecurityFindingType = { id: 'hv1', title: 'HV', description: 'd', location: 'l', severity: 'high', type: 'vulnerability', validator: 'mock', timestamp: new Date().toISOString() };
@@ -288,12 +306,7 @@ describe('SecurityReview', () => {
 
   describe('generateRecommendations', () => {
     it('should generate recommendations based on findings and vulnerabilities', async () => {
-      // Deregistriere Standard-Validatoren für diesen Testfall
-      ['api-key-exposure', 'secure-dependencies', 'config-constraints',
-       'file-permissions', 'secure-communication', 'input-validation',
-       'authentication-security', 'audit-logging'].forEach(name => {
-        securityReview.unregisterValidator(name);
-      });
+      unregisterStandardValidators(securityReview); // Standard-Validatoren entfernen
 
       const apiKeyFinding: SecurityFindingType = { id: 'f1', title: 'API Key Exposure', type: 'finding', validator: 'api-key-exposure', description: 'd', location: 'l', timestamp: new Date().toISOString(), severity: 'high' };
       const depFinding: SecurityFindingType = { id: 'f2', title: 'Outdated Dependency', type: 'finding', validator: 'secure-dependencies', description: 'd', location: 'l', timestamp: new Date().toISOString(), severity: 'medium' };

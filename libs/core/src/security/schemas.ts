@@ -36,8 +36,8 @@ export const PolicyLevelSchema = z.nativeEnum(PolicyLevelEnum);
  */
 export const ApiAccessRuleSchema = z.object({
   resource: z.string().min(1),
-  methods: z.array(z.string().min(1)).readonly(),
-  allowedRoles: z.array(z.string().min(1)).readonly(),
+  methods: z.array(z.string().min(1)).min(1).readonly(), // Sicherstellen, dass das Array nicht leer ist
+  allowedRoles: z.array(z.string().min(1)).min(1).readonly(), // Auch für allowedRoles sinnvoll
   policyLevel: PolicyLevelSchema.optional(),
 });
 

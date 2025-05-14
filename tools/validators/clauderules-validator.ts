@@ -2,7 +2,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as toml from 'toml'; // Diese Abhängigkeit muss später installiert werden: npm install toml @types/toml --save-dev
+import * as toml from 'toml';
 
 interface ProjectRules {
   name?: string;

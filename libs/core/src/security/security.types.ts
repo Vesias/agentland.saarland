@@ -131,11 +131,8 @@ export interface SecureApiOptions {
   readonly secureHeaders?: boolean;
   readonly inputValidation?: boolean;
   readonly policyLevel?: PolicyLevel; // Hinzugefügt, verwendet PolicyLevel aus dieser Datei
-  /**
-   * Allows for additional, unspecified options.
-   */
-  readonly [key: string]: any; // Beibehaltung der Flexibilität für zusätzliche Optionen
-  // Ggf. weitere Optionen aus dem Konstruktor von SecureAPI
+  // Ggf. weitere Optionen aus dem Konstruktor von SecureAPI explizit hinzufügen
+  // readonly [key: string]: any; // Entfernt für striktere Typsicherheit
 }
 
 // Minimaldefinition für Request und Response Objekte,
