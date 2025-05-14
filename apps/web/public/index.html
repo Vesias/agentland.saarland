@@ -1,11 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Agentland Saarland - KI-Schmiede und Real-Life Agent Portal" />
-    <title>Agentland.Saarland</title>
+    <meta name="description" content="AGENT_LAND.SAARLAND - KI-Schmiede Saar und Real-Life Agent Portal" />
+    <meta name="theme-color" content="#5C41A8" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="AGENT_LAND.SAARLAND" />
+    <meta property="og:description" content="KI-Schmiede Saar und Real-Life Agent Portal" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="de_DE" />
+    <title>AGENT_LAND.SAARLAND</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,5 +19,16 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/index.js"></script>
+    
+    <!-- Preload assets -->
+    <link rel="preload" href="/src/index.css" as="style">
+    
+    <!-- Noscript fallback -->
+    <noscript>
+      <div style="padding: 20px; text-align: center; font-family: 'Inter', sans-serif;">
+        <h1>AGENT_LAND.SAARLAND</h1>
+        <p>Bitte aktiviere JavaScript, um das Dashboard zu nutzen.</p>
+      </div>
+    </noscript>
   </body>
 </html>

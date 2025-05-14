@@ -28,6 +28,13 @@ The framework follows a monorepo structure with clear modularization:
 
 ## Development Commands
 
+### Dashboard Startup
+
+```bash
+# Start the AGENT_LAND.SAARLAND dashboard (empfohlen)
+./start-dashboard.sh
+```
+
 ### Basic Commands
 
 ```bash
@@ -64,12 +71,12 @@ npm run dev
 
 The web application will be available at http://localhost:5000 with hot reload enabled.
 
-Alternatively, you can use the start script:
+Alternatively, you can use the enhanced start script:
 
 ```bash
-# Run the start script from the web app directory
+# Run the improved start script from the web app directory
 cd apps/web
-./start.sh
+./start-dashboard.sh
 ```
 
 ### Nx-specific Commands

@@ -32,7 +32,9 @@ export default defineConfig({
   },
   server: {
     port: 5000,
-    open: true
+    open: true,
+    host: true,
+    strictPort: true
   },
   build: {
     outDir: 'dist',

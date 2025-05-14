@@ -146,6 +146,63 @@ export class A2AAuthProvider {
   }
   
   /**
+   * Authenticate using DNS verification
+   * 
+   * @param domainName - Domain name to verify
+   * @param agentId - Agent identifier (from message.from)
+   * @returns Authentication result (Promise)
+   * @private
+   */
+  private async authenticateWithDns(domainName: string, agentId: string): Promise<AuthenticationResult> {
+    if (!this.dnsConfig?.enabled || !this.dnsVerifier) {
+      return {
+        authenticated: false,
+        error: 'DNS authentication is not configured'
+      };
+    }
+    
+    try {
+      // Extract domain from the provided value
+      const domain = domainName.trim().toLowerCase();
+      
+      // Verify domain authentication using DNS
+      const result = await this.dnsVerifier.verifyDomainAuth(
+        domain,
+        this.dnsConfig.authToken
+      );
+      
+      if (!result.verified) {
+        return {
+          authenticated: false,
+          error: result.error || 'DNS authentication failed'
+        };
+      }
+      
+      // Build agent ID from domain if not provided explicitly
+      const effectiveAgentId = agentId || `dns-agent-${domain}`;
+      
+      this.logger.info(`DNS authentication successful for domain: ${domain}`, {
+        agentId: effectiveAgentId
+      });
+      
+      // Domain verified, return success
+      return {
+        authenticated: true,
+        agentId: effectiveAgentId,
+        accessLevel: AgentAccessLevel.PROTECTED,
+        roles: [`domain:${domain}`]
+      };
+    } catch (error) {
+      this.logger.error('DNS authentication error', { error });
+      
+      return {
+        authenticated: false,
+        error: `DNS authentication error: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
+  
+  /**
    * Initialize authentication provider
    * Loads API keys from file if specified
    */

@@ -2,6 +2,20 @@
 
 Dieses Dashboard ist die zentrale Oberfläche für die AGENT_LAND.SAARLAND Plattform und bietet eine modulare, anpassbare Benutzeroberfläche mit Fokus auf "Real-Life Agent" Missionen und regionale Identität des Saarlandes.
 
+## Schnellstart (EMPFOHLEN)
+
+Verwende das verbesserte Startup-Skript für einen zuverlässigen Start des Dashboards:
+
+```bash
+# Ins Verzeichnis wechseln
+cd /home/jan/Dokumente/agentland.saarland/apps/web
+
+# Dashboard mit einem Befehl starten
+./start-dashboard.sh
+```
+
+Das Dashboard wird automatisch auf http://localhost:5000 geöffnet.
+
 ## Funktionen
 
 - **Modular Dashboard** mit konfigurierbaren Widgets
@@ -13,7 +27,9 @@ Dieses Dashboard ist die zentrale Oberfläche für die AGENT_LAND.SAARLAND Platt
 - **Responsives Design** für alle Geräte
 - **Themen-Unterstützung** mit Hell-/Dunkel-Modus
 
-## Installation
+## Manuelle Installation
+
+Falls du das Dashboard manuell starten möchtest:
 
 ```bash
 # Ins Verzeichnis wechseln
@@ -27,6 +43,15 @@ npm run dev
 ```
 
 Der Entwicklungsserver wird auf http://localhost:5000 gestartet.
+
+## Fehlerbehebung
+
+Falls du eine Fehlermeldung "Seite nicht gefunden" oder andere Probleme erhältst:
+
+1. Stelle sicher, dass Port 5000 nicht von einem anderen Dienst verwendet wird
+2. Verwende `./start-dashboard.sh`, das alle bekannten Probleme automatisch behebt
+3. Überprüfe, dass Node.js v18+ und alle Abhängigkeiten korrekt installiert sind
+4. Falls Probleme bestehen bleiben, starte den Server mit: `npm run dev -- --host 0.0.0.0 --port 5000`
 
 ## Architektur
 

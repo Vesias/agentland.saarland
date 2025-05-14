@@ -88,11 +88,14 @@ export class A2AMissionAuth {
     let authResult: AuthenticationResult;
     
     try {
-      // We need to await here to properly catch any potential errors
-      if (typeof this.authProvider.authenticate(message) === 'object') {
-        authResult = this.authProvider.authenticate(message) as AuthenticationResult;
+      // Authentifiziere nur einmal und prüfe dann den Rückgabetyp
+      const authResponse = this.authProvider.authenticate(message);
+      
+      // Prüfe, ob das Ergebnis ein Promise ist oder direkt ein Objekt
+      if (authResponse instanceof Promise) {
+        authResult = await authResponse as Promise<AuthenticationResult>;
       } else {
-        authResult = await this.authProvider.authenticate(message) as Promise<AuthenticationResult>;
+        authResult = authResponse as AuthenticationResult;
       }
       
       if (!authResult.authenticated) {
