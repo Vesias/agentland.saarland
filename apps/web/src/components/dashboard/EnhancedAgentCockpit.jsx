@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaRobot, FaLock, FaArrowRight, FaCheck, FaTimes, FaTrophy, FaMedal, FaKey } from 'react-icons/fa';
-import { useGameState } from '../../hooks/mcp/useGameState';
+import { useGameState } from '../../hooks/mcp';
 
 /**
  * EnhancedAgentCockpit Component

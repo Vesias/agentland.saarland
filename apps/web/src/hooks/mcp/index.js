@@ -6,9 +6,9 @@
  */
 
 // Import hooks
-const { useMcpGameState } = require('./useGameState');
-const { useMcpDailyRewards } = require('./useDailyRewards');
-const { useMcpSequentialPlanner } = require('./useSequentialPlanner');
+import useMcpGameState from './useGameState';
+import { useMcpDailyRewards } from './useDailyRewards';
+import { useMcpSequentialPlanner } from './useSequentialPlanner';
 
 // Mock hooks for testing
 const useMcpSequentialThinking = () => {
@@ -58,14 +58,17 @@ const useMcpContext7 = () => {
 };
 
 // Export all hooks
-module.exports = {
+export {
   useMcpSequentialThinking,
   useMcpBraveSearch,
   useMcpImageGeneration,
   useMcp21stDevMagic,
   useMcpRealTimeUpdates,
   useMcpContext7,
-  useMcpGameState,
   useMcpDailyRewards,
   useMcpSequentialPlanner
 };
+
+// Export useGameState as both the MCP version and a more convenient alias
+export { useMcpGameState as useGameState };
+export default useMcpGameState;
