@@ -20,15 +20,32 @@ export const ProfileProvider = ({ children }) => {
       try {
         setLoading(true);
         
-        // In a real implementation, this would use the MCP client
-        // to fetch the profile from Context7
-        const response = await fetch('/api/profile');
-        if (!response.ok) {
-          throw new Error(`Failed to load profile: ${response.statusText}`);
-        }
+        // Simulate API call with a delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
         
-        const profileData = await response.json();
-        setProfile(profileData);
+        // Mock profile data
+        const mockProfileData = {
+          userId: 'user123',
+          personal: {
+            name: 'Max Mustermann',
+            email: 'max@example.com',
+            location: 'Saarland, Germany',
+            bio: 'Ein Beispielbenutzer für das AGENT_LAND.SAARLAND Dashboard',
+            skills: ['JavaScript', 'React']
+          },
+          preferences: {
+            uiTheme: 'dark',
+            language: 'de',
+            notifications: true
+          },
+          agentSettings: {
+            isActive: true,
+            missionPreferences: ['local', 'regional'],
+            skillLevel: 'beginner'
+          }
+        };
+        
+        setProfile(mockProfileData);
         setError(null);
       } catch (err) {
         console.error('Error loading profile:', err);
@@ -46,23 +63,15 @@ export const ProfileProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      // In a real implementation, this would use the MCP client
-      // to save the profile to Context7
-      const response = await fetch('/api/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(profileData),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to save profile: ${response.statusText}`);
-      }
+      // Simulate API call with a delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Update local state with the latest data
       setProfile(profileData);
       setError(null);
+      
+      // Log the saved profile data
+      console.log('Profile saved:', profileData);
       
       return true;
     } catch (err) {
