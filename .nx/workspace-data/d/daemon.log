@@ -1911,3 +1911,15 @@ Debugger attached.
 [NX v21.0.3 Daemon Server] - 2025-05-14T06:35:17.559Z - [SYNC]: project graph hash is the same, not collecting task sync generators
 [NX v21.0.3 Daemon Server] - 2025-05-14T06:35:17.559Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
 [NX v21.0.3 Daemon Server] - 2025-05-14T06:35:17.559Z - Time taken for 'total execution time for createProjectGraph()' 10.349497000221163ms
+[NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.085Z - Started listening on: /tmp/bc135510768c6fbc7a0d/d.sock
+[NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.087Z - [WATCHER]: Subscribed to changes within: /home/jan/agentland.saarland (native)
+[NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.094Z - Established a connection. Number of open connections: 1
+[NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.095Z - Established a connection. Number of open connections: 2
+[NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.096Z - Closed a connection. Number of open connections: 1
+[NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.097Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.097Z - Done responding to the client Shutdown initiated
+[NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.098Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 1.
+[NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.098Z - Closed a connection. Number of open connections: 0
+[NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.098Z - [WATCHER]: Stopping the watcher for /home/jan/agentland.saarland (sources)
+[NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.098Z - [WATCHER]: Stopping the watcher for /home/jan/agentland.saarland (outputs)
+[NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.098Z - Server stopped because: "Request to shutdown"

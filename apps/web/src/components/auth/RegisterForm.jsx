@@ -102,7 +102,7 @@ const RegisterForm = ({ onRegister, onSwitchToLogin }) => {
 
   return (
     <div className="register-form-container">
-      <style jsx>{`
+      <style>{`
         .register-form-container {
           background: rgba(18, 24, 38, 0.95);
           border: 1px solid #2563eb;

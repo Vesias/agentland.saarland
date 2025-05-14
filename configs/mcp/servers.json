@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "last_updated": "2025-05-12",
+  "last_updated": "2025-05-14",
   "environment": "development",
   "api_key_notice": "ACHTUNG: API-Schlüssel sollten in einer .env-Datei oder in Umgebungsvariablen gespeichert werden",
   "servers": {
@@ -62,6 +62,14 @@
         "@upstash/context7-mcp",
         "--key",
         "${MCP_API_KEY}"
+      ],
+      "autostart": true
+    },
+    "agentland-saarland": {
+      "description": "AGENT_LAND.SAARLAND Framework-Integration",
+      "command": "node",
+      "args": [
+        "/home/jan/agentland.saarland/libs/mcp/src/start_server.js"
       ],
       "autostart": true
     },

@@ -15,11 +15,6 @@ export default defineConfig({
       }
     })
   ],
-  esbuild: {
-    loader: {
-      '.js': 'jsx',
-    },
-  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -32,7 +27,7 @@ export default defineConfig({
   },
   server: {
     port: 5000,
-    open: true,
+    open: false,
     host: true,
     strictPort: true
   },
