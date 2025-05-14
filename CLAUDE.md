@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-The Claude Neural Framework is a comprehensive platform for integrating Claude AI capabilities with development workflows. It combines agent-based architecture, Model Context Protocol (MCP) integration, and Retrieval Augmented Generation (RAG) in a consistent environment.
+The Claude Neural Framework (agentland.saarland) is a comprehensive platform for integrating Claude AI capabilities with development workflows. It combines agent-based architecture, Model Context Protocol (MCP) integration, and Retrieval Augmented Generation (RAG) in a consistent environment.
 
 Key features include:
 - System of specialized AI agents for different tasks
-- MCP integration for extended AI functionality
+- MCP integration for extended AI functionality  
 - RAG framework for context-aware information retrieval
 - Recursive debugging tools
 - Automated documentation generation
@@ -25,15 +25,22 @@ The framework follows a monorepo structure with clear modularization:
 4. **RAG** (`libs/rag`): Retrieval Augmented Generation framework for context-aware responses
 5. **Workflows** (`libs/workflows`): Sequential planning and execution engines
 6. **Apps** (`apps/`): Applications including CLI, API, and web interface
+   - **Web** (`apps/web`): React-based dashboard for AGENT_LAND.SAARLAND
+   - **CLI** (`apps/cli`): Command-line interface for framework operations
 
 ## Development Commands
 
-### Dashboard Startup
+### Quick Start
 
 ```bash
-# Start the AGENT_LAND.SAARLAND dashboard (empfohlen)
+# Start the AGENT_LAND.SAARLAND dashboard (recommended)
 ./start-dashboard.sh
 ```
+
+This will automatically:
+- Install dependencies if needed
+- Ensure port 5000 is available
+- Start the dashboard at http://localhost:5000
 
 ### Basic Commands
 
@@ -47,11 +54,21 @@ npm run dev
 # Run all tests
 npm test
 
+# Run Jest tests specifically  
+npm run test:jest
+npm run test:jest:watch  # Watch mode
+
 # Lint all projects
 npm run lint
 
 # Build all projects
 npm run build
+
+# Validate Claude rules
+npm run validate:clauderules
+
+# A2A Security administration
+npm run a2a:security
 ```
 
 ### Web Application
@@ -62,22 +79,11 @@ To start the web application specifically:
 # Navigate to the web application directory
 cd apps/web
 
-# Install web app dependencies if needed
-npm install
-
-# Start web development server
+# Start web development server (uses Vite)
 npm run dev
 ```
 
 The web application will be available at http://localhost:5000 with hot reload enabled.
-
-Alternatively, you can use the enhanced start script:
-
-```bash
-# Run the improved start script from the web app directory
-cd apps/web
-./start-dashboard.sh
-```
 
 ### Nx-specific Commands
 
@@ -117,28 +123,15 @@ nx test [project-name] --watch
 nx test [project-name] --coverage
 ```
 
-## Development Conventions
+## Key Technologies
 
-### Code Style
-
-- TypeScript is used throughout the codebase with strict typing
-- Use functional programming patterns where appropriate
-- Follow the hexagonal architecture pattern for better separation of concerns
-- Use dependency injection for better testability
-
-### Testing
-
-- Write unit tests for all core functionality
-- Use integration tests for testing between modules
-- Use E2E tests for testing applications
-- Use mocks and test doubles for external dependencies
-
-### Documentation
-
-- Document all public APIs with JSDoc comments
-- Keep README files up-to-date
-- Document architectural decisions
-- Use diagrams to explain complex systems
+- **Frontend**: React 18 with Vite for fast development
+- **Backend**: Node.js with Express
+- **Testing**: Jest for unit testing
+- **Build System**: Nx for monorepo management
+- **Type System**: TypeScript with strict typing
+- **Package Manager**: npm with workspaces
+- **Web Server**: Vite dev server for the dashboard
 
 ## MCP Integration
 
@@ -150,14 +143,22 @@ The framework integrates with various MCP servers:
 - **brave-search**: External knowledge acquisition
 - **think-mcp**: Meta-cognitive reflection
 
+MCP configuration is located in `configs/mcp/`.
+
 ## Agent System
 
-The agent system is based on specialized agents that communicate with each other through a standardized protocol:
+The agent system is based on specialized agents that communicate with each other through a standardized protocol. Key components include:
 
 - **Debug Agents**: For recursive debugging and bug hunting
 - **Documentation Agents**: For generating documentation from code
 - **Git Agents**: For integrating with Git workflows
 - **Orchestrator**: For coordinating agent activities
+
+Agent architecture follows the A2A (Agent-to-Agent) protocol, with security features including:
+- DNS verification
+- Message validation
+- Priority management
+- Authentication providers
 
 ## RAG Framework
 
@@ -168,6 +169,8 @@ The RAG framework provides context-aware responses by:
 3. Retrieving relevant context for a given query
 4. Generating responses augmented with retrieved information
 
+RAG configuration is located in `configs/rag/`.
+
 ## Sequential Thinking and Planning
 
 The framework implements sequential thinking and planning through:
@@ -177,14 +180,40 @@ The framework implements sequential thinking and planning through:
 3. Executing plans step by step
 4. Monitoring and adapting to changes during execution
 
+Sequential execution tools are available in `tools/mcp/integration/` and `libs/workflows/src/sequential/`.
+
+## Security Considerations
+
+The framework includes comprehensive security features:
+
+- JWT-based authentication
+- Session management
+- Security constraints configuration
+- DNS security verification
+- A2A message validation
+
+Security configuration is located in `configs/security/`.
+
 ## SAAR Workflow
 
-SAAR (Simplified Agent Architecture and Routing) provides a streamlined workflow for configuring and using the framework. The startup scripts are located in `libs/workflows/src/saar/startup/` and follow a sequential execution pattern from basic setup to advanced features.
+SAAR (Simplified Agent Architecture and Routing) provides a streamlined workflow for configuring and using the framework. Key scripts and configurations are located in:
+
+- `tools/scripts/saar/`: Administrative scripts
+- `configs/saar/`: SAAR configuration
+
+## Key Configuration Files
+
+- **Global config**: `configs/global.json`
+- **Process definitions**: `configs/processes.json`
+- **Enterprise workflows**: `configs/enterprise/workflow.json`
+- **Color schema**: `configs/color-schema/config.json`
+- **i18n settings**: `configs/i18n/config.json`
 
 ## Project Structure Notes
 
 - The project is structured as an Nx monorepo with workspaces for apps and libraries
 - Configuration files are stored in the `configs/` directory
-- Documentation is available in the `docs/` directory with subdirectories for different aspects
+- Documentation is available in the `ai_docs/` directory with subdirectories for different aspects
 - Tools and scripts for development are in the `tools/` directory
-- Examples are provided in `docs/examples/` and `tools/examples/`
+- Examples are provided in `ai_docs/examples/` and `tools/examples/`
+- Schema definitions are in `configs/schemas/` and `libs/core/src/schemas/`
