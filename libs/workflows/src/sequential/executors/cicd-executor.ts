@@ -2,6 +2,8 @@ import { PlanStep, ExecutionResult } from "../types";
 import { BaseExecutor } from './base-executor';
 import configManager, { ConfigType } from '../../../../core/src/config/config-manager';
 import { ClaudeError } from '../../../../core/src/error/error-handler';
+import { spawn } from 'child_process';
+import fetch from 'node-fetch';
 
 /**
  * CI/CD-specific execution implementation.
@@ -61,35 +63,117 @@ export class CICDExecutor extends BaseExecutor {
   private async lintCode(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
     this.logger.info('Linting code', { linters: step.data?.linters, fix: step.data?.fix });
 
-    // TODO: Implement actual linting command execution (e.g., using child_process.spawn or a library)
-    // Example: const { stdout, stderr, exitCode } = await executeCommandAsync('eslint . --format=json');
-    
-    // Simulating linting results
-    const simulatedExitCode = 0; // 0 for success, 1 for errors
-    const simulatedOutput = {
-      totalFiles: 120,
-      filesWithIssues: step.data?.fix ? 0 : 5, // Assume fix resolves issues
-      issuesBySeverity: {
-        error: step.data?.fix ? 0 : 2,
-        warning: 8,
-        info: 15
-      },
-      issuesFixed: step.data?.fix ? 10 : 0
-    };
+    const linter = step.data?.linter || 'eslint'; // Default to eslint
+    const fix = step.data?.fix || false;
+    const args = ['.', '--format=json'];
+    if (fix) {
+      args.push('--fix');
+    }
 
-    const success = simulatedExitCode === 0 || (step.data?.fix && simulatedOutput.issuesBySeverity.error === 0);
-    
-    const message = success
-        ? `Linting completed. Files checked: ${simulatedOutput.totalFiles}. Issues fixed: ${simulatedOutput.issuesFixed}.`
-        : `Linting found ${simulatedOutput.issuesBySeverity.error} errors.`;
-    return {
-      type: 'lint',
-      success,
-      stepId: step.id,
-      message,
-      summary: message,
-      data: { lintResults: simulatedOutput }
-    };
+    try {
+      const process = spawn(linter, args);
+
+      let stdout = '';
+      let stderr = '';
+
+      process.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      process.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      return new Promise((resolve) => {
+        process.on('close', (code) => {
+          if (stderr && code !== 0) { // ESLint often outputs to stderr even on success with warnings
+            this.logger.warn(`Linter ${linter} stderr:`, { stderr });
+          }
+
+          let lintResults: any = {};
+          let filesWithIssues = 0;
+          let errors = 0;
+          let warnings = 0;
+          let issuesFixed = 0; // This is harder to get accurately without parsing specific linter output
+
+          try {
+            const parsedOutput = JSON.parse(stdout);
+            // Assuming ESLint JSON format: Array of objects, each with filePath, messages, errorCount, warningCount, fixableErrorCount, fixableWarningCount
+            parsedOutput.forEach((fileResult: any) => {
+              if (fileResult.errorCount > 0 || fileResult.warningCount > 0) {
+                filesWithIssues++;
+              }
+              errors += fileResult.errorCount;
+              warnings += fileResult.warningCount;
+              // ESLint's output doesn't directly say "issuesFixed" in a simple summary for --fix.
+              // It modifies files in place. We might need a more complex way to track this if essential.
+              // For now, we'll rely on the error/warning counts after --fix.
+            });
+            lintResults = {
+              totalFiles: parsedOutput.length,
+              filesWithIssues,
+              issuesBySeverity: { error: errors, warning: warnings, info: 0 }, // Info not typically in ESLint JSON
+              issuesFixed: fix ? 'attempted' : 0, // Placeholder, as direct count is complex
+              rawOutput: parsedOutput,
+            };
+          } catch (e) {
+            this.logger.error('Failed to parse linter output as JSON', { stdout, error: e });
+            // If JSON parsing fails, use the exit code and stderr
+            const success = code === 0;
+            const message = success ? 'Linting completed (unable to parse JSON output).' : `Linting failed with code ${code}.`;
+            resolve({
+              type: 'lint',
+              success,
+              stepId: step.id,
+              message,
+              summary: message,
+              error: success ? undefined : stderr || 'Linter execution failed.',
+              data: { rawStdout: stdout, rawStderr: stderr, exitCode: code }
+            });
+            return;
+          }
+
+          const success = code === 0 || (fix && errors === 0); // Success if exit code is 0, or if --fix was used and no errors remain
+          const message = success
+            ? `Linting completed. Files checked: ${lintResults.totalFiles}. Errors: ${errors}, Warnings: ${warnings}.`
+            : `Linting found ${errors} errors and ${warnings} warnings.`;
+
+          resolve({
+            type: 'lint',
+            success,
+            stepId: step.id,
+            message,
+            summary: message,
+            error: !success ? stderr || `${linter} exited with code ${code}` : undefined,
+            data: { lintResults, exitCode: code }
+          });
+        });
+
+        process.on('error', (err) => {
+          this.logger.error(`Failed to start linter ${linter}`, { error: err });
+          resolve({
+            type: 'lint',
+            success: false,
+            stepId: step.id,
+            message: `Failed to start linter ${linter}: ${err.message}`,
+            summary: `Failed to start linter ${linter}.`,
+            error: err.message,
+            data: { error: err }
+          });
+        });
+      });
+    } catch (error) {
+      this.logger.error('Error during lintCode execution setup', { error });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error during lint setup';
+      return {
+        type: 'lint',
+        success: false,
+        stepId: step.id,
+        error: errorMessage,
+        summary: `Error setting up lint step: ${errorMessage}`,
+        data: { error }
+      };
+    }
   }
 
   /**
@@ -98,41 +182,177 @@ export class CICDExecutor extends BaseExecutor {
   private async runTests(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
     this.logger.info('Running tests', { testTypes: step.data?.testTypes, coverage: step.data?.coverage });
 
-    // TODO: Implement actual test execution command (e.g., 'npm test -- --coverage' or 'jest')
-    // Example: const { stdout, stderr, exitCode } = await executeCommandAsync('npm test -- --json');
+    const testCommand = step.data?.testCommand || 'npm'; // Default to npm
+    const testArgs = step.data?.testArgs || ['test']; // Default to 'test' for npm
+    const coverage = step.data?.coverage || false;
+    const jestJsonOutput = step.data?.jestJsonOutput || '--json'; // Specific to Jest, adjust if using other runners
 
-    // Simulating test results
-    const simulatedTestResults = {
-      testTypes: step.data?.testTypes || ['unit', 'integration'],
-      totalTests: 250,
-      passed: 245,
-      failed: 5,
-      skipped: 3,
-      coverage: step.data?.coverage ? {
-        statements: 87.5,
-        branches: 82.3,
-        functions: 91.2,
-        lines: 88.6,
-        passesThreshold: true, // This would come from the test runner's output
-      } : undefined, // Use undefined if coverage is not requested or not available
-    };
-    
-    const success = simulatedTestResults.failed === 0 &&
-                   (step.data?.coverage ? simulatedTestResults.coverage?.passesThreshold === true : true);
-    
-    const message = success
-        ? `${simulatedTestResults.passed}/${simulatedTestResults.totalTests} tests passed.` +
-          (simulatedTestResults.coverage ? ` Coverage: ${simulatedTestResults.coverage.lines}%.` : '')
-        : `${simulatedTestResults.failed} tests failed.` +
-          (simulatedTestResults.coverage && !simulatedTestResults.coverage.passesThreshold ? ' Coverage threshold not met.' : '');
-    return {
-      type: 'test',
-      success,
-      stepId: step.id,
-      message,
-      summary: message,
-      data: { testResults: simulatedTestResults },
-    };
+    const finalArgs = [...testArgs];
+    if (coverage) {
+      finalArgs.push('--coverage');
+    }
+    // Add Jest's JSON output flag if not already present and if it's likely Jest
+    if (testCommand.includes('jest') || (testCommand === 'npm' && testArgs.includes('test'))) {
+        if(!finalArgs.find(arg => arg.startsWith('--json'))) {
+            finalArgs.push(jestJsonOutput);
+            finalArgs.push('--outputFile=test-results.json'); // Direct Jest JSON output to a file
+        }
+    }
+
+
+    try {
+      const process = spawn(testCommand, finalArgs);
+      let stdout = '';
+      let stderr = '';
+
+      process.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      process.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      return new Promise((resolve) => {
+        process.on('close', async (code) => { // Make this async to read the file
+          if (stderr && code !== 0) {
+            this.logger.warn(`Test runner ${testCommand} stderr:`, { stderr });
+          }
+
+          let testResults: any = {};
+          let numTotalTests = 0;
+          let numPassedTests = 0;
+          let numFailedTests = 0;
+          let numPendingTests = 0; // Jest calls skipped tests "pending" in some contexts
+          let coverageData: any = undefined;
+
+          // Attempt to read and parse Jest's JSON output
+          // Note: Jest with --json might print to stdout or a file. Here we assume file.
+          // If it prints to stdout, parsing `stdout` directly would be the approach.
+          let rawJsonOutput = '';
+          try {
+            // Check if test-results.json was created
+            const fs = require('fs').promises;
+            try {
+                rawJsonOutput = await fs.readFile('test-results.json', 'utf-8');
+                const parsedOutput = JSON.parse(rawJsonOutput);
+
+                numTotalTests = parsedOutput.numTotalTests || 0;
+                numPassedTests = parsedOutput.numPassedTests || 0;
+                numFailedTests = parsedOutput.numFailedTests || 0;
+                numPendingTests = parsedOutput.numPendingTests || 0;
+
+                if (parsedOutput.coverageMap && coverage) {
+                    // Simplified coverage summary; real parsing is more complex
+                    // This is a placeholder. Actual Jest coverage reporters output detailed HTML/JSON.
+                    // For a simple summary, you might need to parse text output or use a specific Jest reporter.
+                    coverageData = {
+                        // Example: extract global statement coverage if available
+                        statements: parsedOutput.coverageMap?.data ? (parsedOutput.coverageMap.getCoverageSummary().statements.pct) : 'N/A',
+                        // ... other coverage metrics
+                        passesThreshold: true, // This would need to be determined based on configured thresholds
+                    };
+                }
+                testResults = parsedOutput; // Store the full parsed output
+            } catch (fileError: any) {
+                 this.logger.warn('Could not read or parse test-results.json, attempting to parse stdout for Jest JSON', { fileError: fileError.message, stdout });
+                 // Fallback to parsing stdout if file read fails
+                 if (stdout.trim()) {
+                    try {
+                        const parsedStdout = JSON.parse(stdout);
+                        numTotalTests = parsedStdout.numTotalTests || 0;
+                        numPassedTests = parsedStdout.numPassedTests || 0;
+                        numFailedTests = parsedStdout.numFailedTests || 0;
+                        numPendingTests = parsedStdout.numPendingTests || 0;
+                        if (parsedStdout.coverageMap && coverage) {
+                             coverageData = {
+                                statements: parsedStdout.coverageMap?.data ? (parsedStdout.coverageMap.getCoverageSummary().statements.pct) : 'N/A',
+                                passesThreshold: true,
+                            };
+                        }
+                        testResults = parsedStdout;
+                    } catch(stdoutParseError: any) {
+                        this.logger.error('Failed to parse test runner stdout as JSON', { stdout, error: stdoutParseError.message });
+                    }
+                 } else {
+                    this.logger.info('No test-results.json found and stdout is empty.');
+                 }
+            }
+
+
+          } catch (e: any) {
+            this.logger.error('Failed to parse test runner output as JSON', { rawJsonOutput, stdout, error: e.message });
+            // If JSON parsing fails, rely on exit code and stderr
+          }
+
+          // If parsing failed or didn't provide counts, use exit code as primary indicator
+          if (numTotalTests === 0 && code !== 0 && !rawJsonOutput && !stdout.trim()) {
+             const success = code === 0;
+             const message = success ? 'Tests completed (unable to parse JSON output).' : `Tests failed with code ${code}.`;
+             resolve({
+                type: 'test',
+                success,
+                stepId: step.id,
+                message,
+                summary: message,
+                error: success ? undefined : stderr || 'Test execution failed.',
+                data: { rawStdout: stdout, rawStderr: stderr, exitCode: code }
+            });
+            return;
+          }
+
+
+          const success = code === 0 && numFailedTests === 0; // Exit code 0 and no failed tests
+          let message = `${numPassedTests}/${numTotalTests} tests passed.`;
+          if (numFailedTests > 0) message += ` ${numFailedTests} failed.`;
+          if (numPendingTests > 0) message += ` ${numPendingTests} skipped.`;
+          if (coverage && coverageData) {
+            message += ` Coverage: ${coverageData.statements}%.`;
+            if (coverageData.passesThreshold === false) { // Explicitly check for false
+              message += ' Coverage threshold not met.';
+            }
+          }
+          if (!success && !message.includes('failed')) {
+              message = `Tests failed (exit code ${code}). ` + message;
+          }
+
+
+          resolve({
+            type: 'test',
+            success,
+            stepId: step.id,
+            message,
+            summary: message,
+            error: !success ? stderr || `${testCommand} exited with code ${code}` : undefined,
+            data: { testResults, coverageData, exitCode: code, rawStdout: stdout, rawStderr: stderr },
+          });
+        });
+
+        process.on('error', (err) => {
+          this.logger.error(`Failed to start test runner ${testCommand}`, { error: err });
+          resolve({
+            type: 'test',
+            success: false,
+            stepId: step.id,
+            message: `Failed to start test runner ${testCommand}: ${err.message}`,
+            summary: `Failed to start test runner ${testCommand}.`,
+            error: err.message,
+            data: { error: err }
+          });
+        });
+      });
+    } catch (error) {
+      this.logger.error('Error during runTests execution setup', { error });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error during test setup';
+      return {
+        type: 'test',
+        success: false,
+        stepId: step.id,
+        error: errorMessage,
+        summary: `Error setting up test step: ${errorMessage}`,
+        data: { error }
+      };
+    }
   }
 
   /**
@@ -141,48 +361,115 @@ export class CICDExecutor extends BaseExecutor {
   private async buildProject(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
     this.logger.info('Building project', { production: step.data?.production, optimize: step.data?.optimize });
 
-    // TODO: Implement actual build command (e.g., 'npm run build' or 'webpack')
-    // Example: const { stdout, stderr, exitCode } = await executeCommandAsync('npm run build');
-    
-    // Simulating build results
-    const simulatedBuildSuccess = true; // This would come from the build process
-    const buildDuration = Math.floor(Math.random() * 100) + 50; // Random build time
-    const artifacts = [
-      { name: 'app.js', size: 1240000, path: 'dist/app.js' },
-      { name: 'styles.css', size: 356000, path: 'dist/styles.css' },
-    ];
-    const totalSize = artifacts.reduce((sum, art) => sum + art.size, 0);
+    const buildCommand = step.data?.buildCommand || 'npm'; // Default to npm
+    const buildArgs = step.data?.buildArgs || ['run', 'build']; // Default to 'run build' for npm
+    const production = step.data?.production || false; // Assume development build by default
+    const optimize = step.data?.optimize || false;
 
-    if (!simulatedBuildSuccess) {
-      const buildErrorMessage = 'Project build failed.';
+    const finalArgs = [...buildArgs];
+    if (production) {
+      // Add production flags if applicable, this is highly dependent on the build tool
+      // For example, webpack might use '--mode production'
+      // For npm scripts, it's assumed the script itself handles production builds
+      this.logger.info('Production build flag set, ensure your build script handles this.');
+    }
+    if (optimize) {
+      // Add optimization flags if applicable
+      this.logger.info('Optimization flag set, ensure your build script handles this.');
+    }
+
+    const startTime = Date.now();
+
+    try {
+      const process = spawn(buildCommand, finalArgs);
+      let stdout = '';
+      let stderr = '';
+
+      process.stdout.on('data', (data) => {
+        stdout += data.toString();
+        this.logger.debug('Build stdout:', data.toString());
+      });
+
+      process.stderr.on('data', (data) => {
+        stderr += data.toString();
+        this.logger.debug('Build stderr:', data.toString());
+      });
+
+      return new Promise((resolve) => {
+        process.on('close', (code) => {
+          const duration = (Date.now() - startTime) / 1000; // Duration in seconds
+          if (code !== 0) {
+            const buildErrorMessage = `Project build failed with code ${code}.`;
+            this.logger.error(buildErrorMessage, { stderr, stdout });
+            resolve({
+              type: 'build',
+              success: false,
+              stepId: step.id,
+              message: buildErrorMessage,
+              error: stderr || 'Build process exited with an error.',
+              summary: buildErrorMessage,
+              data: { buildResults: { success: false, duration }, rawStdout: stdout, rawStderr: stderr, exitCode: code }
+            });
+            return;
+          }
+
+          // TODO: Implement logic to find and list build artifacts.
+          // This is highly dependent on the project structure and build tool.
+          // For example, you might look in a 'dist' or 'build' folder.
+          // For now, we'll use a placeholder.
+          const artifacts = [
+            { name: 'placeholder.js', size: 0, path: 'dist/placeholder.js' }
+          ];
+          const totalSize = artifacts.reduce((sum, art) => sum + art.size, 0);
+
+          const buildResults = {
+            success: true,
+            duration,
+            artifacts,
+            totalSize,
+            optimizationLevel: optimize ? 'high' : 'standard', // Reflect input
+            productionBuild: production, // Reflect input
+          };
+
+          const successMessage = `Build completed in ${buildResults.duration.toFixed(2)}s. ${buildResults.artifacts.length} artifacts produced (${(buildResults.totalSize / (1024 * 1024)).toFixed(2)}MB).`;
+          this.logger.info(successMessage, { buildResults });
+          resolve({
+            type: 'build',
+            success: true,
+            stepId: step.id,
+            message: successMessage,
+            summary: successMessage,
+            data: { buildResults, rawStdout: stdout, exitCode: code },
+          });
+        });
+
+        process.on('error', (err) => {
+          const duration = (Date.now() - startTime) / 1000;
+          this.logger.error(`Failed to start build command ${buildCommand}`, { error: err });
+          resolve({
+            type: 'build',
+            success: false,
+            stepId: step.id,
+            message: `Failed to start build command ${buildCommand}: ${err.message}`,
+            summary: `Failed to start build command ${buildCommand}.`,
+            error: err.message,
+            data: { error: err, duration }
+          });
+        });
+      });
+    } catch (error) {
+      const duration = (Date.now() - startTime) / 1000;
+      this.logger.error('Error during buildProject execution setup', { error });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error during build setup';
       return {
         type: 'build',
         success: false,
         stepId: step.id,
-        message: buildErrorMessage,
-        error: 'Build process exited with an error.', // Or more specific error from stderr
-        summary: buildErrorMessage,
-        data: { buildResults: { success: false, duration: buildDuration } }
+        error: errorMessage,
+        summary: `Error setting up build step: ${errorMessage}`,
+        data: { error, duration }
       };
     }
-    
-    const buildResults = {
-      success: true,
-      duration: buildDuration,
-      artifacts,
-      totalSize,
-      optimizationLevel: step.data?.optimize ? 'high' : 'standard',
-    };
-    
-    const successMessage = `Build completed in ${buildResults.duration}s. ${buildResults.artifacts.length} artifacts produced (${(buildResults.totalSize / (1024 * 1024)).toFixed(2)}MB).`;
-    return {
-      type: 'build',
-      success: true,
-      stepId: step.id,
-      message: successMessage,
-      summary: successMessage,
-      data: { buildResults },
-    };
   }
 
   /**
@@ -190,10 +477,13 @@ export class CICDExecutor extends BaseExecutor {
    */
   private async deployProject(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
     const environment = step.data?.environment || 'staging';
-    const strategy = step.data?.strategy || 'blue-green';
-    this.logger.info('Deploying project', { environment, strategy });
-    
-    const previousBuildStep = Object.values(context).find(s => (s as ExecutionResult).stepId === 'build') as ExecutionResult | undefined;
+    const strategy = step.data?.strategy || 'blue-green'; // Example strategy
+    const deployCommand = step.data?.deployCommand || 'echo'; // Placeholder: use a real deploy command/script
+    const deployArgs = step.data?.deployArgs || [`Deploying to ${environment} via ${strategy}`]; // Placeholder args
+
+    this.logger.info('Deploying project', { environment, strategy, command: deployCommand, args: deployArgs });
+
+    const previousBuildStep = Object.values(context).find(s => (s as ExecutionResult).type ==='build') as ExecutionResult | undefined;
     if (!previousBuildStep || !previousBuildStep.success || !previousBuildStep.data?.buildResults?.success) {
       const errorMsg = 'Cannot deploy: previous build step failed or build artifacts are missing.';
       this.logger.error(errorMsg, { buildContext: previousBuildStep });
@@ -204,51 +494,118 @@ export class CICDExecutor extends BaseExecutor {
         error: errorMsg,
         message: errorMsg,
         summary: errorMsg,
-        data: { error: errorMsg } // Ensure data field is present
+        data: { error: errorMsg }
       };
     }
     
-    // TODO: Implement actual deployment logic (e.g., using 'aws s3 sync', 'kubectl apply', or a deployment API)
-    // Example: const { stdout, stderr, exitCode } = await executeCommandAsync(`deploy-script.sh --env ${environment}`);
+    const artifactsToDeploy = previousBuildStep.data?.buildResults?.artifacts;
+    if (!artifactsToDeploy || !Array.isArray(artifactsToDeploy) || artifactsToDeploy.length === 0) {
+        const errorMsg = 'No artifacts found from build step to deploy, or artifacts are not in expected array format.';
+        this.logger.error(errorMsg, { buildContextData: previousBuildStep.data });
+        return {
+            type: 'deploy',
+            success: false,
+            stepId: step.id,
+            error: errorMsg,
+            message: errorMsg,
+            summary: errorMsg,
+            data: { error: errorMsg }
+        };
+    }
 
-    // Simulating deployment results
-    const simulatedDeploymentSuccess = true; // This would come from the deployment process
-    const deploymentDuration = Math.floor(Math.random() * 60) + 20;
-    const deploymentUrl = `https://${environment}.example.com/app-v${Date.now()}`;
+    // Actual deployment logic would involve using these artifacts
+    this.logger.info('Artifacts to deploy:', { artifactsToDeploy });
 
-    if (!simulatedDeploymentSuccess) {
-      const deployErrorMessage = `Deployment to ${environment} failed.`;
+    const startTime = Date.now();
+
+    try {
+      // This is a placeholder. Real deployment would involve complex interactions.
+      // For example, uploading files, running remote commands, etc.
+      // We'll simulate a command execution.
+      const process = spawn(deployCommand, deployArgs);
+      let stdout = '';
+      let stderr = '';
+
+      process.stdout.on('data', (data) => {
+        stdout += data.toString();
+        this.logger.debug('Deploy stdout:', data.toString());
+      });
+
+      process.stderr.on('data', (data) => {
+        stderr += data.toString();
+        this.logger.debug('Deploy stderr:', data.toString());
+      });
+
+      return new Promise((resolve) => {
+        process.on('close', (code) => {
+          const duration = (Date.now() - startTime) / 1000;
+          const deploymentUrl = `https://${environment}.example.com/app-v${Date.now()}`; // Simulated URL
+
+          if (code !== 0) {
+            const deployErrorMessage = `Deployment to ${environment} failed with code ${code}.`;
+            this.logger.error(deployErrorMessage, { stderr, stdout });
+            resolve({
+              type: 'deploy',
+              success: false,
+              stepId: step.id,
+              message: deployErrorMessage,
+              error: stderr || 'Deployment process encountered an error.',
+              summary: deployErrorMessage,
+              data: { deployResults: { success: false, environment, duration, strategy }, rawStdout: stdout, rawStderr: stderr, exitCode: code }
+            });
+            return;
+          }
+
+          const deployResults = {
+            success: true,
+            environment,
+            strategy,
+            timestamp: new Date().toISOString(),
+            deploymentId: `deploy-${Date.now()}`,
+            duration,
+            url: deploymentUrl, // This would come from the actual deployment process
+            artifactsDeployed: artifactsToDeploy.map((art: any) => art.name),
+          };
+
+          const deploySuccessMessage = `Successfully deployed to ${deployResults.environment} using ${deployResults.strategy} strategy in ${deployResults.duration.toFixed(2)}s. URL: ${deployResults.url}`;
+          this.logger.info(deploySuccessMessage, { deployResults });
+          resolve({
+            type: 'deploy',
+            success: true,
+            stepId: step.id,
+            message: deploySuccessMessage,
+            summary: deploySuccessMessage,
+            data: { deployResults, rawStdout: stdout, exitCode: code },
+          });
+        });
+
+        process.on('error', (err) => {
+          const duration = (Date.now() - startTime) / 1000;
+          this.logger.error(`Failed to start deploy command ${deployCommand}`, { error: err });
+          resolve({
+            type: 'deploy',
+            success: false,
+            stepId: step.id,
+            message: `Failed to start deploy command ${deployCommand}: ${err.message}`,
+            summary: `Failed to start deploy command ${deployCommand}.`,
+            error: err.message,
+            data: { error: err, duration }
+          });
+        });
+      });
+    } catch (error) {
+      const duration = (Date.now() - startTime) / 1000;
+      this.logger.error('Error during deployProject execution setup', { error });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error during deploy setup';
       return {
         type: 'deploy',
         success: false,
         stepId: step.id,
-        message: deployErrorMessage,
-        error: 'Deployment process encountered an error.', // Or more specific error
-        summary: deployErrorMessage,
-        data: { deployResults: { success: false, environment, duration: deploymentDuration } }
+        error: errorMessage,
+        summary: `Error setting up deploy step: ${errorMessage}`,
+        data: { error, duration }
       };
     }
-
-    const deployResults = {
-      success: true,
-      environment,
-      strategy,
-      timestamp: new Date().toISOString(),
-      deploymentId: `deploy-${Date.now()}`,
-      duration: deploymentDuration,
-      url: deploymentUrl,
-      artifactsDeployed: previousBuildStep.data?.buildResults?.artifacts.map((art: any) => art.name),
-    };
-    
-    const deploySuccessMessage = `Successfully deployed to ${deployResults.environment} using ${deployResults.strategy} strategy in ${deployResults.duration}s. URL: ${deployResults.url}`;
-    return {
-      type: 'deploy',
-      success: true,
-      stepId: step.id,
-      message: deploySuccessMessage,
-      summary: deploySuccessMessage,
-      data: { deployResults },
-    };
   }
 
   /**
@@ -256,79 +613,111 @@ export class CICDExecutor extends BaseExecutor {
    */
   private async verifyDeployment(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
     const performHealthChecks = step.data?.healthChecks !== false; // Default to true
+    const healthCheckEndpoints = step.data?.healthCheckEndpoints || ['/health']; // Default health endpoint
     const performSmokeTests = step.data?.smokeTests !== false;   // Default to true
-    this.logger.info('Verifying deployment', { performHealthChecks, performSmokeTests });
+    const smokeTestCommand = step.data?.smokeTestCommand || 'echo'; // Placeholder
+    const smokeTestArgs = step.data?.smokeTestArgs || ['Simulating smoke tests...']; // Placeholder
 
-    const previousDeployStep = Object.values(context).find(s => (s as ExecutionResult).stepId === 'deploy') as ExecutionResult | undefined;
+    this.logger.info('Verifying deployment', { performHealthChecks, healthCheckEndpoints, performSmokeTests });
+
+    const previousDeployStep = Object.values(context).find(s => (s as ExecutionResult).type === 'deploy') as ExecutionResult | undefined;
     if (!previousDeployStep || !previousDeployStep.success || !previousDeployStep.data?.deployResults?.success) {
       const errorMsg = 'Cannot verify deployment: previous deployment step failed or deployment data is missing.';
       this.logger.error(errorMsg, { deployContext: previousDeployStep });
-      return {
-        type: 'verify',
-        success: false,
-        stepId: step.id,
-        error: errorMsg,
-        message: errorMsg,
-        summary: errorMsg,
-        data: { error: errorMsg }
-      };
+      return { type: 'verify', success: false, stepId: step.id, error: errorMsg, message: errorMsg, summary: errorMsg, data: { error: errorMsg } };
     }
     
     const deploymentUrl = previousDeployStep.data?.deployResults?.url;
     if (!deploymentUrl) {
       const errorMsg = 'Cannot verify deployment: deployment URL not found in context.';
       this.logger.error(errorMsg, { deployContextData: previousDeployStep.data });
-       return {
-        type: 'verify',
-        success: false,
-        stepId: step.id,
-        error: errorMsg,
-        message: errorMsg,
-        summary: errorMsg,
-        data: { error: errorMsg }
-      };
+       return { type: 'verify', success: false, stepId: step.id, error: errorMsg, message: errorMsg, summary: errorMsg, data: { error: errorMsg } };
     }
     
-    // TODO: Implement actual health checks (e.g., HTTP GET to health endpoints)
-    // TODO: Implement actual smoke tests (e.g., run a small suite of critical E2E tests)
-    // Example: const healthStatus = await checkHealth(deploymentUrl + '/health');
-    // Example: const smokeTestResult = await runSmokeTests(deploymentUrl);
-
-    // Simulating verification results
-    let healthCheckResults: any = null;
+    let healthCheckResults: any = { passed: 0, failed: 0, checked: 0, details: [] };
     if (performHealthChecks) {
-      healthCheckResults = {
-        endpointsChecked: 5,
-        passed: 5, // Assume all pass for simulation
-        failed: 0,
-        averageResponseTimeMs: Math.floor(Math.random() * 200) + 50,
-      };
+      this.logger.info(`Performing health checks on ${deploymentUrl}`, { endpoints: healthCheckEndpoints });
+      for (const endpoint of healthCheckEndpoints) {
+        const url = new URL(endpoint, deploymentUrl).toString();
+        healthCheckResults.checked++;
+        try {
+          const startTime = Date.now();
+          // Make sure 'fetch' is imported if you are in a Node.js environment (e.g., import fetch from 'node-fetch';)
+          const response = await fetch(url, { timeout: step.data?.healthCheckTimeout || 5000 });
+          const duration = Date.now() - startTime;
+          if (response.ok) {
+            healthCheckResults.passed++;
+            healthCheckResults.details.push({ endpoint, url, status: response.status, success: true, duration });
+            this.logger.info(`Health check passed for ${url}`, { status: response.status });
+          } else {
+            healthCheckResults.failed++;
+            healthCheckResults.details.push({ endpoint, url, status: response.status, success: false, duration, error: `Status ${response.status}` });
+            this.logger.warn(`Health check failed for ${url}`, { status: response.status });
+          }
+        } catch (error: any) {
+          healthCheckResults.failed++;
+          healthCheckResults.details.push({ endpoint, url, success: false, error: error.message });
+          this.logger.error(`Health check error for ${url}`, { error: error.message });
+        }
+      }
     }
 
-    let smokeTestResults: any = null;
+    let smokeTestResultsData: any = { success: true, message: 'Smoke tests not performed or passed.', rawStdout: '', rawStderr: '', exitCode: 0 };
     if (performSmokeTests) {
-      smokeTestResults = {
-        testsRun: 8,
-        passed: 8, // Assume all pass
-        failed: 0,
-      };
+      this.logger.info('Performing smoke tests', { command: smokeTestCommand, args: smokeTestArgs });
+      // This is a placeholder for actual smoke test execution
+      // You would typically run a command (e.g., a small E2E test suite)
+      const smokeProcess = spawn(smokeTestCommand, smokeTestArgs);
+      let smokeStdout = '';
+      let smokeStderr = '';
+      smokeProcess.stdout.on('data', (data) => smokeStdout += data.toString());
+      smokeProcess.stderr.on('data', (data) => smokeStderr += data.toString());
+
+      smokeTestResultsData = await new Promise<any>(resolve => {
+        smokeProcess.on('close', code => {
+          resolve({
+            success: code === 0,
+            message: code === 0 ? 'Smoke tests passed.' : `Smoke tests failed with code ${code}.`,
+            rawStdout: smokeStdout,
+            rawStderr: smokeStderr,
+            exitCode: code,
+            testsRun: smokeTestCommand === 'echo' ? 0 : 1, // Simplistic, real count would be from output
+            passed: smokeTestCommand === 'echo' ? 0 : (code === 0 ? 1: 0),
+            failed: smokeTestCommand === 'echo' ? 0 : (code !== 0 ? 1: 0),
+          });
+        });
+        smokeProcess.on('error', err => {
+          this.logger.error('Failed to start smoke test command', { error: err });
+          resolve({ success: false, message: `Failed to start smoke tests: ${err.message}`, error: err.message, testsRun: 0, passed: 0, failed: 0 });
+        });
+      });
+      if (!smokeTestResultsData.success) {
+          this.logger.warn('Smoke tests failed', { results: smokeTestResultsData });
+      } else {
+          this.logger.info('Smoke tests completed', { results: smokeTestResultsData });
+      }
     }
     
     const overallSuccess =
-      (!performHealthChecks || (healthCheckResults && healthCheckResults.failed === 0)) &&
-      (!performSmokeTests || (smokeTestResults && smokeTestResults.failed === 0));
+      (!performHealthChecks || healthCheckResults.failed === 0) &&
+      (!performSmokeTests || smokeTestResultsData.success);
 
     let message = 'Deployment verification: ';
-    if (performHealthChecks && healthCheckResults) {
-      message += `${healthCheckResults.passed}/${healthCheckResults.endpointsChecked} health checks passed. `;
+    if (performHealthChecks && healthCheckResults.checked > 0) {
+      message += `${healthCheckResults.passed}/${healthCheckResults.checked} health checks passed. `;
+    } else if (performHealthChecks) {
+      message += `No health checks performed or endpoints specified. `;
     }
-    if (performSmokeTests && smokeTestResults) {
-      message += `${smokeTestResults.passed}/${smokeTestResults.testsRun} smoke tests passed.`;
+
+    if (performSmokeTests) {
+      message += smokeTestResultsData.message;
     }
+    
     if (!performHealthChecks && !performSmokeTests) {
       message += 'No verification steps performed as per configuration.';
     }
-    if (!overallSuccess) {
+
+    if (!overallSuccess && !message.toLowerCase().includes('failed')) {
         message = 'Deployment verification failed. ' + message;
     }
     
@@ -338,7 +727,11 @@ export class CICDExecutor extends BaseExecutor {
       stepId: step.id,
       message,
       summary: message,
-      data: { healthCheckResults, smokeTestResults, deploymentUrlChecked: deploymentUrl },
+      data: {
+          healthCheckResults: performHealthChecks ? healthCheckResults : undefined,
+          smokeTestResults: performSmokeTests ? smokeTestResultsData : undefined,
+          deploymentUrlChecked: deploymentUrl
+      },
     };
   }
 
@@ -346,18 +739,23 @@ export class CICDExecutor extends BaseExecutor {
    * Sends notifications about pipeline results
    */
   private async sendNotifications(step: PlanStep, context: Record<string, any>): Promise<ExecutionResult> {
-    const channels = step.data?.channels || ['email', 'slack'];
+    const channels = step.data?.channels || ['email', 'slack']; // e.g., ['email', 'slack']
     const onlyOnFailure = step.data?.onlyOnFailure === true;
-    const recipients = step.data?.recipients || ['dev-team@example.com', '#cicd-alerts'];
+    const recipientsByChannel = step.data?.recipientsByChannel || { // More granular control
+      email: ['dev-team@example.com', 'product-manager@example.com'],
+      slack: ['#cicd-alerts', '#dev-channel'],
+    };
+    const defaultRecipients = step.data?.defaultRecipients || ['default-notification-group@example.com'];
 
-    this.logger.info('Preparing to send notifications', { channels, onlyOnFailure, recipients });
+
+    this.logger.info('Preparing to send notifications', { channels, onlyOnFailure, recipientsByChannel });
     
-    const pipelineSteps = Object.values(context).filter(s => (s as ExecutionResult).stepId !== step.id) as ExecutionResult[];
+    const pipelineSteps = Object.values(context).filter(s => (s as ExecutionResult).type !== 'notify' && (s as ExecutionResult).stepId) as ExecutionResult[];
     const overallSuccess = pipelineSteps.every(s => s.success);
     
     if (onlyOnFailure && overallSuccess) {
-      this.logger.info('Skipping notifications: pipeline succeeded and onlyOnFailure is true.');
-      const skipMessage = 'Notifications skipped as pipeline succeeded and onlyOnFailure is enabled.';
+      const skipMessage = 'Notifications skipped: pipeline succeeded and onlyOnFailure is true.';
+      this.logger.info(skipMessage);
       return {
         type: 'notify',
         success: true,
@@ -368,47 +766,66 @@ export class CICDExecutor extends BaseExecutor {
       };
     }
     
-    // TODO: Implement actual notification logic (e.g., using an email library, Slack API, etc.)
-    // Example: await sendEmail(recipients, subject, body);
-    // Example: await postToSlackChannel(channel, message);
+    const messageSummary = pipelineSteps.map(s => {
+      let summary = `${s.type} (${s.stepId}): ${s.success ? 'OK' : 'Failed'}`;
+      if(!s.success) summary += ` - Error: ${s.error || s.message || 'Unknown error'}`;
+      return summary;
+    }).join('\n');
 
-    const messageSummary = pipelineSteps.map(s => `${s.stepId}: ${s.success ? 'OK' : 'Failed - ' + (s.error || s.message)}`).join('\n');
-    const notificationSubject = `CI/CD Pipeline ${overallSuccess ? 'Succeeded' : 'Failed'}`;
-    const notificationBody = `Pipeline status: ${overallSuccess ? 'SUCCESS' : 'FAILURE'}\n\nDetails:\n${messageSummary}`;
+    const notificationSubject = `CI/CD Pipeline Report (${step.data?.pipelineName || 'Unnamed Pipeline'}): ${overallSuccess ? 'Succeeded' : 'Failed'}`;
+    const notificationBody = `Pipeline Status: ${overallSuccess ? 'SUCCESS' : 'FAILURE'}\n\nStep Summary:\n${messageSummary}\n\nFull Context (JSON):\n${JSON.stringify(context, null, 2)}`;
 
-    this.logger.info(`Sending ${overallSuccess ? 'success' : 'failure'} notification.`, { subject: notificationSubject, channels });
+    this.logger.info(`Notification details:`, { subject: notificationSubject, channels });
 
-    // Simulating notification sending
-    const simulatedNotificationSuccess = true; // Assume sending always works for this simulation
+    let allNotificationsSentSuccessfully = true;
+    const sentDetails: any[] = [];
 
-    if (!simulatedNotificationSuccess) {
-      const notificationErrorMessage = 'Failed to send notifications.';
-      return {
-        type: 'notify',
-        success: false,
-        stepId: step.id,
-        message: notificationErrorMessage,
-        error: 'Notification service returned an error.', // Or more specific error
-        summary: notificationErrorMessage,
-        data: { notificationsSent: false, channels, recipients }
-      };
+    for (const channel of channels) {
+      const recipients = recipientsByChannel[channel] || defaultRecipients;
+      if (!recipients || recipients.length === 0) {
+        this.logger.warn(`No recipients configured for channel: ${channel}. Skipping.`);
+        sentDetails.push({ channel, success: false, error: 'No recipients configured' });
+        allNotificationsSentSuccessfully = false;
+        continue;
+      }
+
+      this.logger.info(`Attempting to send notification via ${channel} to:`, { recipients });
+      // TODO: Replace with actual channel-specific sending logic
+      // Example for email: await sendEmail(recipients, notificationSubject, notificationBody);
+      // Example for Slack: await postToSlack(recipients, notificationBody);
+      
+      // Simulating send operation for now
+      const simulatedSendSuccess = Math.random() > 0.1; // 90% success rate for simulation
+      
+      if (simulatedSendSuccess) {
+        this.logger.info(`Successfully simulated sending notification via ${channel}.`);
+        sentDetails.push({ channel, success: true, recipients });
+      } else {
+        this.logger.error(`Failed to simulate sending notification via ${channel}.`);
+        sentDetails.push({ channel, success: false, error: `Simulated failure for ${channel}`, recipients });
+        allNotificationsSentSuccessfully = false;
+      }
     }
 
     const notificationResults = {
-      success: true,
-      channelsSentTo: channels,
-      recipientsNotified: recipients, // In a real scenario, this might be a count or list of actual recipients
+      success: allNotificationsSentSuccessfully,
+      channelsAttempted: channels,
+      details: sentDetails,
       messageType: overallSuccess ? 'success' : 'failure',
       timestamp: new Date().toISOString(),
     };
     
-    const notificationSuccessMessage = `Notifications sent to ${notificationResults.recipientsNotified.length} recipient groups via ${notificationResults.channelsSentTo.join(', ')}. Status: ${notificationResults.messageType}.`;
+    const finalMessage = allNotificationsSentSuccessfully
+      ? `Notifications processed. Status: ${notificationResults.messageType}. See details in data.`
+      : `Some notifications failed to send. Status: ${notificationResults.messageType}. See details in data.`;
+
     return {
       type: 'notify',
-      success: true,
+      success: allNotificationsSentSuccessfully,
       stepId: step.id,
-      message: notificationSuccessMessage,
-      summary: notificationSuccessMessage,
+      message: finalMessage,
+      summary: finalMessage,
+      error: !allNotificationsSentSuccessfully ? 'One or more notification channels failed.' : undefined,
       data: { notificationResults },
     };
   }

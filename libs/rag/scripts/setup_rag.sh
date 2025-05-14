@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # RAG Setup Script
 # ================
@@ -88,12 +89,12 @@ install_advanced_packages() {
 # Function to create minimal RAG scripts if they don't exist
 create_rag_scripts() {
   # Ensure rag directory exists
-  mkdir -p "$SCRIPT_DIR/libs/rag/src"
+  mkdir -p "$SCRIPT_DIR/../src"
   
   # Create indexing script
-  if [ ! -f "$SCRIPT_DIR/libs/rag/src/update_vector_db.py" ]; then
+  if [ ! -f "$SCRIPT_DIR/../src/update_vector_db.py" ]; then
     echo "Creating indexing script..."
-    cat > "$SCRIPT_DIR/libs/rag/src/update_vector_db.py" << 'EOL'
+    cat > "$SCRIPT_DIR/../src/update_vector_db.py" << 'EOL'
 #!/usr/bin/env python3
 """
 Vector Database Updater Script
@@ -162,13 +163,13 @@ if __name__ == "__main__":
     main()
 EOL
 
-    chmod +x "$SCRIPT_DIR/libs/rag/src/update_vector_db.py"
+    chmod +x "$SCRIPT_DIR/../src/update_vector_db.py"
   fi
   
   # Create query script
-  if [ ! -f "$SCRIPT_DIR/libs/rag/src/query_rag.py" ]; then
+  if [ ! -f "$SCRIPT_DIR/../src/query_rag.py" ]; then
     echo "Creating query script..."
-    cat > "$SCRIPT_DIR/libs/rag/src/query_rag.py" << 'EOL'
+    cat > "$SCRIPT_DIR/../src/query_rag.py" << 'EOL'
 #!/usr/bin/env python3
 """
 RAG Query Script
@@ -246,13 +247,13 @@ if __name__ == "__main__":
     main()
 EOL
 
-    chmod +x "$SCRIPT_DIR/libs/rag/src/query_rag.py"
+    chmod +x "$SCRIPT_DIR/../src/query_rag.py"
   fi
   
   # Create rag_framework.py
-  if [ ! -f "$SCRIPT_DIR/libs/rag/src/rag_framework.py" ]; then
+  if [ ! -f "$SCRIPT_DIR/../src/rag_framework.py" ]; then
     echo "Creating RAG framework script..."
-    cat > "$SCRIPT_DIR/libs/rag/src/rag_framework.py" << 'EOL'
+    cat > "$SCRIPT_DIR/../src/rag_framework.py" << 'EOL'
 #!/usr/bin/env python3
 """
 RAG Framework
@@ -271,7 +272,8 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'logs', 'rag.log'))
+        # Log file will be in libs/rag/logs/rag.log
+        logging.FileHandler(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs', 'rag.log'))
     ]
 )
 
@@ -420,7 +422,7 @@ if __name__ == "__main__":
     main()
 EOL
 
-    chmod +x "$SCRIPT_DIR/libs/rag/src/rag_framework.py"
+    chmod +x "$SCRIPT_DIR/../src/rag_framework.py"
   fi
   
   echo "RAG scripts created"
@@ -428,8 +430,9 @@ EOL
 
 # Create logs directory if it doesn't exist
 ensure_logs_directory() {
-  mkdir -p "$SCRIPT_DIR/logs"
-  echo "Logs directory created at $SCRIPT_DIR/logs"
+  # This will create logs directory at libs/rag/logs
+  mkdir -p "$SCRIPT_DIR/../logs"
+  echo "Logs directory created at $SCRIPT_DIR/../logs"
 }
 
 # Main function
@@ -482,7 +485,8 @@ fi
 source "\$VENV_DIR/bin/activate"
 
 # Set PYTHONPATH
-export PYTHONPATH="\$SCRIPT_DIR:\$PYTHONPATH"
+# This will point to libs/rag/src, allowing Python to find modules there
+export PYTHONPATH="\$SCRIPT_DIR/../src:\$PYTHONPATH"
 
 # Run command or show help
 if [ \$# -eq 0 ]; then
@@ -508,11 +512,11 @@ else
       ;;
     update)
       shift
-      python "\$SCRIPT_DIR/libs/rag/src/update_vector_db.py" "\$@"
+      python "\$SCRIPT_DIR/../src/update_vector_db.py" "\$@"
       ;;
     query)
       shift
-      python "\$SCRIPT_DIR/libs/rag/src/query_rag.py" "\$@"
+      python "\$SCRIPT_DIR/../src/query_rag.py" "\$@"
       ;;
     shell)
       python
@@ -541,7 +545,7 @@ EOF
   echo "To run RAG commands:"
   echo "  ./run_rag.sh query 'How does the system work?'"
   echo "  ./run_rag.sh update docs/"
-  echo "  ./run_rag.sh run libs/rag/src/rag_framework.py"
+  echo "  ./run_rag.sh run ../src/rag_framework.py" # Adjusted path for example
   echo ""
   echo "To install additional packages:"
   echo "  source ./activate_venv.sh"

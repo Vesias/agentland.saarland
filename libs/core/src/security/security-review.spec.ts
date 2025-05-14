@@ -245,6 +245,16 @@ describe('SecurityReview', () => {
       // Base score 100 - 20 (critical) - 10 (high) - 0.5*2 (findings) = 69
       expect(report.summary.securityScore).toBe(69);
     });
+
+    // TODO: Add tests for individual default validators (validateNoApiKeyExposure, etc.)
+    // once their implementations are complete. Currently, they are placeholders.
+    // Example:
+    // it('should correctly identify API key exposure by validateNoApiKeyExposure', async () => {
+    //   // Setup context to trigger API key exposure
+    //   const report = await securityReview.runValidators({ /* ... context ... */ });
+    //   const apiKeyFinding = report.findings.find(f => f.validator === 'api-key-exposure');
+    //   expect(apiKeyFinding).toBeDefined();
+    // });
   });
 
   describe('generateRecommendations', () => {

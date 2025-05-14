@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json", // Korrigierter Pfad zur Root tsconfig.base.json
+  "compilerOptions": {
+    "outDir": "../../../dist/out-tsc", // Angepasster outDir, um Konflikte zu vermeiden
+    "module": "commonjs", // Für Jest ist commonjs oft besser geeignet
+    "types": ["jest", "node"] // Stellt sicher, dass Jest- und Node-Typen geladen werden
+  },
+  "include": ["*.ts"], // Bezieht alle .ts-Dateien in diesem Verzeichnis ein
+  "exclude": ["node_modules", "dist", "../../../dist", "../../../tmp"]
+}

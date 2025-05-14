@@ -2,11 +2,12 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as toml from 'toml'; // Diese Abhängigkeit muss später installiert werden, ggf. mit Typen: npm install toml @types/toml
+import * as toml from 'toml'; // Diese Abhängigkeit muss später installiert werden: npm install toml @types/toml --save-dev
 
 interface ProjectRules {
   name?: string;
   docs_base?: string;
+  [key: string]: any; // Für Flexibilität, falls weitere Felder existieren
 }
 
 interface AiDocsRules {
@@ -30,30 +31,29 @@ interface EnforceRules {
   scripts?: ScriptsRules;
 }
 
-interface ClauderulesConfig {
+interface ClaudeRules {
   project?: ProjectRules;
   folders?: FoldersRules;
   enforce?: EnforceRules;
-  [key: string]: any; // Für andere mögliche Top-Level-Sektionen
+  [key: string]: any; // Für Flexibilität
 }
 
-export function validateClauderules(filePath: string = './.clauderules'): void {
-  const fullPath: string = path.resolve(filePath);
+export function validateClauderules(filePath: string = './.clauderules'): string[] {
+  const fullPath = path.resolve(filePath);
   const issues: string[] = [];
 
   if (!fs.existsSync(fullPath)) {
-    console.error(`Fehler: Datei nicht gefunden unter ${fullPath}`);
-    process.exit(1);
+    issues.push(`Fehler: Datei nicht gefunden unter ${fullPath}`);
+    return issues;
   }
 
-  let rules: ClauderulesConfig;
+  let rules: ClaudeRules;
   try {
-    const fileContent: string = fs.readFileSync(fullPath, 'utf-8');
-    rules = toml.parse(fileContent) as ClauderulesConfig;
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error(`Fehler beim Parsen der TOML-Datei: ${message}`);
-    process.exit(1);
+    const fileContent = fs.readFileSync(fullPath, 'utf-8');
+    rules = toml.parse(fileContent);
+  } catch (error: any) {
+    issues.push(`Fehler beim Parsen der TOML-Datei: ${error.message}`);
+    return issues;
   }
 
   // --- Sektion [project] Prüfungen ---
@@ -66,15 +66,14 @@ export function validateClauderules(filePath: string = './.clauderules'): void {
     if (!rules.project.docs_base) {
       issues.push("Fehler: project.docs_base in Sektion [project] fehlt.");
     }
-    // Weitere Pflichtfelder für [project] können hier hinzugefügt werden
   }
 
   // --- Sektion [folders.enforce_structure.ai_docs] Prüfungen ---
   if (rules.folders?.enforce_structure?.ai_docs?.must_have) {
-    const aiDocsBasePath: string = rules.project?.docs_base || 'ai_docs/'; // Fallback, falls docs_base nicht definiert ist
-    const mustHaveFolders: string[] = rules.folders.enforce_structure.ai_docs.must_have;
-    mustHaveFolders.forEach((folder: string) => {
-      const folderPath: string = path.join(aiDocsBasePath, folder);
+    const aiDocsBasePath = rules.project?.docs_base || 'ai_docs/'; // Fallback
+    const mustHaveFolders = rules.folders.enforce_structure.ai_docs.must_have;
+    mustHaveFolders.forEach(folder => {
+      const folderPath = path.join(aiDocsBasePath, folder);
       if (!fs.existsSync(folderPath) || !fs.lstatSync(folderPath).isDirectory()) {
         issues.push(`Fehler: Das in [folders.enforce_structure.ai_docs].must_have definierte Verzeichnis '${folder}' existiert nicht unter '${aiDocsBasePath}'.`);
       }
@@ -83,30 +82,27 @@ export function validateClauderules(filePath: string = './.clauderules'): void {
 
   // --- Sektion [enforce.scripts] Prüfungen ---
   if (rules.enforce?.scripts?.only_root_script) {
-    const allowedRootScripts: string[] = rules.enforce.scripts.only_root_script;
-    allowedRootScripts.forEach((scriptName: string) => {
+    const allowedRootScripts = rules.enforce.scripts.only_root_script;
+    allowedRootScripts.forEach(scriptName => {
       if (!fs.existsSync(path.resolve(scriptName))) {
         issues.push(`Fehler: Das in [enforce.scripts].only_root_script definierte Skript '${scriptName}' existiert nicht im Root-Verzeichnis.`);
       }
     });
 
     if (rules.enforce.scripts.disallow_other_root_scripts) {
-      const rootDir: string = path.resolve('.');
-      const rootFiles: string[] = fs.readdirSync(rootDir);
-      rootFiles.forEach((file: string) => {
-        const filePathInRoot: string = path.join(rootDir, file);
-        // Prüft, ob es eine Datei ist und ausführbar sein könnte (vereinfachte Prüfung)
-        if (fs.lstatSync(filePathInRoot).isFile() && (path.extname(file) === '.sh' || path.extname(file) === '.js' || path.extname(file) === '')) {
+      const rootDir = path.resolve('.');
+      const rootFiles = fs.readdirSync(rootDir);
+      rootFiles.forEach(file => {
+        const currentFilePath = path.join(rootDir, file);
+        if (fs.lstatSync(currentFilePath).isFile() && (path.extname(file) === '.sh' || path.extname(file) === '.js' || path.extname(file) === '')) {
           if (!allowedRootScripts.includes(file)) {
-            // Zusätzliche Prüfung, um sicherzustellen, dass es sich um ein Skript handelt (heuristisch)
             try {
-                const content: string = fs.readFileSync(filePathInRoot, 'utf-8');
-                if (content.startsWith('#!/bin/bash') || content.startsWith('#!/usr/bin/env node')) {
-                     issues.push(`Fehler: Unerlaubtes Skript '${file}' im Root-Verzeichnis gefunden. Nur '${allowedRootScripts.join(', ')}' sind erlaubt.`);
-                }
-            } catch(e: unknown) {
-                // Datei konnte nicht gelesen werden oder anderer Fehler, ignoriere für diese spezielle Prüfung
-                // In einem robusten Szenario könnte hier spezifischer geloggt oder behandelt werden.
+              const content = fs.readFileSync(currentFilePath, 'utf-8');
+              if (content.startsWith('#!/bin/bash') || content.startsWith('#!/usr/bin/env node')) {
+                issues.push(`Fehler: Unerlaubtes Skript '${file}' im Root-Verzeichnis gefunden. Nur '${allowedRootScripts.join(', ')}' sind erlaubt.`);
+              }
+            } catch (e) {
+              // Datei konnte nicht gelesen werden oder ist kein Text, ignoriere
             }
           }
         }
@@ -114,25 +110,19 @@ export function validateClauderules(filePath: string = './.clauderules'): void {
     }
   }
 
+  return issues;
+}
 
-  if (issues.length > 0) {
+// Direkter Aufruf, wenn das Skript ausgeführt wird (CLI-Teil)
+if (require.main === module) {
+  const filePathArg = process.argv[2];
+  const validationIssues = validateClauderules(filePathArg);
+
+  if (validationIssues.length > 0) {
     console.error("Validierung der .clauderules fehlgeschlagen:\n");
-    issues.forEach((issue: string) => console.error(`- ${issue}`));
+    validationIssues.forEach(issue => console.error(`- ${issue}`));
     process.exit(1);
   } else {
     console.log(".clauderules erfolgreich validiert. Keine Probleme gefunden.");
   }
-}
-
-// Direkter Aufruf, wenn das Skript ausgeführt wird
-// Überprüfung, ob das Modul direkt ausgeführt wird.
-// In TypeScript ist `require.main === module` nicht direkt verfügbar oder die empfohlene Methode.
-// Eine gängige Alternative ist, dies in einer separaten Datei zu behandeln oder
-// die Ausführung basierend auf process.argv zu steuern, wenn es als CLI-Tool gedacht ist.
-// Für dieses Beispiel lassen wir den direkten Aufruf ähnlich wie im JS-Original,
-// aber in einer realen TS-Anwendung würde man dies ggf. anders strukturieren.
-if (process.argv[1] && (process.argv[1].endsWith('clauderules-validator.ts') || process.argv[1].endsWith('clauderules-validator.js'))) {
-  // Annahme: Wenn das Skript mit ts-node oder direkt mit node (nach Transpilierung) ausgeführt wird.
-  const filePathArg: string | undefined = process.argv[2];
-  validateClauderules(filePathArg);
 }

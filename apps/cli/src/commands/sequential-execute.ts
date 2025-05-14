@@ -4,6 +4,7 @@ import inquirer from 'inquirer';
 import path from 'path';
 import ora from 'ora';
 import fs from 'fs';
+import { z } from 'zod';
 import { SequentialExecutionManager, Domain, ExecutionResult, Plan, PlanStep } from '@claude-framework/workflows';
 
 export const sequentialExecuteCommand = new Command()
@@ -18,6 +19,59 @@ export const sequentialExecuteCommand = new Command()
   .action(async (options) => {
     await run(options);
   });
+
+// Zod Schemas for planParams based on domain
+const basePlanParamsSchema = z.object({
+  name: z.string().min(1),
+  description: z.string().min(1),
+});
+
+const documentationPlanParamsSchema = basePlanParamsSchema.extend({
+  patterns: z.array(z.string()).min(1),
+  excludePatterns: z.array(z.string()).optional(),
+  format: z.enum(['markdown', 'html', 'json']),
+  outputDir: z.string().min(1),
+  extractExamples: z.boolean().optional(),
+  includeApi: z.boolean().optional(),
+});
+
+const cicdPlanParamsSchema = basePlanParamsSchema.extend({
+  pipelineType: z.enum(['standard', 'deployment', 'complete']),
+  linters: z.array(z.string()).optional(),
+  autoFix: z.boolean().optional(),
+  testTypes: z.array(z.string()).optional(),
+  coverage: z.boolean().optional(),
+  environment: z.enum(['development', 'staging', 'production']).optional(),
+  deployStrategy: z.enum(['standard', 'blue-green', 'canary']).optional(),
+  notifications: z.boolean().optional(),
+});
+
+const dataPlanParamsSchema = basePlanParamsSchema.extend({
+  workflowType: z.enum(['processing', 'analysis', 'complete']),
+  sources: z.array(z.string()).min(1),
+  formats: z.array(z.string()).min(1),
+  transformations: z.array(z.string()).optional(),
+  destination: z.string().min(1),
+  analysisTypes: z.array(z.string()).optional(),
+  generateReports: z.boolean().optional(),
+  interactive: z.boolean().optional(),
+});
+
+const generalPlanParamsSchema = basePlanParamsSchema;
+
+type PlanParamsSchemaType =
+  | typeof documentationPlanParamsSchema
+  | typeof cicdPlanParamsSchema
+  | typeof dataPlanParamsSchema
+  | typeof generalPlanParamsSchema;
+
+const domainToSchemaMap: Record<Domain, PlanParamsSchemaType> = {
+  documentation: documentationPlanParamsSchema,
+  cicd: cicdPlanParamsSchema,
+  data: dataPlanParamsSchema,
+  general: generalPlanParamsSchema,
+};
+
 
 /**
  * Run the sequential execute command
@@ -93,9 +147,27 @@ export async function run(options: any = {}): Promise<void> {
   
   if (options.params) {
     try {
-      planParams = JSON.parse(options.params);
+      const parsedParams = JSON.parse(options.params);
+      const schema = domainToSchemaMap[domain];
+      if (schema) {
+        const validationResult = schema.safeParse(parsedParams);
+        if (validationResult.success) {
+          planParams = validationResult.data;
+        } else {
+          console.error(chalk.red('Invalid --params structure:'));
+          validationResult.error.errors.forEach(err => {
+            console.error(chalk.red(`  - ${err.path.join('.')}: ${err.message}`));
+          });
+          console.error(chalk.yellow('Using interactive mode to define parameters.'));
+          planParams = await getInteractivePlanParams(domain);
+        }
+      } else {
+        // Should not happen if domain is validated by commander
+        console.error(chalk.red(`Unknown domain "${domain}" for params validation. Using empty params.`));
+      }
     } catch (err) {
-      console.error(chalk.red('Invalid JSON in --params option. Using empty params.'));
+      console.error(chalk.red('Invalid JSON in --params option. Using interactive mode.'));
+      planParams = await getInteractivePlanParams(domain);
     }
   } else {
     planParams = await getInteractivePlanParams(domain);

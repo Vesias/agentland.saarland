@@ -13,7 +13,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Anthropic, MessageParam } from '@anthropic/sdk';
 
 // Import standardized config manager and logger
-import configManager, { ConfigType } from '@core/config/config-manager';
+import configManager, { ConfigType, ServerConfig } from '@core/config/config-manager';
 import { Logger } from '@core/logging/logger';
 
 // Import internationalization
@@ -38,18 +38,6 @@ export interface ServerInfo {
   description: string;
   autostart: boolean;
   running: boolean;
-}
-
-/**
- * Interface for MCP server configuration
- */
-export interface ServerConfig {
-  enabled: boolean;
-  autostart: boolean;
-  command: string;
-  args: string[];
-  description: string;
-  api_key_env?: string;
 }
 
 /**

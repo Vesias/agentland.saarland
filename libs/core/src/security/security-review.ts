@@ -79,6 +79,10 @@ export interface SecurityReviewOptions {
   autoFix?: boolean;
   strictMode?: boolean;
   reportPath?: string;
+  /**
+   * Allows for additional, unspecified options.
+   * Consider defining more specific types if possible for better type safety.
+   */
   [key: string]: any;
 }
 
@@ -89,6 +93,10 @@ export interface ValidationContext {
   targetDir?: string;
   targetFiles?: string[];
   excludePatterns?: string[];
+  /**
+   * Allows for additional, unspecified context properties.
+   * Consider defining more specific types if possible for better type safety.
+   */
   [key: string]: any;
 }
 
@@ -103,6 +111,10 @@ export interface SecurityFinding {
   description: string;
   location: string;
   timestamp: string;
+  /**
+   * Allows for additional, unspecified properties for a finding.
+   * Consider defining more specific types for known extensions.
+   */
   [key: string]: any;
 }
 
@@ -119,6 +131,10 @@ export interface SecurityVulnerability {
   location: string;
   recommendation?: string;
   timestamp: string;
+  /**
+   * Allows for additional, unspecified properties for a vulnerability.
+   * Consider defining more specific types for known extensions.
+   */
   [key: string]: any;
 }
 
@@ -139,6 +155,9 @@ export interface SecurityRecommendation {
 export interface ValidationResult {
   findings: SecurityFinding[];
   vulnerabilities: SecurityVulnerability[];
+  /**
+   * Allows for additional, unspecified properties in a validation result.
+   */
   [key: string]: any;
 }
 
@@ -180,6 +199,8 @@ export type ValidatorFunction = (context: ValidationContext) => Promise<Validati
  */
 export class SecurityReview {
   private i18n: I18n;
+  // TODO: Define a specific type for the security configuration
+  // once its structure is clearly defined and stable.
   private config: any;
   private options: SecurityReviewOptions;
   private findings: SecurityFinding[];

@@ -6,6 +6,7 @@
 
 import crypto from 'crypto';
 import { promisify } from 'util';
+import session from 'express-session';
 
 // Import standardized config manager
 // TODO: Sicherstellen, dass config_manager nach TypeScript migriert wurde und korrekte Typen exportiert
@@ -29,6 +30,9 @@ import {
   MockResponse,
   FormattedErrorResponse,
 } from './security.types';
+
+// Importiere die erweiterten Session-Typen
+import './session.types';
 
 const logger: Logger = createLogger('secure-api');
 const randomBytesAsync = promisify(crypto.randomBytes);

@@ -8,6 +8,7 @@
 import crypto from 'crypto';
 import { promisify } from 'util';
 import { Request, Response, NextFunction } from 'express';
+import session from 'express-session'; // Default Import statt Named Import
 
 // Import standardized config manager
 import configManager, { ConfigType } from '../config/config-manager';
@@ -20,6 +21,9 @@ import { ValidationError, ClaudeError } from '../error/error-handler';
 
 // Import internationalization
 import { I18n } from '../i18n/i18n';
+// Die globale Namespace-Erweiterung wird entfernt, da @types/express-session
+// bereits eine Typisierung für req.session bereitstellen sollte.
+// Wir werden den csrfToken direkt beim Zugriff typisieren.
 
 /**
  * Promisified crypto functions
@@ -48,6 +52,10 @@ export interface SecureAPIOptions {
   secureHeaders?: boolean;
   inputValidation?: boolean;
   policyLevel?: SecurityPolicyLevel;
+  /**
+   * Allows for additional, unspecified options.
+   * Consider defining more specific types if possible for better type safety.
+   */
   [key: string]: any;
 }
 
@@ -141,10 +149,12 @@ export class SecureAPI {
    * @param handler - Request handler function
    * @returns Secured request handler
    */
-  public secureHandler<T = any>(
-    handler: (req: Request, res: Response, ...args: any[]) => Promise<T>
-  ): (req: Request, res: Response, ...args: any[]) => Promise<T | void> {
-    return async (req: Request, res: Response, ...args: any[]): Promise<T | void> => {
+  public secureHandler<T = any, Args extends any[] = any[]>(
+    handler: (req: Request, res: Response, ...args: Args) => Promise<T>
+  ): (req: Request, res: Response, ...args: Args) => Promise<T | void> {
+    // Die ...args: Args Typisierung ist flexibel gehalten.
+    // Für spezifischere Anwendungsfälle könnte Args genauer definiert werden (z.B. [NextFunction] für Middleware).
+    return async (req: Request, res: Response, ...args: Args): Promise<T | void> => {
       try {
         // Verify HTTPS
         if (this.options.requireHTTPS && !req.secure) {
@@ -303,7 +313,9 @@ export class SecureAPI {
                         (req.query && req.query._csrf);
     
     // Get session token
-    const sessionToken = req.session && (req.session as any).csrfToken;
+    // Wir nehmen an, dass req.session von express-session typisiert wird
+    // und fügen csrfToken spezifisch hinzu.
+    const sessionToken = req.session && (req.session as { csrfToken?: string }).csrfToken;
     
     // Validate token
     return Boolean(requestToken && sessionToken && requestToken === sessionToken);

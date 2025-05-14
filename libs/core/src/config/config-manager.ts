@@ -62,14 +62,33 @@ export class ConfigAccessError extends ConfigError {
 const DEFAULT_GLOBAL_CONFIG_PATH = path.join(os.homedir(), '.claude');
 
 /**
- * Local configuration paths
+ * Dynamically determines the project root directory.
+ * It checks if the current execution path is within a 'dist' directory (build)
+ * or directly in the source structure (development) and resolves accordingly.
+ * @returns {string} The absolute path to the project root.
+ */
+function getProjectRoot(): string {
+  // Check if 'dist' is in the path, indicating a build environment
+  if (__dirname.includes(path.sep + 'dist' + path.sep)) {
+    // Path for build structure: e.g., .../dist/libs/core/src/config -> ../../../../../
+    return path.resolve(__dirname, '../../../../..');
+  } else {
+    // Path for development structure: e.g., .../libs/core/src/config -> ../../../..
+    return path.resolve(__dirname, '../../../..');
+  }
+}
+
+const PROJECT_ROOT = getProjectRoot();
+
+/**
+ * Local configuration paths, resolved relative to the project root.
  */
 const LOCAL_CONFIG_PATHS: Record<string, string> = {
-  [ConfigType.RAG]: path.resolve(__dirname, 'rag_config.json'),
-  [ConfigType.MCP]: path.resolve(__dirname, 'mcp_config.json'),
-  [ConfigType.SECURITY]: path.resolve(__dirname, 'security_constraints.json'),
-  [ConfigType.COLOR_SCHEMA]: path.resolve(__dirname, 'color_schema_config.json'),
-  [ConfigType.I18N]: path.resolve(__dirname, 'i18n_config.json')
+  [ConfigType.RAG]: path.join(PROJECT_ROOT, 'configs', 'rag', 'config.json'),
+  [ConfigType.MCP]: path.join(PROJECT_ROOT, 'configs', 'mcp', 'config.json'), // Assuming mcp_config.json is named config.json in configs/mcp/
+  [ConfigType.SECURITY]: path.join(PROJECT_ROOT, 'configs', 'security', 'constraints.json'),
+  [ConfigType.COLOR_SCHEMA]: path.join(PROJECT_ROOT, 'configs', 'color-schema', 'config.json'),
+  [ConfigType.I18N]: path.join(PROJECT_ROOT, 'configs', 'i18n', 'config.json')
 };
 
 /**
@@ -83,7 +102,7 @@ const ServerConfigSchema = z.object({
   description: z.string(),
   api_key_env: z.string().optional(),
 });
-interface ServerConfig extends z.infer<typeof ServerConfigSchema> {}
+export interface ServerConfig extends z.infer<typeof ServerConfigSchema> {}
 
 /**
  * Interface for theme colors
@@ -595,12 +614,7 @@ export class ConfigManager {
    * 
    * @param options - Configuration options
    */
-  constructor(options: ConfigManagerOptions = {}) {
-    this.globalConfigPath = options.globalConfigPath || DEFAULT_GLOBAL_CONFIG_PATH;
-    this.schemaValidation = options.schemaValidation !== undefined ? options.schemaValidation : true;
-    this.environmentOverrides = options.environmentOverrides !== undefined ? options.environmentOverrides : true;
-    this.logger = new Logger('ConfigManager');
-    
+  private _initializeConfigMaps(): void {
     this.configs = {
       [ConfigType.RAG]: null,
       [ConfigType.MCP]: null,
@@ -610,19 +624,30 @@ export class ConfigManager {
       [ConfigType.USER]: null,
       [ConfigType.I18N]: null
     };
-    
-    this.schemas = {}; // Optional schema validation
-    this.observers = new Map(); // For config change notifications
-    this.configVersions = new Map(); // Track config versions for cache invalidation
-    
-    // Ensure global configuration path exists
+    this.schemas = {};
+    this.observers = new Map();
+    this.configVersions = new Map();
+  }
+
+  private _ensureGlobalConfigPathExists(): void {
     if (!fs.existsSync(this.globalConfigPath)) {
       try {
         fs.mkdirSync(this.globalConfigPath, { recursive: true });
       } catch (err) {
         this.logger.error(`Failed to create global configuration directory: ${(err as Error).message}`);
+        // Depending on severity, could throw an error here
       }
     }
+  }
+
+  constructor(options: ConfigManagerOptions = {}) {
+    this.globalConfigPath = options.globalConfigPath || DEFAULT_GLOBAL_CONFIG_PATH;
+    this.schemaValidation = options.schemaValidation !== undefined ? options.schemaValidation : true;
+    this.environmentOverrides = options.environmentOverrides !== undefined ? options.environmentOverrides : true;
+    this.logger = new Logger('ConfigManager');
+    
+    this._initializeConfigMaps();
+    this._ensureGlobalConfigPathExists();
   }
   
   /**
@@ -686,43 +711,49 @@ export class ConfigManager {
     }
   }
   
-  /**
-   * Loads all configurations
-   * 
-   * @returns All loaded configurations
-   */
-  public loadAllConfigs(): Record<string, ConfigData | null> {
-    // Load local configurations
+  private _loadLocalConfigs(): void {
     Object.entries(LOCAL_CONFIG_PATHS).forEach(([configType, configPath]) => {
       try {
         this.configs[configType] = loadJsonConfig(configPath, DEFAULT_CONFIGS[configType]) as ConfigData;
         this.configVersions.set(configType, Date.now());
       } catch (err) {
         this.logger.error(`Failed to load ${configType} configuration`, { error: err });
-        this.configs[configType] = DEFAULT_CONFIGS[configType];
+        this.configs[configType] = DEFAULT_CONFIGS[configType]; // Fallback to default
       }
     });
-    
-    // Load global configuration
+  }
+
+  private _loadGlobalConfig(): void {
     try {
       const globalConfigPath = path.join(this.globalConfigPath, 'config.json');
       this.configs[ConfigType.GLOBAL] = loadJsonConfig(globalConfigPath, DEFAULT_CONFIGS[ConfigType.GLOBAL]) as GlobalConfig;
       this.configVersions.set(ConfigType.GLOBAL, Date.now());
     } catch (err) {
       this.logger.error(`Failed to load global configuration`, { error: err });
-      this.configs[ConfigType.GLOBAL] = DEFAULT_CONFIGS[ConfigType.GLOBAL] as GlobalConfig;
+      this.configs[ConfigType.GLOBAL] = DEFAULT_CONFIGS[ConfigType.GLOBAL] as GlobalConfig; // Fallback
     }
-    
-    // Load user configuration
+  }
+
+  private _loadUserConfig(): void {
     try {
       const userConfigPath = path.join(this.globalConfigPath, 'user.about.json');
       this.configs[ConfigType.USER] = loadJsonConfig(userConfigPath, DEFAULT_CONFIGS[ConfigType.USER]) as UserConfig;
       this.configVersions.set(ConfigType.USER, Date.now());
     } catch (err) {
       this.logger.error(`Failed to load user configuration`, { error: err });
-      this.configs[ConfigType.USER] = DEFAULT_CONFIGS[ConfigType.USER] as UserConfig;
+      this.configs[ConfigType.USER] = DEFAULT_CONFIGS[ConfigType.USER] as UserConfig; // Fallback
     }
-    
+  }
+
+  /**
+   * Loads all configurations
+   *
+   * @returns All loaded configurations
+   */
+  public loadAllConfigs(): Record<string, ConfigData | null> {
+    this._loadLocalConfigs();
+    this._loadGlobalConfig();
+    this._loadUserConfig();
     return this.configs;
   }
   
@@ -733,42 +764,45 @@ export class ConfigManager {
    * @returns The loaded configuration
    * @throws {ConfigError} If the configuration type is unknown
    */
-  public getConfig<T extends ConfigData>(configType: ConfigType): T {
+  private _loadSpecificLocalConfig(configType: ConfigType): void {
+    if (LOCAL_CONFIG_PATHS[configType]) {
+      try {
+        this.configs[configType] = loadJsonConfig(LOCAL_CONFIG_PATHS[configType], DEFAULT_CONFIGS[configType]) as ConfigData;
+        this.configVersions.set(configType, Date.now());
+      } catch (err) {
+        this.logger.error(`Failed to load ${configType} configuration`, { error: err });
+        this.configs[configType] = DEFAULT_CONFIGS[configType]; // Fallback
+      }
+    } else {
+      // This case should ideally not be reached if configType is a valid local config type
+      throw new ConfigError(`Unknown or non-local configuration type for _loadSpecificLocalConfig: ${configType}`);
+    }
+  }
+
+  private _ensureConfigLoaded(configType: ConfigType): void {
     if (!this.configs[configType]) {
       if (configType === ConfigType.GLOBAL) {
-        try {
-          const globalConfigPath = path.join(this.globalConfigPath, 'config.json');
-          this.configs[configType] = loadJsonConfig(globalConfigPath, DEFAULT_CONFIGS[ConfigType.GLOBAL]) as GlobalConfig;
-          this.configVersions.set(configType, Date.now());
-        } catch (err) {
-          this.logger.error(`Failed to load global configuration`, { error: err });
-          this.configs[configType] = DEFAULT_CONFIGS[ConfigType.GLOBAL] as GlobalConfig;
-        }
+        this._loadGlobalConfig();
       } else if (configType === ConfigType.USER) {
-        try {
-          const userConfigPath = path.join(this.globalConfigPath, 'user.about.json');
-          this.configs[configType] = loadJsonConfig(userConfigPath, DEFAULT_CONFIGS[ConfigType.USER]) as UserConfig;
-          this.configVersions.set(configType, Date.now());
-        } catch (err) {
-          this.logger.error(`Failed to load user configuration`, { error: err });
-          this.configs[configType] = DEFAULT_CONFIGS[ConfigType.USER] as UserConfig;
-        }
+        this._loadUserConfig();
       } else if (LOCAL_CONFIG_PATHS[configType]) {
-        try {
-          this.configs[configType] = loadJsonConfig(LOCAL_CONFIG_PATHS[configType], DEFAULT_CONFIGS[configType]) as ConfigData;
-          this.configVersions.set(configType, Date.now());
-        } catch (err) {
-          this.logger.error(`Failed to load ${configType} configuration`, { error: err });
-          this.configs[configType] = DEFAULT_CONFIGS[configType];
-        }
+        this._loadSpecificLocalConfig(configType);
       } else {
         throw new ConfigError(`Unknown configuration type: ${configType}`);
       }
     }
+  }
+
+  public getConfig<T extends ConfigData>(configType: ConfigType): T {
+    this._ensureConfigLoaded(configType);
     
-    // Apply environment overrides
+    // Apply environment overrides if the config was just loaded or needs re-evaluation
+    // This check might need refinement if overrides should only be applied once per session
     if (this.environmentOverrides) {
-      this.applyEnvironmentOverrides(configType, this.configs[configType]!);
+      // Ensure config is not null before applying overrides, though _ensureConfigLoaded should handle it.
+      if (this.configs[configType]) {
+        this.applyEnvironmentOverrides(configType, this.configs[configType]!);
+      }
     }
     
     return this.configs[configType] as T;
@@ -783,6 +817,15 @@ export class ConfigManager {
    * @param config - Configuration object
    * @private
    */
+  private _parseEnvValue(value: string): any {
+    try {
+      return JSON.parse(value);
+    } catch (e) {
+      // If not valid JSON, return as string
+      return value;
+    }
+  }
+
   private applyEnvironmentOverrides(configType: ConfigType, config: ConfigData): void {
     const prefix = `CNF_${configType.toUpperCase()}_`;
     
@@ -791,15 +834,7 @@ export class ConfigManager {
       .forEach(key => {
         const keyPath = key.substring(prefix.length).toLowerCase().replace(/_/g, '.');
         const value = process.env[key]!;
-        
-        // Try to parse as JSON, fall back to string
-        let parsedValue: any = value;
-        try {
-          parsedValue = JSON.parse(value);
-        } catch (e) {
-          // If not valid JSON, keep as string
-        }
-        
+        const parsedValue = this._parseEnvValue(value);
         this.setConfigValueByPath(config as Record<string, any>, keyPath, parsedValue);
       });
   }
@@ -838,8 +873,7 @@ export class ConfigManager {
    * @throws {ConfigError} If the configuration type is unknown
    * @throws {ConfigValidationError} If schema validation fails
    */
-  public saveConfig(configType: ConfigType, config: ConfigData): boolean {
-    // Validate the configuration using Zod
+  private _validateAndPrepareSave(configType: ConfigType, config: ConfigData): ConfigData {
     if (this.schemaValidation) {
       const zodSchema = getZodSchemaForConfigType(configType);
       const validation = validateConfig(config, zodSchema);
@@ -850,42 +884,59 @@ export class ConfigManager {
         );
       }
     }
-    
     this.configs[configType] = config;
     this.configVersions.set(configType, Date.now());
+    return config;
+  }
+
+  private _saveGlobalConfigInternal(config: GlobalConfig): void {
+    try {
+      const globalConfigPath = path.join(this.globalConfigPath, 'config.json');
+      saveJsonConfig(globalConfigPath, config as Record<string, any>);
+      this.notifyObservers(ConfigType.GLOBAL, config);
+    } catch (err) {
+      this.logger.error(`Failed to save global configuration`, { error: err });
+      throw err; // Re-throw to be caught by the public saveConfig method
+    }
+  }
+
+  private _saveUserConfigInternal(config: UserConfig): void {
+    try {
+      const userConfigPath = path.join(this.globalConfigPath, 'user.about.json');
+      saveJsonConfig(userConfigPath, config as Record<string, any>);
+      this.notifyObservers(ConfigType.USER, config);
+    } catch (err) {
+      this.logger.error(`Failed to save user configuration`, { error: err });
+      throw err;
+    }
+  }
+
+  private _saveLocalConfigInternal(configType: ConfigType, config: ConfigData): void {
+    if (!LOCAL_CONFIG_PATHS[configType]) {
+      throw new ConfigError(`Cannot save: No local path defined for ${configType}`);
+    }
+    try {
+      saveJsonConfig(LOCAL_CONFIG_PATHS[configType], config as Record<string, any>);
+      this.notifyObservers(configType, config);
+    } catch (err) {
+      this.logger.error(`Failed to save ${configType} configuration`, { error: err });
+      throw err;
+    }
+  }
+
+  public saveConfig(configType: ConfigType, configData: ConfigData): boolean {
+    const preparedConfig = this._validateAndPrepareSave(configType, configData);
     
     if (configType === ConfigType.GLOBAL) {
-      try {
-        const globalConfigPath = path.join(this.globalConfigPath, 'config.json');
-        saveJsonConfig(globalConfigPath, config as Record<string, any>);
-        this.notifyObservers(configType, config);
-        return true;
-      } catch (err) {
-        this.logger.error(`Failed to save global configuration`, { error: err });
-        throw err;
-      }
+      this._saveGlobalConfigInternal(preparedConfig as GlobalConfig);
     } else if (configType === ConfigType.USER) {
-      try {
-        const userConfigPath = path.join(this.globalConfigPath, 'user.about.json');
-        saveJsonConfig(userConfigPath, config as Record<string, any>);
-        this.notifyObservers(configType, config);
-        return true;
-      } catch (err) {
-        this.logger.error(`Failed to save user configuration`, { error: err });
-        throw err;
-      }
+      this._saveUserConfigInternal(preparedConfig as UserConfig);
     } else if (LOCAL_CONFIG_PATHS[configType]) {
-      try {
-        saveJsonConfig(LOCAL_CONFIG_PATHS[configType], config as Record<string, any>);
-        this.notifyObservers(configType, config);
-        return true;
-      } catch (err) {
-        this.logger.error(`Failed to save ${configType} configuration`, { error: err });
-        throw err;
-      }
+      this._saveLocalConfigInternal(configType, preparedConfig);
     } else {
-      throw new ConfigError(`Unknown configuration type: ${configType}`);
+      throw new ConfigError(`Unknown configuration type for saving: ${configType}`);
     }
+    return true; // If no error is thrown, saving was successful
   }
   
   /**
@@ -922,6 +973,51 @@ export class ConfigManager {
     return this.saveConfig(configType, config);
   }
   
+  private _getValueByPath<T = any>(config: Record<string, any>, keyPath: string, defaultValue?: T): T {
+    const keyParts = keyPath.split('.');
+    let target: any = config;
+
+    for (const part of keyParts) {
+      if (target === undefined || target === null || typeof target !== 'object' || !(part in target)) {
+        return defaultValue as T;
+      }
+      target = target[part];
+    }
+    return target as T;
+  }
+
+  private _getGlobalColorSchemaValue<T = any>(keyPath: string, defaultValue?: T): T {
+    try {
+      const colorSchemaConfig = this.getConfig<ColorSchemaConfig>(ConfigType.COLOR_SCHEMA);
+      if (keyPath === 'COLOR_SCHEMA') {
+        return {
+          activeTheme: colorSchemaConfig.userPreferences?.activeTheme || 'dark'
+        } as unknown as T;
+      }
+      const subPath = keyPath.substring('COLOR_SCHEMA.'.length);
+      // Use _getValueByPath for the sub-config to avoid recursive calls to getConfigValue for the same configType
+      return this._getValueByPath<T>(colorSchemaConfig as Record<string, any>, subPath, defaultValue);
+    } catch (err) {
+      this.logger.warn(`Failed to get COLOR_SCHEMA config for global access`, { error: err, keyPath });
+      return defaultValue as T;
+    }
+  }
+
+  private _getGlobalMcpValue<T = any>(keyPath: string, defaultValue?: T): T {
+    try {
+      const mcpConfig = this.getConfig<McpConfig>(ConfigType.MCP);
+      if (keyPath === 'MCP') {
+        return mcpConfig as unknown as T;
+      }
+      const subPath = keyPath.substring('MCP.'.length);
+      // Use _getValueByPath for the sub-config
+      return this._getValueByPath<T>(mcpConfig as Record<string, any>, subPath, defaultValue);
+    } catch (err) {
+      this.logger.warn(`Failed to get MCP config for global access`, { error: err, keyPath });
+      return defaultValue as T;
+    }
+  }
+
   /**
    * Gets a configuration value
    *
@@ -935,60 +1031,16 @@ export class ConfigManager {
     try {
       const config = this.getConfig(configType);
 
-      // Handle special cases for COLOR_SCHEMA and MCP access
       if (configType === ConfigType.GLOBAL) {
-        // Handle requests for COLOR_SCHEMA through GLOBAL by redirecting to the appropriate config
         if (keyPath === 'COLOR_SCHEMA' || keyPath.startsWith('COLOR_SCHEMA.')) {
-          try {
-            const colorSchemaConfig = this.getConfig<ColorSchemaConfig>(ConfigType.COLOR_SCHEMA);
-            if (keyPath === 'COLOR_SCHEMA') {
-              return {
-                activeTheme: colorSchemaConfig.userPreferences?.activeTheme || 'dark'
-              } as unknown as T;
-            }
-
-            const subPath = keyPath.substring('COLOR_SCHEMA.'.length);
-            return this.getConfigValue<T>(ConfigType.COLOR_SCHEMA, subPath, defaultValue);
-          } catch (err) {
-            this.logger.warn(`Failed to get COLOR_SCHEMA config`, { error: err });
-            return defaultValue as T;
-          }
+          return this._getGlobalColorSchemaValue<T>(keyPath, defaultValue);
         }
-
         if (keyPath === 'MCP' || keyPath.startsWith('MCP.')) {
-          try {
-            const mcpConfig = this.getConfig<McpConfig>(ConfigType.MCP);
-            if (keyPath === 'MCP') {
-              return mcpConfig as unknown as T;
-            }
-
-            const subPath = keyPath.substring('MCP.'.length);
-            return this.getConfigValue<T>(ConfigType.MCP, subPath, defaultValue);
-          } catch (err) {
-            this.logger.warn(`Failed to get MCP config`, { error: err });
-            return defaultValue as T;
-          }
+          return this._getGlobalMcpValue<T>(keyPath, defaultValue);
         }
       }
-
-      // Split path into parts
-      const keyParts = keyPath.split('.');
-
-      // Navigate through the object
-      let target: any = config;
-      for (const part of keyParts) {
-        if (target === undefined || target === null || typeof target !== 'object') {
-          return defaultValue as T;
-        }
-
-        target = target[part];
-
-        if (target === undefined) {
-          return defaultValue as T;
-        }
-      }
-
-      return target as T;
+      
+      return this._getValueByPath<T>(config as Record<string, any>, keyPath, defaultValue);
     } catch (err) {
       this.logger.warn(`Error in getConfigValue for ${configType}.${keyPath}`, { error: err });
       return defaultValue as T;
@@ -1079,30 +1131,36 @@ export class ConfigManager {
    * @throws {ConfigError} If the configuration type is unknown
    * @throws {ConfigValidationError} If schema validation fails
    */
+  private _loadConfigForImport(importPath: string): ConfigData {
+    // loadJsonConfig will throw if the file doesn't exist and no default is provided,
+    // or return an empty object if a default is not provided and the file is empty.
+    const config = loadJsonConfig(importPath); // No default config
+
+    // Check if the file existed but was empty, or if it didn't exist and loadJsonConfig returned {}.
+    // fs.existsSync is crucial here.
+    if (Object.keys(config).length === 0 && !fs.existsSync(importPath)) {
+      throw new ConfigAccessError(`Configuration file not found: ${importPath}`);
+    }
+    // If file exists but is empty (or only whitespace), JSON.parse would have thrown or returned an empty object.
+    // loadJsonConfig handles the JSON.parse error and would throw ConfigAccessError.
+    // If it returns an empty object for an existing empty file, that's fine, Zod validation in saveConfig will catch it if invalid.
+    return config as ConfigData;
+  }
+
   public importConfig(configType: ConfigType, importPath: string): boolean {
     try {
-      // loadJsonConfig will throw if the file doesn't exist and no default is provided,
-      // or return an empty object if a default is not provided and the file is empty.
-      // We want to ensure we get a valid config object or throw.
-      const config = loadJsonConfig(importPath); // No default config, rely on loadJsonConfig's behavior or throw
-
-      if (Object.keys(config).length === 0 && !fs.existsSync(importPath)) {
-        // If config is empty and file doesn't exist, it means loadJsonConfig returned its internal default {}
-        // which is not what we want for an import.
-        throw new ConfigError(`Configuration file not found or is empty: ${importPath}`);
-      }
-      
-      // At this point, 'config' should be the parsed JSON content.
-      // saveConfig will perform Zod validation.
-      return this.saveConfig(configType, config as ConfigData);
+      const configToImport = this._loadConfigForImport(importPath);
+      // saveConfig will perform Zod validation and then save.
+      return this.saveConfig(configType, configToImport);
     } catch (err) {
-      // Log the original error if it's a ConfigError, otherwise wrap it.
-      if (err instanceof ConfigError) {
+      // Log the original error if it's a ConfigError or ConfigAccessError, otherwise wrap it.
+      if (err instanceof ConfigError) { // Catches ConfigAccessError and ConfigValidationError too
         this.logger.error(`Failed to import ${configType} configuration from ${importPath}: ${err.message}`, { error: err });
-        throw err;
+        throw err; // Re-throw the original, more specific error
       }
-      const importError = new ConfigAccessError(`Failed to import ${configType} configuration from ${importPath}: ${(err as Error).message}`);
-      this.logger.error(importError.message, { error: err });
+      // For other unexpected errors during the import process (e.g., fs errors not caught by loadJsonConfig)
+      const importError = new ConfigAccessError(`Unexpected error during import of ${configType} from ${importPath}: ${(err as Error).message}`);
+      this.logger.error(importError.message, { originalError: err });
       throw importError;
     }
   }

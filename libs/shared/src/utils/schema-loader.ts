@@ -9,8 +9,23 @@ import path from 'path';
 import Ajv, { ValidateFunction } from 'ajv';
 import { Logger } from '@claude-framework/core';
 
-// Base directory for schemas
-const SCHEMA_BASE_DIR = path.join(__dirname, '..', 'schemas');
+// Helper function to determine the project root directory
+function getProjectRoot(): string {
+  // Check if 'dist' is in the path, indicating a build environment
+  if (__dirname.includes(path.sep + 'dist' + path.sep)) {
+    // Path for build structure: e.g., .../dist/libs/shared/src/utils -> ../../../../../
+    // This needs to point to the actual project root from the 'dist' location
+    return path.resolve(__dirname, '../../../../..');
+  } else {
+    // Path for development structure: e.g., .../libs/shared/src/utils -> ../../../..
+    return path.resolve(__dirname, '../../../..');
+  }
+}
+
+const PROJECT_ROOT = getProjectRoot();
+
+// Base directory for schemas, pointing to 'configs/schemas' in the project root
+const SCHEMA_BASE_DIR = path.join(PROJECT_ROOT, 'configs', 'schemas');
 
 // Define options interface
 interface LoadSchemaOptions {
@@ -51,8 +66,10 @@ export class SchemaLoader {
       
       // Validate schema if requested
       if (validate) {
-        // TODO: Implement schema validation
-        // this.validateSchema(schema);
+        if (!this.validateSchemaItself(schema)) {
+          this.logger.error(`Schema ${schemaName} is not a valid JSON Schema according to its meta-schema.`);
+          throw new Error(`Schema ${schemaName} is not a valid JSON Schema.`);
+        }
       }
       
       return schema;
@@ -103,23 +120,25 @@ export class SchemaLoader {
   /**
    * Validate a schema against JSON Schema metadata
    * 
-   * @param schema - The schema to validate
-   * @returns Whether the schema is valid
+   * @param schema - The schema to validate (i.e., check if it's a valid JSON schema itself)
+   * @returns Whether the schema is a valid JSON Schema.
    */
-  private validateSchema(schema: Record<string, any>): boolean {
-    // TODO: Implement schema validation using a JSON Schema validator library
-    // For now, just check if it has basic properties
-    if (!schema || typeof schema !== 'object') {
+  private validateSchemaItself(schema: Record<string, any>): boolean {
+    const ajv = new Ajv({ allErrors: true });
+    try {
+      const isValid = ajv.validateSchema(schema);
+      if (!isValid) {
+        this.logger.warn('The provided schema is not a valid JSON Schema:', { errors: ajv.errors });
+        return false;
+      }
+      this.logger.debug('Schema successfully validated against its meta-schema.');
+      return true;
+    } catch (err) {
+      // This catch block handles errors thrown by ajv.validateSchema itself,
+      // for example, if the schema is so malformed ajv cannot even attempt validation.
+      this.logger.error('Error during schema meta-validation with AJV.', { error: err });
       return false;
     }
-    
-    // Basic validation - check if it has type property
-    if (!schema.type && !schema.properties && !schema.$schema) {
-      this.logger.warn('Schema may not be valid - missing type or properties');
-      return false;
-    }
-    
-    return true;
   }
 
   /**

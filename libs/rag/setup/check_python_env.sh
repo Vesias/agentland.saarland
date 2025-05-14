@@ -1,10 +1,11 @@
 #!/bin/bash
+set -e
 # Python Environment Checker Script
 # Runs both system Python and virtual environment Python checks
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VENV_DIR="$SCRIPT_DIR/.venv"
-CHECK_SCRIPT="$SCRIPT_DIR/libs/rag/src/check_env_status.py"
+VENV_DIR="$SCRIPT_DIR/../scripts/.venv" # Points to the venv created by setup_rag.sh
+CHECK_SCRIPT="$SCRIPT_DIR/../src/check_env_status.py" # Points to the script in libs/rag/src
 
 # Colors for output
 GREEN='\033[0;32m'

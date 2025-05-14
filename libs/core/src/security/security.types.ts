@@ -142,7 +142,7 @@ export interface MockRequest {
   readonly method?: string;
   readonly body?: unknown; // Geändert von any zu unknown
   readonly query?: unknown; // Geändert von any zu unknown
-  readonly session?: { csrfToken?: string; [key: string]: unknown }; // Geändert von any zu unknown
+  readonly session?: import('express-session').Session & Partial<import('express-session').SessionData>; // Typsichere Session
   // Weitere Request-Eigenschaften nach Bedarf
 }
 

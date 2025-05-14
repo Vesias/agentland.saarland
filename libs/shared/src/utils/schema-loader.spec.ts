@@ -1,10 +1,29 @@
 import { SchemaLoader } from './schema-loader';
+import fs from 'fs';
+
+// Mock fs.readFileSync
+jest.mock('fs');
+const mockedFs = fs as jest.Mocked<typeof fs>;
 
 describe('SchemaLoader', () => {
   let schemaLoader: SchemaLoader;
+  // @ts-ignore
+  let consoleWarnSpy: jest.SpyInstance;
+  // @ts-ignore
+  let consoleErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
     schemaLoader = new SchemaLoader();
+    // Spy on console.warn and console.error to check logger outputs if necessary
+    consoleWarnSpy = jest.spyOn(schemaLoader['logger'], 'warn').mockImplementation();
+    consoleErrorSpy = jest.spyOn(schemaLoader['logger'], 'error').mockImplementation();
+  });
+
+  afterEach(() => {
+    // Restore original console methods
+    consoleWarnSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
+    mockedFs.readFileSync.mockReset();
   });
 
   describe('validateDataWithSchema', () => {
@@ -157,6 +176,113 @@ describe('SchemaLoader', () => {
       };
       const data = { name: 'test' };
       expect(() => schemaLoader.validateDataWithSchema(invalidSchema, data)).toThrow();
+    });
+  });
+
+  describe('loadSchema (testing validateSchemaItself indirectly)', () => {
+    const validSchemaContent = {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'object',
+      properties: {
+        foo: { type: 'string' },
+      },
+    };
+
+    const invalidSchemaContent_badType = {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'object',
+      properties: {
+        foo: { type: 123 }, // Invalid type for 'type'
+      },
+    };
+    
+    const invalidSchemaContent_malformed = {
+        // This schema is malformed in a way that ajv.validateSchema might throw an error
+        type: "object",
+        properties: "not-an-object"
+    };
+
+
+    it('should load and successfully validate a valid schema', () => {
+      mockedFs.readFileSync.mockReturnValue(JSON.stringify(validSchemaContent));
+      mockedFs.existsSync.mockReturnValue(true); // Assume file exists
+
+      const schema = schemaLoader.loadSchema('validTestSchema');
+      expect(schema).toEqual(validSchemaContent);
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+    });
+
+    it('should throw an error when loading an invalid schema (bad type in property)', () => {
+      mockedFs.readFileSync.mockReturnValue(JSON.stringify(invalidSchemaContent_badType));
+      mockedFs.existsSync.mockReturnValue(true);
+
+      expect(() => schemaLoader.loadSchema('invalidTestSchema_badType')).toThrow(
+        'Schema invalidTestSchema_badType is not a valid JSON Schema.'
+      );
+      // Check if logger.error was called by the validateSchemaItself method (via loadSchema)
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Schema invalidTestSchema_badType is not a valid JSON Schema according to its meta-schema.'),
+        expect.any(Object) // We don't need to check the exact error object here
+      );
+    });
+    
+    it('should throw an error when loading a malformed schema that causes ajv to error', () => {
+        mockedFs.readFileSync.mockReturnValue(JSON.stringify(invalidSchemaContent_malformed));
+        mockedFs.existsSync.mockReturnValue(true);
+  
+        expect(() => schemaLoader.loadSchema('invalidTestSchema_malformed')).toThrow(
+          'Schema invalidTestSchema_malformed is not a valid JSON Schema.'
+        );
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          expect.stringContaining('Schema invalidTestSchema_malformed is not a valid JSON Schema according to its meta-schema.'),
+          expect.any(Object)
+        );
+      });
+
+    it('should load a schema without validation if options.validate is false', () => {
+      mockedFs.readFileSync.mockReturnValue(JSON.stringify(invalidSchemaContent_badType));
+      mockedFs.existsSync.mockReturnValue(true);
+
+      const schema = schemaLoader.loadSchema('anotherInvalidSchema', { validate: false });
+      expect(schema).toEqual(invalidSchemaContent_badType);
+      // Ensure validateSchemaItself was not effectively causing an error due to being skipped
+      expect(consoleErrorSpy).not.toHaveBeenCalledWith(
+        expect.stringContaining('Schema anotherInvalidSchema is not a valid JSON Schema according to its meta-schema.'),
+        expect.any(Object)
+      );
+    });
+
+    it('should throw an error if schema file does not exist', () => {
+      mockedFs.existsSync.mockReturnValue(false); // Simulate file not existing
+      expect(() => schemaLoader.loadSchema('nonExistentSchema')).toThrow(
+        'Failed to load schema: nonExistentSchema'
+      );
+       expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Failed to load schema: nonExistentSchema',
+        expect.objectContaining({ error: expect.any(Error) })
+      );
+    });
+
+    it('should throw an error if schema file is empty or invalid JSON', () => {
+      mockedFs.readFileSync.mockReturnValue(''); // Simulate empty file
+      mockedFs.existsSync.mockReturnValue(true);
+      expect(() => schemaLoader.loadSchema('emptySchemaFile')).toThrow(
+        // This error comes from JSON.parse
+        expect.stringContaining('Failed to load schema: emptySchemaFile')
+      );
+       expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Failed to load schema: emptySchemaFile',
+        expect.objectContaining({ error: expect.any(Error) })
+      );
+
+      mockedFs.readFileSync.mockReturnValue('{invalidJson'); // Simulate invalid JSON
+      expect(() => schemaLoader.loadSchema('invalidJsonSchemaFile')).toThrow(
+        expect.stringContaining('Failed to load schema: invalidJsonSchemaFile')
+      );
+       expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Failed to load schema: invalidJsonSchemaFile',
+        expect.objectContaining({ error: expect.any(Error) })
+      );
     });
   });
 });

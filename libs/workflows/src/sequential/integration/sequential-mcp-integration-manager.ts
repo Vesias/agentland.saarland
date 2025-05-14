@@ -18,17 +18,22 @@ import {
   ExecutionResult,
   Domain,
   Plan
-} from "./types";
+} from "../types";
 
 // Import the core sequential execution manager
-import { SequentialExecutionManager as CoreExecutionManager } from "./sequential-execution-manager";
+// IMPORTANT: This path points to the CORE manager, one level up.
+// It should resolve to ../sequential-execution-manager
+// If the core manager itself were renamed, this would need to change.
+// Since we are renaming THIS file, this import remains correct relative to its new name.
+import { SequentialExecutionManager as CoreExecutionManager } from "../sequential-execution-manager";
 
 // Import the sequential planner service
-import { sequentialPlanner } from "./services/sequential-planner";
+// This path also points one level up to the services directory.
+import { sequentialPlanner } from "../services/sequential-planner";
 
 import { createLogger } from "../../../../core/src/logging/logger";
 
-const logger = createLogger('sequential-execution-manager-integration');
+const logger = createLogger('sequential-mcp-integration-manager'); // Updated logger name
 
 /**
  * Sequential Execution Manager Integration Class
@@ -37,6 +42,7 @@ const logger = createLogger('sequential-execution-manager-integration');
 export class SequentialExecutionManager extends CoreExecutionManager {
   private handlers: Map<string, StepHandler>;
   private currentGoal: string | null;
+  private readonly integrationOptions: SequentialExecutionManagerOptions;
   private executionResult: {
     plan: PlanStep[],
     executedSteps: PlanStep[],
@@ -50,6 +56,7 @@ export class SequentialExecutionManager extends CoreExecutionManager {
    */
   constructor(domain: Domain = 'general', options: SequentialExecutionManagerOptions = {}) {
     super(domain, options);
+    this.integrationOptions = options; // Store options for local use
     
     this.handlers = new Map();
     this.currentGoal = null;
@@ -58,7 +65,7 @@ export class SequentialExecutionManager extends CoreExecutionManager {
     // Register MCP integration handlers
     this._registerMcpHandlers();
     
-    logger.info('Sequential Execution Manager (Integration) initialized', {
+    logger.info('Sequential Execution Manager (MCP Integration) initialized', { // Updated log message
       domain,
       fallbackMode: options.fallbackMode || false
     });
@@ -74,7 +81,7 @@ export class SequentialExecutionManager extends CoreExecutionManager {
       logger.debug('Executing context step via MCP', { stepNumber: step.number });
       
       try {
-        const searchTerm = options.searchTerm || step.description;
+        const searchTerm = options?.searchTerm || step.description;
         const result = await sequentialPlanner.executeContextStep(searchTerm);
         return result;
       } catch (err) {
@@ -88,11 +95,14 @@ export class SequentialExecutionManager extends CoreExecutionManager {
       logger.debug('Executing UI step via MCP', { stepNumber: step.number });
       
       try {
-        const componentSpec = options.componentSpec || {
+        const componentSpec = options?.componentSpec || {
           type: 'component',
           description: step.description
         };
-        const result = await sequentialPlanner.executeUIStep(componentSpec);
+        // TODO: Dynamically determine currentFilePath and projectRootDir based on the execution context
+        const currentFilePathPlaceholder = './current-file.tsx'; // Placeholder
+        const projectRootDirPlaceholder = '.'; // Placeholder
+        const result = await sequentialPlanner.executeUIStep(componentSpec, currentFilePathPlaceholder, projectRootDirPlaceholder);
         return result;
       } catch (err) {
         logger.error('Error executing UI step', { error: err.message });
@@ -106,8 +116,8 @@ export class SequentialExecutionManager extends CoreExecutionManager {
       
       return {
         type: 'manual',
-        data: options.result || {},
-        summary: options.summary || 'Step executed manually'
+        data: options?.result || {},
+        summary: options?.summary || 'Step executed manually'
       };
     });
     
@@ -115,13 +125,13 @@ export class SequentialExecutionManager extends CoreExecutionManager {
     this.registerHandler('executable', async (step, options = {}) => {
       logger.debug('Executing executable step', { stepNumber: step.number });
       
-      if (options.executeFunction && typeof options.executeFunction === 'function') {
+      if (options?.executeFunction && typeof options.executeFunction === 'function') {
         try {
           const result = await options.executeFunction(step);
           return {
             type: 'executable',
             data: result || {},
-            summary: options.summary || `Executed step ${step.number} programmatically`
+            summary: options?.summary || `Executed step ${step.number} programmatically`
           };
         } catch (err) {
           logger.error('Error in executable step function', { error: err.message });
@@ -130,8 +140,8 @@ export class SequentialExecutionManager extends CoreExecutionManager {
       } else {
         return {
           type: 'executable',
-          data: options.result || {},
-          summary: options.summary || 'Step executed programmatically'
+          data: options?.result || {},
+          summary: options?.summary || 'Step executed programmatically'
         };
       }
     });
@@ -173,8 +183,8 @@ export class SequentialExecutionManager extends CoreExecutionManager {
       // Convert core options to planner options
       const planOptions = {
         initialSteps: options.initialSteps || 5,
-        maxSteps: options.maxSteps || this.options.maxSteps,
-        depth: options.depth || this.options.planningDepth,
+        maxSteps: options.maxSteps || this.integrationOptions.maxSteps || 20,
+        depth: options.depth || this.integrationOptions.planningDepth || 'medium',
         ...options
       };
       
@@ -209,27 +219,28 @@ export class SequentialExecutionManager extends CoreExecutionManager {
    * @returns The updated plan
    */
   public async continuePlan(): Promise<Plan | null> {
-    if (!this.currentPlan) {
+    const currentPlan = this.getState().plan;
+    if (!currentPlan) {
       throw new Error('No active plan to continue');
     }
     
     try {
-      logger.info('Continuing plan with MCP integration', { 
-        planId: this.currentPlan.id,
-        currentStepCount: this.currentPlan.steps.length 
+      logger.info('Continuing plan with MCP integration', {
+        planId: currentPlan.id,
+        currentStepCount: currentPlan.steps.length
       });
       
       // Generate new steps using the planner service
-      const newSteps = await sequentialPlanner.continuePlanning(this.currentPlan.steps);
+      const newSteps = await sequentialPlanner.continuePlanning(currentPlan.steps);
       
       if (newSteps.length === 0) {
-        return this.currentPlan;
+        return currentPlan;
       }
       
       // Update the current plan with new steps
-      const updatedSteps = [...this.currentPlan.steps, ...newSteps];
+      const updatedSteps = [...currentPlan.steps, ...newSteps];
       const updatedPlan: Plan = {
-        ...this.currentPlan,
+        ...currentPlan,
         steps: updatedSteps
       };
       
@@ -247,23 +258,24 @@ export class SequentialExecutionManager extends CoreExecutionManager {
    * @returns The summary text
    */
   public async generateDetailedSummary(): Promise<string> {
-    if (!this.currentPlan || this.executedSteps.length === 0) {
+    const { plan: currentPlan, executedSteps } = this.getState();
+    if (!currentPlan || executedSteps.length === 0) {
       return "No plan has been executed yet.";
     }
     
     try {
-      logger.info('Generating detailed summary with MCP integration', { 
-        planId: this.currentPlan.id,
-        stepCount: this.executedSteps.length 
+      logger.info('Generating detailed summary with MCP integration', {
+        planId: currentPlan.id,
+        stepCount: executedSteps.length
       });
       
       // Generate summary using the planner service
-      const summary = await sequentialPlanner.generateSummary(this.currentPlan.steps);
+      const summary = await sequentialPlanner.generateSummary(currentPlan.steps);
       
       // Store the summary in the execution result
       this.executionResult = {
-        plan: this.currentPlan.steps,
-        executedSteps: this.executedSteps,
+        plan: currentPlan.steps,
+        executedSteps: executedSteps,
         summary
       };
       
@@ -293,18 +305,19 @@ export class SequentialExecutionManager extends CoreExecutionManager {
     executedSteps: PlanStep[];
     summary: string;
   }> {
-    if (!this.currentPlan) {
+    const currentPlan = this.getState().plan;
+    if (!currentPlan) {
       throw new Error('No current plan to execute');
     }
     
     // First execute the plan using the core implementation
-    const result = await this.executePlan(options);
+    const result = await this.executePlan(options); // executePlan is a public method of CoreExecutionManager
     
     // Generate a more detailed summary using MCP services
     const detailedSummary = await this.generateDetailedSummary();
     
     return {
-      plan: this.currentPlan,
+      plan: currentPlan, // Use the plan fetched at the beginning of the method
       executedSteps: result.executedSteps,
       summary: detailedSummary
     };
@@ -356,19 +369,19 @@ export class SequentialExecutionManager extends CoreExecutionManager {
         manager.registerHandler('code_analysis', async (step, options) => {
           return {
             type: 'code_analysis',
-            data: options.fileContent || { content: 'Mock file content' },
-            summary: `Code analyzed from ${options.path || 'unknown'}`
+            data: options?.fileContent || { content: 'Mock file content' },
+            summary: `Code analyzed from ${options?.path || 'unknown'}`
           };
         });
         
         manager.registerHandler('documentation', async (step, options) => {
           return {
             type: 'documentation',
-            data: { 
-              content: options.content || 'Mock documentation content',
-              path: options.outputPath || 'docs/output.md'
+            data: {
+              content: options?.content || 'Mock documentation content',
+              path: options?.outputPath || 'docs/output.md'
             },
-            summary: `Documentation generated and saved to ${options.outputPath || 'docs/output.md'}`
+            summary: `Documentation generated and saved to ${options?.outputPath || 'docs/output.md'}`
           };
         });
         break;
@@ -378,31 +391,31 @@ export class SequentialExecutionManager extends CoreExecutionManager {
         manager.registerHandler('test', async (step, options) => {
           return {
             type: 'test',
-            data: { 
-              results: options.testResults || { passed: 10, failed: 0, skipped: 2 }
+            data: {
+              results: options?.testResults || { passed: 10, failed: 0, skipped: 2 }
             },
-            summary: `Tests executed: ${options.testCount || 12} tests run, ${options.failCount || 0} failures`
+            summary: `Tests executed: ${options?.testCount || 12} tests run, ${options?.failCount || 0} failures`
           };
         });
         
         manager.registerHandler('build', async (step, options) => {
           return {
             type: 'build',
-            data: { 
-              artifacts: options.artifacts || ['dist/app.js', 'dist/app.css']
+            data: {
+              artifacts: options?.artifacts || ['dist/app.js', 'dist/app.css']
             },
-            summary: `Build completed successfully, ${options.artifactCount || 2} artifacts created`
+            summary: `Build completed successfully, ${options?.artifactCount || 2} artifacts created`
           };
         });
         
         manager.registerHandler('deploy', async (step, options) => {
           return {
             type: 'deploy',
-            data: { 
-              environment: options.environment || 'staging',
-              url: options.url || 'https://staging.example.com'
+            data: {
+              environment: options?.environment || 'staging',
+              url: options?.url || 'https://staging.example.com'
             },
-            summary: `Deployed to ${options.environment || 'staging'} environment`
+            summary: `Deployed to ${options?.environment || 'staging'} environment`
           };
         });
         break;
@@ -412,32 +425,32 @@ export class SequentialExecutionManager extends CoreExecutionManager {
         manager.registerHandler('extract', async (step, options) => {
           return {
             type: 'extract',
-            data: { 
-              records: options.recordCount || 1000,
-              source: options.source || 'database'
+            data: {
+              records: options?.recordCount || 1000,
+              source: options?.source || 'database'
             },
-            summary: `Extracted ${options.recordCount || 1000} records from ${options.source || 'database'}`
+            summary: `Extracted ${options?.recordCount || 1000} records from ${options?.source || 'database'}`
           };
         });
         
         manager.registerHandler('transform', async (step, options) => {
           return {
             type: 'transform',
-            data: { 
-              transformations: options.transformationCount || 5
+            data: {
+              transformations: options?.transformationCount || 5
             },
-            summary: `Applied ${options.transformationCount || 5} transformations to data`
+            summary: `Applied ${options?.transformationCount || 5} transformations to data`
           };
         });
         
         manager.registerHandler('load', async (step, options) => {
           return {
             type: 'load',
-            data: { 
-              destination: options.destination || 'data warehouse',
-              records: options.recordCount || 1000
+            data: {
+              destination: options?.destination || 'data warehouse',
+              records: options?.recordCount || 1000
             },
-            summary: `Loaded ${options.recordCount || 1000} records to ${options.destination || 'data warehouse'}`
+            summary: `Loaded ${options?.recordCount || 1000} records to ${options?.destination || 'data warehouse'}`
           };
         });
         break;
