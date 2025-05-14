@@ -5,10 +5,10 @@
  * It should be used as a reference for implementing secure APIs within the framework.
  */
 
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import { promisify } from 'util';
 import { Request, Response, NextFunction } from 'express';
-import session from 'express-session'; // Default Import statt Named Import
+import * as session from 'express-session'; // Default Import statt Named Import
 
 // Import standardized config manager
 import configManager, { ConfigType } from '../config/config-manager';
@@ -149,7 +149,7 @@ export class SecureAPI {
    * @param handler - Request handler function
    * @returns Secured request handler
    */
-  public secureHandler<T = any, Args extends any[] = any[]>(
+  public secureHandler<T = unknown, Args extends unknown[] = unknown[]>(
     handler: (req: Request, res: Response, ...args: Args) => Promise<T>
   ): (req: Request, res: Response, ...args: Args) => Promise<T | void> {
     // Die ...args: Args Typisierung ist flexibel gehalten.
@@ -169,19 +169,13 @@ export class SecureAPI {
         // Apply rate limiting
         if (!this.checkRateLimit(req)) {
           throw new ValidationError(this.i18n.translate('errors.rateLimitExceeded'), {
-            details: {
-              retryAfter: this.getRateLimitReset(req)
-            },
-            statusCode: 429
-          });
+            retryAfter: this.getRateLimitReset(req)
+          }, 429);
         }
         
         // Validate CSRF token
         if (this.options.csrfProtection && !this.validateCSRF(req)) {
-          throw new ValidationError(this.i18n.translate('errors.invalidCsrfToken'), {
-            details: {},
-            statusCode: 403
-          });
+          throw new ValidationError(this.i18n.translate('errors.invalidCsrfToken'), {}, 403);
         }
         
         // Validate input
@@ -438,11 +432,8 @@ export class SecureAPI {
         // Check rate limit
         if (!this.checkRateLimit(req)) {
           throw new ValidationError(this.i18n.translate('errors.rateLimitExceeded'), {
-            details: {
-              retryAfter: this.getRateLimitReset(req)
-            },
-            statusCode: 429
-          });
+            retryAfter: this.getRateLimitReset(req)
+          }, 429);
         }
         
         // Check HTTPS requirement
@@ -452,10 +443,7 @@ export class SecureAPI {
         
         // Validate CSRF token for non-safe methods
         if (this.options.csrfProtection && !this.validateCSRF(req)) {
-          throw new ValidationError(this.i18n.translate('errors.invalidCsrfToken'), {
-            details: {},
-            statusCode: 403
-          });
+          throw new ValidationError(this.i18n.translate('errors.invalidCsrfToken'), {}, 403);
         }
         
         // Validate input if needed

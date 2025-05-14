@@ -63,7 +63,7 @@ export const SecurityEventSchema = z.object({
   // z.any() für details erlaubt maximale Flexibilität.
   // Falls eine spezifischere Struktur für details bekannt ist oder erzwungen werden soll,
   // könnte hier ein spezifischeres z.object({...}) Schema verwendet werden.
-  details: z.record(z.any()).optional(),
+  details: z.record(z.unknown()).optional(),
 });
 
 /**

@@ -18,7 +18,7 @@ module.exports = {
     '^.+\\.tsx?$': [
       'ts-jest',
       {
-        tsconfig: '<rootDir>/tools/validators/tsconfig.json',
+        tsconfig: '<rootDir>/tsconfig.base.json', // Geändert zur Basis-TSConfig
       },
     ],
   },

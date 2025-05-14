@@ -7,14 +7,19 @@ import { ValidationError } from '../error/error-handler';
 import { Request, Response } from 'express';
 
 // Mock dependencies
-jest.mock('../logging/logger', () => ({
-  Logger: jest.fn().mockImplementation(() => ({
+jest.mock('../logging/logger', () => {
+  const mockLoggerInstance = {
     debug: jest.fn(),
     info: jest.fn(),
     warn: jest.fn(),
     error: jest.fn()
-  }))
-}));
+  };
+  return {
+    Logger: jest.fn().mockImplementation(() => mockLoggerInstance),
+    createLogger: jest.fn().mockImplementation(() => mockLoggerInstance),
+    default: mockLoggerInstance // Falls der Default-Export auch verwendet wird
+  };
+});
 
 jest.mock('../config/config-manager', () => ({
   __esModule: true,
@@ -44,7 +49,7 @@ describe('SecureAPI', () => {
       secure: true,
       socket: {
         remoteAddress: '127.0.0.1'
-      },
+      } as any, // Cast to any to satisfy Socket type for testing purposes
       body: {},
       query: {}
     };

@@ -97,51 +97,52 @@ describe('SecurityReview', () => {
   });
 
   describe('addFinding', () => {
-    it('should add a finding with minimal details', () => {
-      securityReview.addFinding({
-        title: 'Test Finding',
-        description: 'A test finding',
-        location: 'test.js'
-      });
-      
-      // Run validators to check if finding was added
-      securityReview.runValidators().then(report => {
-        expect(report.findings.length).toBe(1);
-        expect(report.findings[0].title).toBe('Test Finding');
+    beforeEach(() => {
+      // Deregistriere Standard-Validatoren, um addFinding isoliert zu testen
+      ['api-key-exposure', 'secure-dependencies', 'config-constraints',
+       'file-permissions', 'secure-communication', 'input-validation',
+       'authentication-security', 'audit-logging'].forEach(name => {
+        securityReview.unregisterValidator(name);
       });
     });
 
-    it('should generate ID if not provided', () => {
+    it('should add a finding with minimal details', async () => {
       securityReview.addFinding({
         title: 'Test Finding',
         description: 'A test finding',
         location: 'test.js'
       });
       
-      securityReview.runValidators().then(report => {
-        expect(report.findings[0].id).toBeDefined();
-        expect(report.findings[0].id.startsWith('finding-')).toBe(true);
+      const report = await securityReview.runValidators();
+      expect(report.findings.length).toBe(1);
+      expect(report.findings[0].title).toBe('Test Finding');
+    });
+
+    it('should generate ID if not provided', async () => {
+      securityReview.addFinding({
+        title: 'Test Finding',
+        description: 'A test finding',
+        location: 'test.js'
       });
+      
+      const report = await securityReview.runValidators();
+      expect(report.findings.length).toBe(1); // Sicherstellen, dass nur dieses eine Finding da ist
+      expect(report.findings[0].id).toBeDefined();
+      expect(report.findings[0].id.startsWith('finding-')).toBe(true);
     });
   });
 
   describe('addVulnerability', () => {
-    it('should add a vulnerability with minimal details', () => {
-      securityReview.addVulnerability({
-        title: 'Test Vulnerability',
-        description: 'A test vulnerability',
-        location: 'test.js',
-        severity: 'high'
-      });
-      
-      securityReview.runValidators().then(report => {
-        expect(report.vulnerabilities.length).toBe(1);
-        expect(report.vulnerabilities[0].title).toBe('Test Vulnerability');
-        expect(report.vulnerabilities[0].severity).toBe('high');
+    beforeEach(() => {
+      // Deregistriere Standard-Validatoren, um addVulnerability isoliert zu testen
+      ['api-key-exposure', 'secure-dependencies', 'config-constraints',
+       'file-permissions', 'secure-communication', 'input-validation',
+       'authentication-security', 'audit-logging'].forEach(name => {
+        securityReview.unregisterValidator(name);
       });
     });
 
-    it('should generate ID if not provided', () => {
+    it('should add a vulnerability with minimal details', async () => {
       securityReview.addVulnerability({
         title: 'Test Vulnerability',
         description: 'A test vulnerability',
@@ -149,10 +150,24 @@ describe('SecurityReview', () => {
         severity: 'high'
       });
       
-      securityReview.runValidators().then(report => {
-        expect(report.vulnerabilities[0].id).toBeDefined();
-        expect(report.vulnerabilities[0].id.startsWith('vuln-')).toBe(true);
+      const report = await securityReview.runValidators();
+      expect(report.vulnerabilities.length).toBe(1);
+      expect(report.vulnerabilities[0].title).toBe('Test Vulnerability');
+      expect(report.vulnerabilities[0].severity).toBe('high');
+    });
+
+    it('should generate ID if not provided', async () => {
+      securityReview.addVulnerability({
+        title: 'Test Vulnerability',
+        description: 'A test vulnerability',
+        location: 'test.js',
+        severity: 'high'
       });
+      
+      const report = await securityReview.runValidators();
+      expect(report.vulnerabilities.length).toBe(1); // Sicherstellen, dass nur diese eine Vulnerability da ist
+      expect(report.vulnerabilities[0].id).toBeDefined();
+      expect(report.vulnerabilities[0].id.startsWith('vuln-')).toBe(true);
     });
   });
 

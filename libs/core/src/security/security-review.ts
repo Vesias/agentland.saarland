@@ -201,7 +201,7 @@ export class SecurityReview {
   private i18n: I18n;
   // TODO: Define a specific type for the security configuration
   // once its structure is clearly defined and stable.
-  private config: any;
+  private config: unknown;
   private options: SecurityReviewOptions;
   private findings: SecurityFinding[];
   private vulnerabilities: SecurityVulnerability[];

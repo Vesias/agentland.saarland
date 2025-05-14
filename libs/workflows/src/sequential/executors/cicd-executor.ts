@@ -4,6 +4,8 @@ import configManager, { ConfigType } from '../../../../core/src/config/config-ma
 import { ClaudeError } from '../../../../core/src/error/error-handler';
 import { spawn } from 'child_process';
 import fetch from 'node-fetch';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 /**
  * CI/CD-specific execution implementation.
@@ -232,7 +234,7 @@ export class CICDExecutor extends BaseExecutor {
           let rawJsonOutput = '';
           try {
             // Check if test-results.json was created
-            const fs = require('fs').promises;
+            // fs is now globally imported as import * as fs from 'fs/promises';
             try {
                 rawJsonOutput = await fs.readFile('test-results.json', 'utf-8');
                 const parsedOutput = JSON.parse(rawJsonOutput);
@@ -396,7 +398,7 @@ export class CICDExecutor extends BaseExecutor {
       });
 
       return new Promise((resolve) => {
-        process.on('close', (code) => {
+        process.on('close', async (code) => { // Make this callback async
           const duration = (Date.now() - startTime) / 1000; // Duration in seconds
           if (code !== 0) {
             const buildErrorMessage = `Project build failed with code ${code}.`;
@@ -413,13 +415,7 @@ export class CICDExecutor extends BaseExecutor {
             return;
           }
 
-          // TODO: Implement logic to find and list build artifacts.
-          // This is highly dependent on the project structure and build tool.
-          // For example, you might look in a 'dist' or 'build' folder.
-          // For now, we'll use a placeholder.
-          const artifacts = [
-            { name: 'placeholder.js', size: 0, path: 'dist/placeholder.js' }
-          ];
+          const artifacts = await this.findBuildArtifacts();
           const totalSize = artifacts.reduce((sum, art) => sum + art.size, 0);
 
           const buildResults = {
@@ -790,19 +786,51 @@ export class CICDExecutor extends BaseExecutor {
       }
 
       this.logger.info(`Attempting to send notification via ${channel} to:`, { recipients });
-      // TODO: Replace with actual channel-specific sending logic
-      // Example for email: await sendEmail(recipients, notificationSubject, notificationBody);
-      // Example for Slack: await postToSlack(recipients, notificationBody);
-      
-      // Simulating send operation for now
-      const simulatedSendSuccess = Math.random() > 0.1; // 90% success rate for simulation
-      
-      if (simulatedSendSuccess) {
-        this.logger.info(`Successfully simulated sending notification via ${channel}.`);
+      // This section demonstrates where actual integrations would go.
+      // For a real implementation, you would use libraries like:
+      // - Nodemailer for email (e.g., await emailService.send({ to: recipients, subject: notificationSubject, body: notificationBody });)
+      // - @slack/web-api for Slack (e.g., await slackService.postMessage({ channels: recipients, text: notificationBody });)
+      // These would require proper setup, API keys, and error handling.
+
+      let sendSuccess = false;
+      let sendError: string | undefined;
+
+      try {
+        switch (channel.toLowerCase()) {
+          case 'email':
+            // Placeholder for email sending logic
+            this.logger.info(`Simulating email notification to: ${recipients.join(', ')} for subject: "${notificationSubject}"`);
+            sendSuccess = true; // Simulate success
+            break;
+          case 'slack':
+            // Placeholder for Slack sending logic
+            this.logger.info(`Simulating Slack notification to: ${recipients.join(', ')} with body starting: "${notificationBody.substring(0, 50)}..."`);
+            sendSuccess = true; // Simulate success
+            break;
+          default:
+            this.logger.warn(`Notification channel '${channel}' not implemented. Skipping.`);
+            sendError = `Channel '${channel}' not implemented.`;
+            sendSuccess = false;
+        }
+        // Simulate potential random failure for demonstration if not explicitly handled above
+        if (sendSuccess && Math.random() < 0.05) { // 5% chance of random simulated failure
+             sendSuccess = false;
+             sendError = `Simulated random failure for channel ${channel}.`;
+             this.logger.warn(sendError);
+        }
+
+      } catch (e: any) {
+        this.logger.error(`Error sending notification via ${channel}: ${e.message}`, { error: e });
+        sendSuccess = false;
+        sendError = e.message;
+      }
+
+      if (sendSuccess) {
+        this.logger.info(`Successfully processed notification for channel ${channel}.`);
         sentDetails.push({ channel, success: true, recipients });
       } else {
-        this.logger.error(`Failed to simulate sending notification via ${channel}.`);
-        sentDetails.push({ channel, success: false, error: `Simulated failure for ${channel}`, recipients });
+        this.logger.error(`Failed to process notification for channel ${channel}.`, { error: sendError });
+        sentDetails.push({ channel, success: false, error: sendError || `Processing failed for ${channel}`, recipients });
         allNotificationsSentSuccessfully = false;
       }
     }
@@ -828,5 +856,74 @@ export class CICDExecutor extends BaseExecutor {
       error: !allNotificationsSentSuccessfully ? 'One or more notification channels failed.' : undefined,
       data: { notificationResults },
     };
+  }
+
+  /**
+   * Finds build artifacts in common output directories.
+   * @param baseDir The base directory of the project, defaults to current working directory.
+   * @returns A list of found artifacts with their name, size, and path.
+   */
+  private async findBuildArtifacts(baseDir: string = '.'): Promise<{ name: string; size: number; path: string }[]> {
+    const commonOutputDirs = ['dist', 'build', 'out', 'public', 'target']; // Added 'target' for Java/Maven projects
+    const foundArtifacts: { name: string; size: number; path: string }[] = [];
+    const searchBasePath = path.resolve(baseDir); // Ensure baseDir is absolute for consistent path.relative
+
+    this.logger.info(`Searching for build artifacts in common directories under: ${searchBasePath}`);
+
+    for (const dir of commonOutputDirs) {
+        const artifactDir = path.join(searchBasePath, dir);
+        try {
+            // Check if directory exists
+            await fs.access(artifactDir);
+            this.logger.debug(`Scanning directory: ${artifactDir}`);
+            // Note: { recursive: true } for fs.readdir is available in Node.js 18.17.0+.
+            // If older Node version, a manual recursive walk function would be needed.
+            // Assuming modern Node.js for this implementation.
+            const files = await fs.readdir(artifactDir, { withFileTypes: true, recursive: true });
+            for (const file of files) {
+                // Construct full path carefully if recursive readdir provides paths relative to artifactDir or full paths
+                // withFileTypes + recursive: file.name is entry name, file.path is full path to directory containing entry (Node 20+)
+                // For broader compatibility, let's construct path from artifactDir and file.name if it's not already absolute
+                let filePath = file.name; // This might be relative path within the recursive search
+                if (file.path) { // Node 20+ provides 'path' property
+                    filePath = path.join(file.path, file.name);
+                } else { // Fallback for older Node versions or if path is not provided
+                    filePath = path.join(artifactDir, file.name); // This assumes file.name is relative to artifactDir
+                }
+
+
+                if (file.isFile()) {
+                    try {
+                        const stats = await fs.stat(filePath);
+                        const relativeFilePath = path.relative(searchBasePath, filePath);
+                        foundArtifacts.push({
+                            name: file.name,
+                            size: stats.size,
+                            path: relativeFilePath
+                        });
+                        this.logger.debug(`Found artifact: ${relativeFilePath}, Size: ${stats.size} bytes`);
+                    } catch (statError: any) {
+                        this.logger.warn(`Could not stat file ${filePath}: ${statError.message}`);
+                    }
+                }
+            }
+            // If artifacts are found in one of the common directories, we can decide to stop or continue.
+            // For now, let's continue to gather from all common dirs, could be configurable.
+            // if (foundArtifacts.length > 0) break;
+        } catch (error: any) {
+            if (error.code === 'ENOENT') {
+                this.logger.debug(`Directory ${artifactDir} not found.`);
+            } else {
+                this.logger.warn(`Error accessing directory ${artifactDir}: ${error.message}`);
+            }
+        }
+    }
+
+    if (foundArtifacts.length === 0) {
+        this.logger.warn('No build artifacts found in common output directories. Returning empty list. Searched in:', commonOutputDirs);
+    } else {
+        this.logger.info(`Found ${foundArtifacts.length} build artifacts.`);
+    }
+    return foundArtifacts;
   }
 }
