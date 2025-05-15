@@ -15,6 +15,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { execSync, spawn } = require('child_process');
 const { program } = require('commander');
 
@@ -515,8 +516,5 @@ function watchFiles(directory, pattern, workflowName) {
     }
   }, 1000);
 }
-
-// Fehlende Module für die Simulation
-const os = require('os');
 
 console.log('Rekursives Debugging-Workflow-Engine gestartet');
