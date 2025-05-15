@@ -15,6 +15,9 @@ export default defineConfig({
       }
     })
   ],
+  css: {
+    postcss: './postcss.config.js',
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
