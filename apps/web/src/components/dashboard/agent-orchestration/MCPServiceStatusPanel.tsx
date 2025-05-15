@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { FaSpinner } from 'react-icons/fa';
 
 interface MCPServiceStatus {
   name: string;
@@ -8,31 +9,44 @@ interface MCPServiceStatus {
 }
 
 const MCPServiceStatusPanel: React.FC = () => {
-  // Placeholder data - in a real implementation, this would be fetched
-  // from a backend service that monitors MCP servers.
-  const [mcpServices, setMcpServices] = useState<MCPServiceStatus[]>([
-    { name: 'sequentialthinking', status: 'online', latency: 55, lastChecked: '2025-05-15 19:50 UTC' },
-    { name: 'context7', status: 'online', latency: 120, lastChecked: '2025-05-15 19:50 UTC' },
-    { name: 'desktop-commander', status: 'degraded', latency: 350, lastChecked: '2025-05-15 19:48 UTC' },
-    { name: 'brave-search', status: 'offline', lastChecked: '2025-05-15 19:45 UTC' },
-    { name: 'think-mcp', status: 'error', lastChecked: '2025-05-15 19:50 UTC' },
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [mcpServices, setMcpServices] = useState<MCPServiceStatus[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   setIsLoading(true);
-  //   // Replace with actual API call to fetch MCP service statuses
-  //   fetch('/api/mcp/status') // Example API endpoint
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       setMcpServices(data);
-  //       setIsLoading(false);
-  //     })
-  //     .catch(error => {
-  //       console.error("Failed to fetch MCP statuses:", error);
-  //       setIsLoading(false);
-  //     });
-  // }, []);
+  useEffect(() => {
+    const fetchMcpStatus = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('/api/mcp/status');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch MCP statuses: ${response.statusText}`);
+        }
+        const data = await response.json();
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        setMcpServices(data);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred');
+        }
+        // Fallback to empty or minimal data
+        setMcpServices([
+            { name: 'sequentialthinking (Fallback)', status: 'offline', lastChecked: new Date().toISOString() },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMcpStatus();
+    // Optional: Set up an interval to periodically refresh statuses
+    // const intervalId = setInterval(fetchMcpStatus, 60000); // every 60 seconds
+    // return () => clearInterval(intervalId);
+  }, []);
 
   const getStatusColor = (status: MCPServiceStatus['status']) => {
     switch (status) {
@@ -52,36 +66,43 @@ const MCPServiceStatusPanel: React.FC = () => {
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 text-center">
+        <FaSpinner className="animate-spin text-blue-500 text-2xl mx-auto mb-2" />
         <p className="text-gray-600 dark:text-gray-300">Lade MCP Service Status...</p>
       </div>
     );
   }
-
+  
   return (
     <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
         MCP Service Status
       </h2>
-      <div className="space-y-3">
-        {mcpServices.map((service) => (
-          <div key={service.name} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-            <div className="flex items-center">
-              <span className={`w-3 h-3 rounded-full mr-3 ${getStatusColor(service.status)}`}></span>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{service.name}</span>
+      {error && <p className="text-red-500 dark:text-red-400 mb-3">Fehler beim Laden: {error}</p>}
+      {!isLoading && mcpServices.length === 0 && !error && <p className="text-gray-500 dark:text-gray-400">Keine MCP Services konfiguriert oder Status nicht abrufbar.</p>}
+
+      {mcpServices.length > 0 && (
+        <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
+          {mcpServices.map((service) => (
+            <div key={service.name} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div className="flex items-center overflow-hidden">
+                <span className={`w-3 h-3 rounded-full mr-2 flex-shrink-0 ${getStatusColor(service.status)}`}></span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate" title={service.name}>{service.name}</span>
+              </div>
+              <div className="text-right flex-shrink-0 ml-2">
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full text-white ${getStatusColor(service.status)}`}>
+                  {service.status.toUpperCase()}
+                </span>
+                {service.latency !== undefined && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{service.latency}ms</p>
+                )}
+              </div>
             </div>
-            <div className="text-right">
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full text-white ${getStatusColor(service.status)}`}>
-                {service.status.toUpperCase()}
-              </span>
-              {service.latency !== undefined && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{service.latency}ms</p>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
       <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
-        Letzte Prüfung: {mcpServices.length > 0 ? mcpServices[0].lastChecked : 'N/A'}
+        Letzte Prüfung: {mcpServices.length > 0 ? new Date(mcpServices[0].lastChecked).toLocaleString() : 'N/A'}
+        {error && " (Fallback-Daten werden angezeigt)"}
       </p>
     </div>
   );
