@@ -1,0 +1,75 @@
+{
+  "workflows": {
+    "standard": [
+      {
+        "command": "debug-recursive",
+        "options": {
+          "template": "recursive_bug_analysis"
+        }
+      },
+      {
+        "command": "optimize-recursive",
+        "options": {
+          "strategy": "auto"
+        }
+      }
+    ],
+    "deep": [
+      {
+        "command": "debug-recursive",
+        "options": {
+          "template": "recursive_bug_analysis",
+          "depth": "deep"
+        }
+      },
+      {
+        "command": "debug-recursive",
+        "options": {
+          "template": "stack_overflow_debugging"
+        }
+      },
+      {
+        "command": "bug-hunt",
+        "options": {
+          "focus": "recursive",
+          "depth": "deep"
+        }
+      },
+      {
+        "command": "optimize-recursive",
+        "options": {
+          "strategy": "auto"
+        }
+      }
+    ],
+    "quick": [
+      {
+        "command": "debug-recursive",
+        "options": {
+          "template": "recursive_bug_analysis",
+          "depth": "quick"
+        }
+      }
+    ],
+    "performance": [
+      {
+        "command": "optimize-recursive",
+        "options": {
+          "strategy": "auto",
+          "measure": "all"
+        }
+      }
+    ]
+  },
+  "triggers": {
+    "git_pre_commit": "quick",
+    "runtime_error": "standard",
+    "ci_failure": "deep",
+    "manual": "standard"
+  },
+  "error_patterns": {
+    "stack_overflow": "RangeError: Maximum call stack size exceeded",
+    "infinite_recursion": "Timeout: Execution timed out",
+    "memory_leak": "FATAL ERROR: JavaScript heap out of memory"
+  }
+}

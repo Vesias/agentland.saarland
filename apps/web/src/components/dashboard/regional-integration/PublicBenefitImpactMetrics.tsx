@@ -1,41 +1,87 @@
 import React, { useState, useEffect } from 'react';
-import { FaChartLine, FaUsers, FaHandsHelping, FaSpinner } from 'react-icons/fa';
+import { FaChartLine, FaArrowUp, FaArrowDown, FaMinus, FaUsers, FaBriefcase, FaUniversalAccess, FaSpinner, FaHeartbeat } from 'react-icons/fa';
 
+// Interface aligned with the API response from /api/regional/impact-metrics
 interface ImpactMetric {
   id: string;
   name: string;
   value: string | number;
   unit?: string;
-  trend?: 'up' | 'down' | 'stable';
+  trend: 'positive' | 'negative' | 'neutral' | 'stable';
   description: string;
-  icon: React.ReactNode;
+  lastUpdated: string;
+  target?: string | number;
+}
+
+interface PublicBenefitImpactSummary {
+  reportDate: string;
+  overallSentiment: 'positive' | 'neutral' | 'mixed' | 'concerning';
+  metrics: ImpactMetric[];
 }
 
 const PublicBenefitImpactMetrics: React.FC = () => {
-  // Placeholder data - in a real implementation, this would be fetched
-  // from backend services that track the impact of agentland.saarland initiatives.
-  const [metrics, setMetrics] = useState<ImpactMetric[]>([
-    { id: 'metric1', name: 'Saarland Citizens Assisted', value: 1250, unit: 'citizens', trend: 'up', description: 'Number of citizens directly benefiting from AI tools.', icon: <FaUsers className="text-blue-500" /> },
-    { id: 'metric2', name: 'Open Datasets Published', value: 25, trend: 'stable', description: 'Number of datasets made available for public use.', icon: <FaChartLine className="text-green-500" /> },
-    { id: 'metric3', name: 'Community Projects Supported', value: 8, trend: 'up', description: 'AI projects within Saarland leveraging this platform.', icon: <FaHandsHelping className="text-purple-500" /> },
-    { id: 'metric4', name: 'Dialect Model Accuracy Improvement', value: '15%', trend: 'up', description: 'Improvement in local dialect processing accuracy.', icon: <FaChartLine className="text-orange-500" /> },
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [summary, setSummary] = useState<PublicBenefitImpactSummary | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   setIsLoading(true);
-  //   fetch('/api/impact/metrics') // Example API
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       setMetrics(data);
-  //       setIsLoading(false);
-  //     })
-  //     .catch(error => {
-  //       console.error("Failed to fetch impact metrics:", error);
-  //       setIsLoading(false);
-  //     });
-  // }, []);
+  useEffect(() => {
+    const fetchImpactMetrics = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('/api/regional/impact-metrics');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch impact metrics: ${response.statusText}`);
+        }
+        const data: PublicBenefitImpactSummary | { error: string } = await response.json();
+        if ('error' in data) {
+          throw new Error(data.error);
+        }
+        setSummary(data);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred');
+        }
+        setSummary(null); // Clear or set fallback data
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchImpactMetrics();
+  }, []);
+
+  const getTrendIcon = (trend: ImpactMetric['trend']) => {
+    switch (trend) {
+      case 'positive': return <FaArrowUp className="text-green-500" />;
+      case 'negative': return <FaArrowDown className="text-red-500" />;
+      case 'neutral': return <FaMinus className="text-gray-500" />;
+      case 'stable': return <FaMinus className="text-gray-500" />; // Could use a different icon for stable if desired
+      default: return null;
+    }
+  };
+
+  const getMetricIcon = (metricName: string) => {
+    const lowerName = metricName.toLowerCase();
+    if (lowerName.includes('arbeitsplätze') || lowerName.includes('job')) return <FaBriefcase className="text-blue-500 dark:text-blue-400" />;
+    if (lowerName.includes('dialekt') || lowerName.includes('sprache') || lowerName.includes('nutzung')) return <FaUsers className="text-purple-500 dark:text-purple-400" />;
+    if (lowerName.includes('barrierefreiheit') || lowerName.includes('accessibility')) return <FaUniversalAccess className="text-teal-500 dark:text-teal-400" />;
+    if (lowerName.includes('effizienz') || lowerName.includes('efficiency')) return <FaChartLine className="text-orange-500 dark:text-orange-400" />;
+    return <FaHeartbeat className="text-gray-500 dark:text-gray-400" />; // Default icon
+  };
   
+  const getOverallSentimentColor = (sentiment: PublicBenefitImpactSummary['overallSentiment']) => {
+    switch (sentiment) {
+      case 'positive': return 'text-green-600 dark:text-green-400';
+      case 'neutral': return 'text-gray-600 dark:text-gray-400';
+      case 'mixed': return 'text-yellow-600 dark:text-yellow-400';
+      case 'concerning': return 'text-red-600 dark:text-red-400';
+      default: return 'text-gray-600 dark:text-gray-400';
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 text-center">
@@ -45,31 +91,56 @@ const PublicBenefitImpactMetrics: React.FC = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-red-500 dark:text-red-400 mb-2">
+          Fehler beim Laden der Impact Metriken
+        </h2>
+        <p className="text-red-600 dark:text-red-400">{error}</p>
+      </div>
+    );
+  }
+
+  if (!summary) {
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Public Benefit Impact Metriken</h2>
+        <p className="text-gray-500 dark:text-gray-400">Daten nicht verfügbar.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-        <FaHandsHelping className="mr-2 text-teal-500" /> Public Benefit Impact Metriken (Saarland)
+      <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-1">
+        Public Benefit Impact Metriken (Saarland)
       </h2>
+      <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+        Gesamtstimmung: <span className={`font-semibold ${getOverallSentimentColor(summary.overallSentiment)} capitalize`}>
+          {summary.overallSentiment}
+        </span> (Stand: {new Date(summary.reportDate).toLocaleDateString()})
+      </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {metrics.map(metric => (
-          <div key={metric.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg flex items-start space-x-3">
-            <div className="text-2xl mt-1">{metric.icon}</div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{metric.name}</p>
-              <p className="text-2xl font-bold text-gray-800 dark:text-white">
-                {metric.value}
-                {metric.unit && <span className="text-sm font-normal"> {metric.unit}</span>}
-                {metric.trend === 'up' && <span className="ml-1 text-xs text-green-500">▲</span>}
-                {metric.trend === 'down' && <span className="ml-1 text-xs text-red-500">▼</span>}
-              </p>
-              <p className="text-xs text-gray-600 dark:text-gray-300">{metric.description}</p>
+        {summary.metrics.map(metric => (
+          <div key={metric.id} className="bg-gray-50 dark:bg-gray-700/60 p-4 rounded-lg shadow hover:shadow-md transition-shadow">
+            <div className="flex items-center text-gray-700 dark:text-gray-200 mb-2">
+              <span className="text-xl">{getMetricIcon(metric.name)}</span>
+              <h3 className="ml-2 text-md font-semibold ">{metric.name}</h3>
             </div>
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">
+              {metric.value}
+              {metric.unit && <span className="text-sm font-normal text-gray-500 dark:text-gray-400 ml-1">{metric.unit}</span>}
+              <span className="ml-2 text-sm">{getTrendIcon(metric.trend)}</span>
+            </p>
+            {metric.target && (
+              <p className="text-xs text-gray-500 dark:text-gray-400">Ziel: {metric.target} {metric.unit || ''}</p>
+            )}
+            <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">{metric.description}</p>
+            <p className="text-xxs text-gray-400 dark:text-gray-500 mt-2">Zuletzt aktualisiert: {new Date(metric.lastUpdated).toLocaleDateString()}</p>
           </div>
         ))}
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
-        Diese Metriken sind aspirativ und illustrieren mögliche Auswirkungen.
-      </p>
     </div>
   );
 };

@@ -2,6 +2,10 @@
 
 Dieses Dokument beschreibt den automatisierten Git-Workflow für das agentland.saarland Projekt. Mit den hier beschriebenen Werkzeugen können Sie Git-Operationen ohne manuelle Eingriffe bei Diffs durchführen und haben eine modernisierte Lösung für Commits, Merges und Konfliktlösungen.
 
+> [!NOTE]
+> Ein **neues, verbessertes Tool** `git-automate.sh` wurde entwickelt, um den Workflow zu optimieren.
+> Siehe den Abschnitt "Neues Git-Automatisierungs-Tool" unten für weitere Details.
+
 ## Hauptfunktionen
 
 Das `auto-git-helper.sh` Skript bietet folgende automatisierte Git-Funktionen:
@@ -122,3 +126,132 @@ Falls Probleme auftreten:
 Weitere Details zu den fortschrittlichen Git-Werkzeugen finden Sie in der Dokumentation:
 - `/tools/scripts/git/README.md` (Standard Git-Tools)
 - `/tools/scripts/saar/git/README.md` (SAAR Git-Tools)
+
+---
+
+# Neues Git-Automatisierungs-Tool
+
+## Einführung zu git-automate.sh
+
+Das neue `git-automate.sh` Skript bietet einen noch optimierteren und zuverlässigeren Git-Workflow für agentland.saarland. Es wurde entwickelt, um die bestehenden Funktionen zu verbessern und gleichzeitig die Benutzung zu vereinfachen.
+
+## Hauptverbesserungen gegenüber auto-git-helper.sh
+
+- **Verbesserte Zuverlässigkeit**: Robustere Fehlerbehandlung und -prüfung
+- **NX-Build-Optimierung**: Automatische Erkennung und korrekte Behandlung von NX-Build-Dateien
+- **Vereinfachte Befehle**: Intuitivere Befehlsstruktur
+- **Intelligentere Konfliktlösung**: Typ-basierte Strategien für verschiedene Dateitypen
+- **Bessere Remote-Synchronisierung**: Sichere Push- und Pull-Strategien
+
+## Schnellstart für git-automate.sh
+
+```bash
+# Alle Änderungen automatisch committen und zum Remote pushen (All-in-One)
+./git-automate.sh auto-all
+
+# Nur Änderungen committen mit automatischer Nachrichtengenerierung
+./git-automate.sh auto-commit
+
+# Automatisch mit einem anderen Branch mergen
+./git-automate.sh auto-merge feature-branch
+
+# Aktuelle Änderungen mit Remote synchronisieren
+./git-automate.sh auto-sync
+```
+
+## Befehle im Detail
+
+### auto-commit [nachricht]
+
+Fügt alle Änderungen zum Staging-Bereich hinzu und erstellt einen Commit. Die Nachricht ist optional - ohne Angabe wird eine intelligente Commit-Nachricht basierend auf den Änderungen generiert.
+
+```bash
+./git-automate.sh auto-commit "Verbesserungen am Dashboard hinzugefügt"
+```
+
+Das Skript erkennt:
+- UI-Komponenten-Updates
+- API-Änderungen
+- Konfigurationsänderungen
+- Styling-Updates
+
+### auto-merge [branch]
+
+Führt einen Merge mit dem angegebenen Branch durch und löst Konflikte automatisch.
+
+```bash
+./git-automate.sh auto-merge develop
+```
+
+Die Konfliktlösung verwendet verschiedene Strategien je nach Dateityp:
+- JSON: "Ours"-Strategie, behält lokale Änderungen
+- Code-Dateien: "Theirs"-Strategie, übernimmt die neueren Änderungen
+- Andere Dateien: Standard-"Theirs"-Strategie
+
+### auto-sync
+
+Synchronisiert mit dem Remote-Repository (pull mit rebase und push).
+
+```bash
+./git-automate.sh auto-sync
+```
+
+Falls Konflikte auftreten, werden Anweisungen zur Auflösung angezeigt.
+
+### auto-all [nachricht]
+
+Kombiniert alle Funktionen: Aktualisiert .gitignore für NX-Dateien, committet alle Änderungen und synchronisiert mit dem Remote.
+
+```bash
+./git-automate.sh auto-all "Wöchentliches Update"
+```
+
+### ignore-nx
+
+Aktualisiert die .gitignore, um NX-Build-Dateien auszuschließen und entfernt eventuell bereits im Repository verfolgte NX-Dateien.
+
+```bash
+./git-automate.sh ignore-nx
+```
+
+## Integration mit staged-split-features.js
+
+Für eine fortgeschrittenere Feature-basierte Gruppierung von Commits kann das `staged-split-features.js` Skript mit der neuen Automatisierung kombiniert werden:
+
+### Integration mit einem Skript
+
+Erstellen Sie ein neues Skript namens `feature-commit.sh`:
+
+```bash
+#!/bin/bash
+# Feature-basierte Commits mit intelligenter Gruppierung
+git add .
+node tools/scripts/saar/git/staged-split-features.js --auto
+
+# Mit Remote synchronisieren
+./git-automate.sh auto-sync
+```
+
+Machen Sie es ausführbar mit:
+```bash
+chmod +x feature-commit.sh
+```
+
+## Anpassen und Erweitern
+
+Die Git-Automatisierung kann erweitert werden:
+
+1. Passen Sie die Kategorisierungslogik in `auto_commit()` an für domainspezifische Commit-Nachrichten
+2. Fügen Sie neue Konfliktlösungsstrategien in `auto_merge()` für projektspezifische Dateitypen hinzu
+3. Integrieren Sie mit CI/CD-Systemen durch zusätzliche Skripte oder Post-Commit-Hooks
+
+## Fehlerbehebung
+
+**Problem**: Probleme beim Synchronisieren mit Remote
+**Lösung**: Prüfen Sie Ihre Git-Konfiguration mit `git remote -v` und stellen Sie sicher, dass Sie die richtigen Berechtigungen haben
+
+**Problem**: Automatische Konfliktlösung funktioniert nicht wie erwartet
+**Lösung**: Bei komplexen Konflikten verwenden Sie `git merge --abort` und führen Sie dann einen manuellen Merge durch
+
+**Problem**: staged-split-features.js Integration funktioniert nicht
+**Lösung**: Überprüfen Sie den Pfad zum Skript und stellen Sie sicher, dass die erforderlichen Node.js-Module installiert sind

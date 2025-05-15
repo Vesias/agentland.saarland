@@ -101,7 +101,7 @@ const ServerConfigSchema = z.object({
   args: z.array(z.string()),
   description: z.string(),
   api_key_env: z.string().optional(),
-});
+}).strict();
 export interface ServerConfig extends z.infer<typeof ServerConfigSchema> {}
 
 /**
@@ -121,7 +121,7 @@ const ThemeColorsSchema = z.object({
   textSecondary: z.string(),
   border: z.string(),
   shadow: z.string(),
-});
+}).strict();
 interface ThemeColors extends z.infer<typeof ThemeColorsSchema> {}
 
 /**
@@ -130,7 +130,7 @@ interface ThemeColors extends z.infer<typeof ThemeColorsSchema> {}
 const ThemeSchema = z.object({
   name: z.string(),
   colors: ThemeColorsSchema,
-});
+}).strict();
 interface Theme extends z.infer<typeof ThemeSchema> {}
 
 /**
@@ -141,16 +141,16 @@ const RagConfigSchema = z.object({
   database: z.object({
     type: z.string(),
     path: z.string(),
-  }),
+  }).strict(),
   embedding: z.object({
     model: z.string(),
     api_key_env: z.string(),
-  }),
+  }).strict(),
   claude: z.object({
     api_key_env: z.string(),
     model: z.string(),
-  }),
-});
+  }).strict(),
+}).strict();
 interface RagConfig extends z.infer<typeof RagConfigSchema> {}
 
 /**
@@ -159,7 +159,7 @@ interface RagConfig extends z.infer<typeof RagConfigSchema> {}
 const McpConfigSchema = z.object({
   version: z.string(),
   servers: z.record(ServerConfigSchema),
-});
+}).strict();
 interface McpConfig extends z.infer<typeof McpConfigSchema> {}
 
 /**
@@ -171,11 +171,11 @@ const SecurityConfigSchema = z.object({
     allowed_servers: z.array(z.string()),
     allow_server_autostart: z.boolean(),
     allow_remote_servers: z.boolean(),
-  }),
+  }).strict(),
   filesystem: z.object({
     allowed_directories: z.array(z.string()),
-  }),
-});
+  }).strict(),
+}).strict();
 interface SecurityConfig extends z.infer<typeof SecurityConfigSchema> {}
 
 /**
@@ -187,8 +187,8 @@ const ColorSchemaConfigSchema = z.object({
   userPreferences: z.object({
     activeTheme: z.string(),
     custom: ThemeSchema.nullable(),
-  }),
-});
+  }).strict(),
+}).strict();
 interface ColorSchemaConfig extends z.infer<typeof ColorSchemaConfigSchema> {}
 
 /**
@@ -202,7 +202,7 @@ export const GlobalConfigSchema = z.object({
     enabled: z.boolean(),
     showErrors: z.boolean(),
     showWarnings: z.boolean(),
-  }),
+  }).strict(),
   logging: z.object({
     level: z.number(),
     format: z.string(),
@@ -212,8 +212,8 @@ export const GlobalConfigSchema = z.object({
     showHostname: z.boolean(),
     consoleOutput: z.boolean(),
     fileOutput: z.boolean(),
-  }),
-});
+  }).strict(),
+}).strict();
 export interface GlobalConfig extends z.infer<typeof GlobalConfigSchema> {}
 
 /**
@@ -226,8 +226,8 @@ const UserConfigSchema = z.object({
   preferences: z.object({
     theme: z.string(),
     language: z.string(),
-  }),
-});
+  }).strict(),
+}).strict();
 interface UserConfig extends z.infer<typeof UserConfigSchema> {}
 
 /**
@@ -244,13 +244,13 @@ const I18nConfigSchema = z.object({
     short: z.record(z.string()),
     medium: z.record(z.string()),
     long: z.record(z.string()),
-  }),
+  }).strict(),
   numberFormat: z.object({
     decimal: z.record(z.any()),
     percent: z.record(z.any()),
     currency: z.record(z.any()),
-  }),
-});
+  }).strict(),
+}).strict();
 interface I18nConfig extends z.infer<typeof I18nConfigSchema> {}
 
 /**

@@ -1,59 +1,73 @@
 import React, { useState, useEffect } from 'react';
-import { FaCheckSquare, FaRegSquare, FaSpinner, FaShieldAlt, FaGlobeEurope, FaBalanceScale, FaInfoCircle, FaExchangeAlt } from 'react-icons/fa';
+import { FaBalanceScale, FaCheckCircle, FaExclamationTriangle, FaQuestionCircle, FaSpinner, FaShieldAlt, FaGlobeEurope, FaInfoCircle, FaExchangeAlt } from 'react-icons/fa';
 
-interface ComplianceItem {
+// Interface aligned with the API response from /api/regional/sovereignty-status
+interface ComplianceCheck {
   id: string;
-  name: string;
-  description: string;
-  status: 'compliant' | 'partial' | 'non-compliant' | 'not-applicable' | 'pending-review';
-  detailsLink?: string;
-  category: 'Data Sovereignty' | 'Transparency' | 'Open Standards' | 'Ethical AI';
+  area: string;
+  status: 'compliant' | 'partially_compliant' | 'non_compliant' | 'pending_assessment';
+  details: string;
+  lastAssessed: string;
+  relevantRegulation?: string;
+}
+
+interface SovereigntyStatusSummary {
+  overallStatus: 'compliant' | 'partially_compliant' | 'non_compliant';
+  lastFullAssessment: string;
+  checks: ComplianceCheck[];
 }
 
 const SovereignAIComplianceCheck: React.FC = () => {
-  // Placeholder data - in a real implementation, this would be fetched
-  // from a backend service or configuration management.
-  const [complianceItems, setComplianceItems] = useState<ComplianceItem[]>([
-    { id: 'dsc001', name: 'Data Locality (Saarland/EU)', category: 'Data Sovereignty', description: 'Ensures user data is processed and stored within defined sovereign boundaries.', status: 'compliant', detailsLink: '/docs/data-locality-policy' },
-    { id: 'dsc002', name: 'Open Source Model Usage', category: 'Open Standards', description: 'Prioritizes the use of open-source AI models where feasible.', status: 'partial', detailsLink: '/docs/model-selection-criteria' },
-    { id: 'dsc003', name: 'Explainable AI (XAI) Features', category: 'Transparency', description: 'Provides mechanisms for understanding AI decision-making processes.', status: 'pending-review' },
-    { id: 'dsc004', name: 'GDPR Compliance', category: 'Data Sovereignty', description: 'Adherence to General Data Protection Regulation.', status: 'compliant' },
-    { id: 'dsc005', name: 'Bias Detection & Mitigation', category: 'Ethical AI', description: 'Processes in place to identify and address biases in AI models and data.', status: 'non-compliant', detailsLink: '/docs/bias-mitigation-plan' },
-    { id: 'dsc006', name: 'Interoperability Standards (MCP)', category: 'Open Standards', description: 'Utilizes Model Context Protocol for interoperable AI services.', status: 'compliant' },
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [summary, setSummary] = useState<SovereigntyStatusSummary | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   setIsLoading(true);
-  //   fetch('/api/sovereignty/compliance-status') // Example API
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       setComplianceItems(data);
-  //       setIsLoading(false);
-  //     })
-  //     .catch(error => {
-  //       console.error("Failed to fetch compliance status:", error);
-  //       setIsLoading(false);
-  //     });
-  // }, []);
+  useEffect(() => {
+    const fetchSovereigntyStatus = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('/api/regional/sovereignty-status');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch sovereignty status: ${response.statusText}`);
+        }
+        const data: SovereigntyStatusSummary | { error: string } = await response.json();
+        if ('error' in data) {
+          throw new Error(data.error);
+        }
+        setSummary(data);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred');
+        }
+        setSummary(null); // Clear or set fallback data
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const getStatusIcon = (status: ComplianceItem['status']) => {
+    fetchSovereigntyStatus();
+  }, []);
+
+  const getStatusColor = (status: ComplianceCheck['status'] | SovereigntyStatusSummary['overallStatus']) => {
     switch (status) {
-      case 'compliant': return <FaCheckSquare className="text-green-500 dark:text-green-400" />;
-      case 'partial': return <FaCheckSquare className="text-yellow-500 dark:text-yellow-400" />; // Or a specific partial icon
-      case 'non-compliant': return <FaRegSquare className="text-red-500 dark:text-red-400" />; // Or FaTimesSquare
-      case 'pending-review': return <FaSpinner className="text-blue-500 dark:text-blue-400 animate-spin" />;
-      default: return <FaRegSquare className="text-gray-400 dark:text-gray-500" />;
+      case 'compliant': return 'text-green-600 dark:text-green-400';
+      case 'partially_compliant': return 'text-yellow-600 dark:text-yellow-400';
+      case 'non_compliant': return 'text-red-600 dark:text-red-400';
+      case 'pending_assessment': return 'text-blue-500 dark:text-blue-400';
+      default: return 'text-gray-500 dark:text-gray-400';
     }
   };
 
-  const getCategoryIcon = (category: ComplianceItem['category']) => {
-    switch (category) {
-      case 'Data Sovereignty': return <FaGlobeEurope className="mr-2 text-blue-500" />;
-      case 'Transparency': return <FaInfoCircle className="mr-2 text-purple-500" />; // Assuming FaInfoCircle is imported
-      case 'Open Standards': return <FaExchangeAlt className="mr-2 text-orange-500" />;
-      case 'Ethical AI': return <FaBalanceScale className="mr-2 text-teal-500" />;
-      default: return <FaShieldAlt className="mr-2 text-gray-500" />;
+  const getStatusIcon = (status: ComplianceCheck['status'] | SovereigntyStatusSummary['overallStatus']) => {
+    switch (status) {
+      case 'compliant': return <FaCheckCircle className="inline mr-1" />;
+      case 'partially_compliant': return <FaExclamationTriangle className="inline mr-1" />; // Could use a specific icon for partial
+      case 'non_compliant': return <FaExclamationTriangle className="inline mr-1 text-red-600 dark:text-red-400" />;
+      case 'pending_assessment': return <FaSpinner className="inline mr-1 animate-spin" />;
+      default: return <FaQuestionCircle className="inline mr-1" />;
     }
   };
   
@@ -61,7 +75,29 @@ const SovereignAIComplianceCheck: React.FC = () => {
     return (
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 text-center">
         <FaSpinner className="animate-spin text-blue-500 text-2xl mx-auto mb-2" />
-        <p className="text-gray-600 dark:text-gray-300">Lade Sovereign AI Compliance Status...</p>
+        <p className="text-gray-600 dark:text-gray-300">Lade Compliance Status...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-red-500 dark:text-red-400 mb-2 flex items-center">
+          <FaExclamationTriangle className="mr-2" /> Fehler beim Laden des Compliance-Status
+        </h2>
+        <p className="text-red-600 dark:text-red-400">{error}</p>
+      </div>
+    );
+  }
+
+  if (!summary) {
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+          <FaBalanceScale className="mr-2 text-indigo-500" /> Sovereign AI Compliance
+        </h2>
+        <p className="text-gray-500 dark:text-gray-400">Compliance-Daten nicht verfügbar.</p>
       </div>
     );
   }
@@ -69,35 +105,39 @@ const SovereignAIComplianceCheck: React.FC = () => {
   return (
     <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-        <FaShieldAlt className="mr-2 text-indigo-500" /> Sovereign AI Compliance-Status
+        <FaBalanceScale className="mr-2 text-indigo-500" /> Sovereign AI Compliance
       </h2>
-      <div className="space-y-3">
-        {complianceItems.map(item => (
-          <div key={item.id} className="p-3 border border-gray-200 dark:border-gray-700 rounded-md hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                {getCategoryIcon(item.category)}
-                <h3 className="text-md font-medium text-gray-700 dark:text-gray-200">{item.name}</h3>
-              </div>
-              <div className="text-lg">{getStatusIcon(item.status)}</div>
+      
+      <div className="mb-6 p-3 rounded-md bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200">Gesamtstatus: 
+          <span className={`ml-2 font-semibold ${getStatusColor(summary.overallStatus)}`}>
+            {getStatusIcon(summary.overallStatus)}
+            {summary.overallStatus.replace('_', ' ')}
+          </span>
+        </h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400">Letzte Gesamtbewertung: {new Date(summary.lastFullAssessment).toLocaleDateString()}</p>
+      </div>
+
+      <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
+        {summary.checks.map((check) => (
+          <div key={check.id} className="border border-gray-200 dark:border-gray-700 rounded-md p-3 hover:shadow-md transition-shadow">
+            <div className="flex justify-between items-start">
+              <h4 className="text-md font-semibold text-gray-700 dark:text-gray-200">{check.area}</h4>
+              <span className={`text-sm font-medium ${getStatusColor(check.status)} capitalize`}>
+                {getStatusIcon(check.status)}
+                {check.status.replace('_', ' ')}
+              </span>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-2">{item.description}</p>
-            {item.detailsLink && (
-              <a href={item.detailsLink} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:underline dark:text-blue-400">
-                Weitere Details
-              </a>
-            )}
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-2">
+              Zuletzt geprüft: {new Date(check.lastAssessed).toLocaleDateString()}
+              {check.relevantRegulation && <span className="ml-2 italic">| Regulierung: {check.relevantRegulation}</span>}
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">{check.details}</p>
           </div>
         ))}
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
-        Status basierend auf internen Richtlinien und Audits.
-      </p>
     </div>
   );
 };
-
-// Assuming FaInfoCircle is imported if not already available globally
-// import { FaInfoCircle } from 'react-icons/fa'; 
 
 export default SovereignAIComplianceCheck;
