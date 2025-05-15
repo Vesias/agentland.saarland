@@ -222,57 +222,121 @@ create_release() {
   return 0
 }
 
-# Fügt NX-Build-Dateien zur .gitignore hinzu, falls noch nicht vorhanden
-update_gitignore_for_nx() {
-  echo -e "${BLUE}=== Aktualisiere .gitignore für NX-Build-Dateien ===${NC}"
+# CI/CD-Deployment starten
+ci_deploy() {
+  ENV=$1
   
-  NX_PATTERNS=(
-    ".nx/workspace-data/d/daemon.log"
-    ".nx/workspace-data/file-map.json"
-    ".nx/workspace-data/project-graph.json"
-    ".nx/workspace-data/**/*.db-shm"
-    ".nx/workspace-data/**/*.db-wal"
-    ".nx/workspace-data/**/*.db"
-    ".nx/cache/terminalOutputs/*"
-    ".nx/cache/run.json"
-    ".nx/tmp/*"
-  )
-  
-  GITIGNORE_FILE="$SCRIPT_DIR/.gitignore"
-  
-  if [ ! -f "$GITIGNORE_FILE" ]; then
-    echo -e "${YELLOW}.gitignore nicht gefunden, erstelle neu...${NC}"
-    touch "$GITIGNORE_FILE"
+  if [ -z "$ENV" ]; then
+    echo -e "${RED}Bitte geben Sie eine Umgebung an (z.B. staging, production).${NC}"
+    return 1
   fi
   
-  UPDATED=0
+  echo -e "${BLUE}=== Starte CI/CD-Deployment für $ENV ===${NC}"
   
-  for pattern in "${NX_PATTERNS[@]}"; do
-    if ! grep -q "^$pattern$" "$GITIGNORE_FILE"; then
-      echo "$pattern" >> "$GITIGNORE_FILE"
-      echo -e "${GREEN}Hinzugefügt: $pattern${NC}"
-      UPDATED=1
+  # Prüfen, ob GitHub Actions verwendet wird
+  if [ -d ".github/workflows" ]; then
+    echo "GitHub Actions erkannt..."
+    
+    # Manuellen Workflow-Dispatch auslösen (falls GitHub CLI installiert ist)
+    if command -v gh &> /dev/null; then
+      echo "Verwende GitHub CLI zum Auslösen des Workflows..."
+      
+      # Finde den passenden Workflow für die Umgebung
+      WORKFLOW_FILE=$(find .github/workflows -type f -name "*$ENV*" -o -name "deploy.yml" | head -n 1)
+      
+      if [ -n "$WORKFLOW_FILE" ]; then
+        WORKFLOW_NAME=$(basename "$WORKFLOW_FILE")
+        gh workflow run "$WORKFLOW_NAME" -f environment="$ENV"
+        echo -e "${GREEN}Deployment-Workflow für $ENV wurde gestartet.${NC}"
+      else
+        echo -e "${RED}Kein passender Workflow für $ENV gefunden.${NC}"
+        return 1
+      fi
+    else
+      # Alternativ: Push zum Environment-Branch
+      CURRENT_BRANCH=$(git branch --show-current)
+      git push origin "$CURRENT_BRANCH:deploy-$ENV" -f
+      echo -e "${GREEN}Code zum deploy-$ENV Branch gepusht. CI/CD sollte automatisch starten.${NC}"
     fi
-  done
-  
-  if [ $UPDATED -eq 0 ]; then
-    echo -e "${GREEN}NX-Build-Dateien sind bereits in .gitignore eingetragen.${NC}"
+  # Prüfen, ob GitLab CI verwendet wird
+  elif [ -f ".gitlab-ci.yml" ]; then
+    echo "GitLab CI erkannt..."
+    
+    # Manuellen Pipeline-Trigger auslösen
+    if command -v gitlab &> /dev/null; then
+      REPO_PATH=$(git remote get-url origin | sed 's/.*[:/]\([^/]*\/[^/]*\).git/\1/')
+      gitlab pipeline create -r "$REPO_PATH" -v "DEPLOY_ENV=$ENV"
+      echo -e "${GREEN}GitLab Pipeline für $ENV wurde gestartet.${NC}"
+    else
+      # Alternativ: mit API-Call 
+      echo -e "${YELLOW}GitLab CLI nicht gefunden. Bitte Pipeline manuell starten oder GitLab CLI installieren.${NC}"
+      return 1
+    fi
   else
-    echo -e "${GREEN}.gitignore erfolgreich aktualisiert.${NC}"
-    
-    # Entferne alle gestaged NX-Build-Dateien
-    git rm --cached ".nx/workspace-data/d/daemon.log" 2>/dev/null || true
-    git rm --cached ".nx/workspace-data/file-map.json" 2>/dev/null || true
-    git rm --cached ".nx/workspace-data/project-graph.json" 2>/dev/null || true
-    git rm --cached ".nx/workspace-data/**/*.db-shm" 2>/dev/null || true
-    git rm --cached ".nx/workspace-data/**/*.db-wal" 2>/dev/null || true
-    git rm --cached ".nx/workspace-data/**/*.db" 2>/dev/null || true
-    git rm --cached ".nx/cache/terminalOutputs/*" 2>/dev/null || true
-    git rm --cached ".nx/cache/run.json" 2>/dev/null || true
-    git rm --cached ".nx/tmp/*" 2>/dev/null || true
-    
-    echo -e "${GREEN}Ignorierte NX-Build-Dateien wurden aus dem Git-Index entfernt.${NC}"
+    echo -e "${YELLOW}Kein bekanntes CI/CD-System erkannt.${NC}"
+    echo -e "${YELLOW}Prüfen Sie manuell, ob ein CI/CD-System konfiguriert ist und wie man Deployments auslöst.${NC}"
+    return 1
   fi
+  
+  return 0
+}
+# CI/CD-Deployment starten
+ci_deploy() {
+  ENV=$1
+  
+  if [ -z "$ENV" ]; then
+    echo -e "${RED}Bitte geben Sie eine Umgebung an (z.B. staging, production).${NC}"
+    return 1
+  fi
+  
+  echo -e "${BLUE}=== Starte CI/CD-Deployment für $ENV ===${NC}"
+  
+  # Prüfen, ob GitHub Actions verwendet wird
+  if [ -d ".github/workflows" ]; then
+    echo "GitHub Actions erkannt..."
+    
+    # Manuellen Workflow-Dispatch auslösen (falls GitHub CLI installiert ist)
+    if command -v gh &> /dev/null; then
+      echo "Verwende GitHub CLI zum Auslösen des Workflows..."
+      
+      # Finde den passenden Workflow für die Umgebung
+      WORKFLOW_FILE=$(find .github/workflows -type f -name "*$ENV*" -o -name "deploy.yml" | head -n 1)
+      
+      if [ -n "$WORKFLOW_FILE" ]; then
+        WORKFLOW_NAME=$(basename "$WORKFLOW_FILE")
+        gh workflow run "$WORKFLOW_NAME" -f environment="$ENV"
+        echo -e "${GREEN}Deployment-Workflow für $ENV wurde gestartet.${NC}"
+      else
+        echo -e "${RED}Kein passender Workflow für $ENV gefunden.${NC}"
+        return 1
+      fi
+    else
+      # Alternativ: Push zum Environment-Branch
+      CURRENT_BRANCH=$(git branch --show-current)
+      git push origin "$CURRENT_BRANCH:deploy-$ENV" -f
+      echo -e "${GREEN}Code zum deploy-$ENV Branch gepusht. CI/CD sollte automatisch starten.${NC}"
+    fi
+  # Prüfen, ob GitLab CI verwendet wird
+  elif [ -f ".gitlab-ci.yml" ]; then
+    echo "GitLab CI erkannt..."
+    
+    # Manuellen Pipeline-Trigger auslösen
+    if command -v gitlab &> /dev/null; then
+      REPO_PATH=$(git remote get-url origin | sed 's/.*[:/]\([^/]*\/[^/]*\).git/\1/')
+      gitlab pipeline create -r "$REPO_PATH" -v "DEPLOY_ENV=$ENV"
+      echo -e "${GREEN}GitLab Pipeline für $ENV wurde gestartet.${NC}"
+    else
+      # Alternativ: mit API-Call 
+      echo -e "${YELLOW}GitLab CLI nicht gefunden. Bitte Pipeline manuell starten oder GitLab CLI installieren.${NC}"
+      return 1
+    fi
+  else
+    echo -e "${YELLOW}Kein bekanntes CI/CD-System erkannt.${NC}"
+    echo -e "${YELLOW}Prüfen Sie manuell, ob ein CI/CD-System konfiguriert ist und wie man Deployments auslöst.${NC}"
+    return 1
+  fi
+  
+  return 0
 }
   
   # Prüfen, ob GitHub Actions verwendet wird
