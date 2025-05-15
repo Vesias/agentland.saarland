@@ -82,6 +82,13 @@ bump_version() {
   fi
   
   CURRENT_VERSION=$(cat "$VERSION_FILE")
+  # Prüfe, ob die Version das richtige Format hat (x.y.z)
+  if [[ ! $CURRENT_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo -e "${YELLOW}Ungültiges Versionsformat in $VERSION_FILE. Setze auf 0.1.0.${NC}"
+    CURRENT_VERSION="0.1.0"
+    echo "$CURRENT_VERSION" > "$VERSION_FILE"
+  fi
+  
   MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
   MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
   PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
