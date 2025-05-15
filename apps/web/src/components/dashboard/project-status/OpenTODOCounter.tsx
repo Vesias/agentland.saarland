@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { FaSpinner } from 'react-icons/fa';
 
 interface TodoCount {
   total: number;
@@ -6,40 +7,70 @@ interface TodoCount {
 }
 
 const OpenTODOCounter: React.FC = () => {
-  // Placeholder data - in a real implementation, this would be fetched
-  // from a backend service that scans the codebase.
-  const [todoData, setTodoData] = useState<TodoCount>({
-    total: 42, // Example total
-    byModule: {
-      'libs/core': 15,
-      'libs/agents': 10,
-      'apps/web': 8,
-      'apps/cli': 5,
-      'Sonstige': 4,
-    },
-  });
-  const [isLoading, setIsLoading] = useState(false); // Example for future API call
+  const [todoData, setTodoData] = useState<TodoCount | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   setIsLoading(true);
-  //   // Replace with actual API call to fetch TODO counts
-  //   fetch('/api/project/todo-counts') // Example API endpoint
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       setTodoData(data);
-  //       setIsLoading(false);
-  //     })
-  //     .catch(error => {
-  //       console.error("Failed to fetch TODO counts:", error);
-  //       setIsLoading(false);
-  //       // Keep placeholder or set error state
-  //     });
-  // }, []);
+  useEffect(() => {
+    const fetchTodoCounts = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('/api/project/todo-counts');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch TODO counts: ${response.statusText}`);
+        }
+        const data = await response.json();
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        setTodoData(data);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred');
+        }
+        setTodoData({ // Fallback data
+          total: 0,
+          byModule: { 'Error': 0 }
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTodoCounts();
+  }, []);
 
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 text-center">
+        <FaSpinner className="animate-spin text-blue-500 text-2xl mx-auto mb-2" />
         <p className="text-gray-600 dark:text-gray-300">Lade TODOs...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-red-500 dark:text-red-400 mb-4">
+          Fehler bei TODOs
+        </h2>
+        <p className="text-red-500 dark:text-red-400">{error}</p>
+        {todoData && <p className="text-xs text-gray-400 mt-2">(Fallback-Daten werden angezeigt)</p>}
+      </div>
+    );
+  }
+  
+  if (!todoData) {
+     return (
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+          Offene TODOs im Code
+        </h2>
+        <p className="text-gray-500 dark:text-gray-400">Keine Daten verfügbar.</p>
       </div>
     );
   }
@@ -56,9 +87,9 @@ const OpenTODOCounter: React.FC = () => {
       {todoData.byModule && Object.keys(todoData.byModule).length > 0 && (
         <div>
           <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-2">Nach Modul:</h3>
-          <ul className="space-y-1 text-sm">
+          <ul className="space-y-1 text-sm max-h-32 overflow-y-auto">
             {Object.entries(todoData.byModule).map(([moduleName, count]) => (
-              <li key={moduleName} className="flex justify-between text-gray-600 dark:text-gray-300">
+              <li key={moduleName} className="flex justify-between text-gray-600 dark:text-gray-300 pr-2">
                 <span>{moduleName}:</span>
                 <span className="font-medium">{count}</span>
               </li>
@@ -67,7 +98,8 @@ const OpenTODOCounter: React.FC = () => {
         </div>
       )}
       <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
-        Daten basierend auf Codebase-Scan.
+        Daten basierend auf automatischem Codebase-Scan.
+        {error && " (Fallback-Daten werden angezeigt)"}
       </p>
     </div>
   );
