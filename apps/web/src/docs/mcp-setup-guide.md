@@ -1,4 +1,4 @@
-# MCP Setup Guide for AGENT_LAND.SAARLAND
+# MCP Setup Guide for agentland.saarland
 
 ## Setting up MCP Servers
 
@@ -44,7 +44,7 @@ Create or edit your Claude configuration file:
 
 ### 3. Your Project's MCP Integration
 
-Your AGENT_LAND.SAARLAND project already has MCP integration built-in:
+Your agentland.saarland project already has MCP integration built-in:
 
 - **MCP Client**: `/apps/web/src/core/mcp/claude_mcp_client.js`
 - **MCP Hooks**: `/apps/web/src/hooks/mcp/`

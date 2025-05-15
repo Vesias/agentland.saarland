@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# AGENT_LAND.SAARLAND Dashboard Starter
+# agentland.saarland Dashboard Starter
 # Dieses Skript startet das Dashboard mit einem Befehl
 
-echo "=== AGENT_LAND.SAARLAND Dashboard ==="
+echo "=== agentland.saarland Dashboard ==="
 echo "Starte das Dashboard..."
 
 # Go to the web app directory

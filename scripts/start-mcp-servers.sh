@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# AGENT_LAND.SAARLAND MCP Server Startup Script
+# agentland.saarland MCP Server Startup Script
 
-echo "🚀 Starting AGENT_LAND.SAARLAND MCP Servers..."
+echo "🚀 Starting agentland.saarland MCP Servers..."
 
 # Set project root
 export PROJECT_ROOT="/home/jan/agentland.saarland"

@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import './index.css';
 import RegisterForm from './components/auth/RegisterForm';
 import LoginForm from './components/auth/LoginForm';
+import DashboardPage from './pages/dashboard.tsx'; // Explicitly add .tsx
 
 function App() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // Default to true for dev
   const [showRegister, setShowRegister] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
@@ -87,7 +88,7 @@ function App() {
         borderRadius: 'var(--radius-lg)'
       }}>
         <div className="flex items-center">
-          <h1 style={{margin: 0, fontSize: 'var(--text-2xl)'}}>AGENT_LAND.SAARLAND</h1>
+          <h1 style={{margin: 0, fontSize: 'var(--text-2xl)'}}>agentland.saarland</h1>
         </div>
         <div style={{display: 'flex', gap: 'var(--spacing-2)'}}>
           {!isLoggedIn && (
@@ -135,83 +136,86 @@ function App() {
         </div>
       )}
 
-      <main className="dashboard-grid" style={{gridTemplateColumns: '1fr'}}>
-        <div className="card">
-          <h2 className="widget-title" style={{color: 'var(--primary-color)', marginTop: 0}}>Real-Life Agent Cockpit</h2>
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="badge badge-primary">Aktive Mission</div>
-              <div className="text-muted">Agent Level: {userProfile ? 3 : 1}</div>
-            </div>
-            <div style={{fontWeight: 'bold', marginBottom: 'var(--spacing-2)'}}>
-              Mission: Saarland-Wanderweg digitalisieren
-            </div>
-            <div style={{
-              height: '8px',
-              background: 'var(--border-color)',
-              borderRadius: 'var(--radius-sm)',
-              overflow: 'hidden',
-              marginBottom: 'var(--spacing-2)'
-            }}>
+      {isLoggedIn ? (
+        <DashboardPage />
+      ) : (
+        <main className="dashboard-grid" style={{gridTemplateColumns: '1fr'}}>
+          {/* Content for non-logged-in users, or a prompt to log in/register */}
+          <div className="card">
+            <h2 className="widget-title" style={{color: 'var(--primary-color)', marginTop: 0}}>Real-Life Agent Cockpit</h2>
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="badge badge-primary">Aktive Mission</div>
+                <div className="text-muted">Agent Level: 1</div>
+              </div>
+              <div style={{fontWeight: 'bold', marginBottom: 'var(--spacing-2)'}}>
+                Mission: Saarland-Wanderweg digitalisieren
+              </div>
               <div style={{
-                width: isLoggedIn ? '45%' : '0%',
-                height: '100%',
-                background: 'var(--success-color)',
-                transition: 'width 1s ease-in-out'
-              }}></div>
+                height: '8px',
+                background: 'var(--border-color)',
+                borderRadius: 'var(--radius-sm)',
+                overflow: 'hidden',
+                marginBottom: 'var(--spacing-2)'
+              }}>
+                <div style={{
+                  width: '0%',
+                  height: '100%',
+                  background: 'var(--success-color)',
+                  transition: 'width 1s ease-in-out'
+                }}></div>
+              </div>
+              <div style={{fontSize: 'var(--text-sm)', color: 'var(--success-color)'}}>
+                Anmelden zum Starten
+              </div>
             </div>
-            <div style={{fontSize: 'var(--text-sm)', color: 'var(--success-color)'}}>
-              {isLoggedIn ? '45% abgeschlossen' : 'Anmelden zum Starten'}
-            </div>
+            <button 
+              className="btn btn-primary" 
+              style={{width: '100%'}}
+              onClick={() => setShowLogin(true)}
+            >
+              Anmelden erforderlich
+            </button>
           </div>
-          <button 
-            className="btn btn-primary" 
-            style={{width: '100%'}}
-            disabled={!isLoggedIn}
-          >
-            {isLoggedIn ? 'Fortschritt aktualisieren' : 'Anmelden erforderlich'}
-          </button>
-        </div>
 
-        <div className="card">
-          <h2 className="widget-title" style={{color: 'var(--primary-color)', marginTop: 0}}>KI-Workspace</h2>
-          <div className="mb-4">
-            <div className="flex items-center mb-2">
-              <div style={{
-                width: '10px',
-                height: '10px',
-                borderRadius: '50%',
-                background: isLoggedIn ? 'var(--success-color)' : 'var(--warning-color)',
-                marginRight: 'var(--spacing-2)'
-              }}></div>
-              <span>Lokaler Llama 3.2 Agent: {isLoggedIn ? 'Aktiv' : 'Wartend'}</span>
+          <div className="card">
+            <h2 className="widget-title" style={{color: 'var(--primary-color)', marginTop: 0}}>KI-Workspace</h2>
+            <div className="mb-4">
+              <div className="flex items-center mb-2">
+                <div style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  background: 'var(--warning-color)',
+                  marginRight: 'var(--spacing-2)'
+                }}></div>
+                <span>Lokaler Llama 3.2 Agent: Wartend</span>
+              </div>
+              <div className="flex items-center mb-2">
+                <div style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  background: 'var(--error-color)', /* Assuming var(--error-color) is defined */
+                  marginRight: 'var(--spacing-2)'
+                }}></div>
+                <span>Workspace gesperrt</span>
+              </div>
+              <div className="badge badge-secondary mb-2">AI-Schmiede Saar</div>
             </div>
-            <div className="flex items-center mb-2">
-              <div style={{
-                width: '10px',
-                height: '10px',
-                borderRadius: '50%',
-                background: isLoggedIn ? 'var(--success-color)' : 'var(--error-color)',
-                marginRight: 'var(--spacing-2)'
-              }}></div>
-              <span>Workspace {isLoggedIn ? 'bereit' : 'gesperrt'}</span>
-            </div>
-            <div className="badge badge-secondary mb-2">AI-Schmiede Saar</div>
+            <button 
+              className="btn btn-primary" 
+              style={{width: '100%'}}
+              onClick={() => setShowLogin(true)}
+            >
+              Anmeldung erforderlich
+            </button>
           </div>
-          <button 
-            className="btn btn-primary" 
-            style={{width: '100%'}}
-            disabled={!isLoggedIn}
-          >
-            {isLoggedIn ? 'Workspace öffnen' : 'Anmeldung erforderlich'}
-          </button>
-        </div>
-
-        {!isLoggedIn ? (
+          
           <div className="card">
             <h2 className="widget-title" style={{color: 'var(--primary-color)', marginTop: 0}}>Konto erstellen</h2>
             <div className="mb-4">
-              <p>Erstelle ein Konto, um alle Funktionen des AGENT_LAND.SAARLAND Dashboard zu nutzen.</p>
+              <p>Erstelle ein Konto, um alle Funktionen des agentland.saarland Dashboard zu nutzen.</p>
               <ul style={{paddingLeft: '1.5rem', margin: '1rem 0'}}>
                 <li>Zugriff auf KI-Agenten</li>
                 <li>Personalisierte Missionen</li>
@@ -248,75 +252,8 @@ function App() {
               </div>
             </div>
           </div>
-        ) : (
-          <div className="card">
-            <h2 className="widget-title" style={{color: 'var(--primary-color)', marginTop: 0}}>Profil bearbeiten</h2>
-            <div className="mb-4">
-              <p>Aktualisiere deine Profildaten.</p>
-              <form>
-                <div className="mb-4">
-                  <label style={{display: 'block', marginBottom: 'var(--spacing-2)', fontWeight: 'bold'}}>Name</label>
-                  <input 
-                    type="text" 
-                    placeholder="Dein Name" 
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: 'var(--spacing-2)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: 'var(--radius-sm)',
-                      background: 'rgba(30, 41, 59, 0.8)',
-                      color: '#fff'
-                    }} 
-                  />
-                </div>
-                <div className="mb-4">
-                  <label style={{display: 'block', marginBottom: 'var(--spacing-2)', fontWeight: 'bold'}}>E-Mail</label>
-                  <input 
-                    type="email" 
-                    placeholder="deine@email.de" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: 'var(--spacing-2)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: 'var(--radius-sm)',
-                      background: 'rgba(30, 41, 59, 0.8)',
-                      color: '#fff'
-                    }} 
-                  />
-                </div>
-                <div className="mb-4">
-                  <label style={{display: 'block', marginBottom: 'var(--spacing-2)', fontWeight: 'bold'}}>Neues Passwort</label>
-                  <input 
-                    type="password" 
-                    placeholder="Leer lassen um beizubehalten" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: 'var(--spacing-2)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: 'var(--radius-sm)',
-                      background: 'rgba(30, 41, 59, 0.8)',
-                      color: '#fff'
-                    }} 
-                  />
-                </div>
-                <button 
-                  type="button" 
-                  className="btn btn-secondary"
-                  onClick={handleSaveProfile}
-                >
-                  Profil aktualisieren
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
-      </main>
+        </main>
+      )}
 
       <footer className="text-center mt-4" style={{
         padding: 'var(--spacing-4)',
@@ -324,7 +261,7 @@ function App() {
         fontSize: 'var(--text-sm)'
       }}>
         <div className="mb-2">KI-Schmiede Saar | Real-Life Agenten | Digitale Innovation</div>
-        <div>&copy; {new Date().getFullYear()} AGENT_LAND.SAARLAND</div>
+        <div>&copy; {new Date().getFullYear()} agentland.saarland</div>
       </footer>
     </div>
   );

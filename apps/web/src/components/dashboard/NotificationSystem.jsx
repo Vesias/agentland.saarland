@@ -4,7 +4,7 @@ import { FaBell, FaCheck, FaTimes, FaRobot, FaShieldAlt, FaClipboardList, FaExcl
 /**
  * NotificationSystem Component
  * 
- * A comprehensive notification system for the AGENT_LAND.SAARLAND dashboard
+ * A comprehensive notification system for the agentland.saarland dashboard
  * with support for different notification types and real-time updates
  */
 const NotificationSystem = ({ onNotificationClick }) => {

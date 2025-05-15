@@ -66,7 +66,7 @@
       "autostart": true
     },
     "agentland-saarland": {
-      "description": "AGENT_LAND.SAARLAND Framework-Integration",
+      "description": "agentland.saarland Framework-Integration",
       "command": "node",
       "args": [
         "/home/jan/agentland.saarland/libs/mcp/src/start_server.js"

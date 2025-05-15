@@ -8,7 +8,7 @@
 // Import hooks
 import useMcpGameState from './useGameState';
 import { useMcpDailyRewards } from './useDailyRewards';
-import { useMcpSequentialPlanner } from './useSequentialPlanner';
+import useSequentialPlanner_default from './useSequentialPlanner'; // Correctly import the default export
 
 // Mock hooks for testing
 const useMcpSequentialThinking = () => {
@@ -66,7 +66,7 @@ export {
   useMcpRealTimeUpdates,
   useMcpContext7,
   useMcpDailyRewards,
-  useMcpSequentialPlanner
+  useSequentialPlanner_default as useMcpSequentialPlanner // Re-export with the desired name
 };
 
 // Export useGameState as both the MCP version and a more convenient alias

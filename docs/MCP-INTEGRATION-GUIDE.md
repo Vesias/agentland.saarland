@@ -1,8 +1,8 @@
-# MCP Integration Guide for AGENT_LAND.SAARLAND
+# MCP Integration Guide for agentland.saarland
 
 ## Overview
 
-Your AGENT_LAND.SAARLAND project is now configured with MCP (Model Context Protocol) integration, allowing Claude to directly interact with your dashboard and AI agents.
+Your agentland.saarland project is now configured with MCP (Model Context Protocol) integration, allowing Claude to directly interact with your dashboard and AI agents.
 
 ## Configuration Complete ✅
 
@@ -17,7 +17,7 @@ The following MCP servers are now configured in your Claude installation:
 - **OSP Marketing Tools**: Writing guides
 - **Genkit**: Firebase integration
 
-### 2. AGENT_LAND.SAARLAND MCP Server
+### 2. agentland.saarland MCP Server
 - **Server ID**: `agentland-saarland`
 - **Location**: `/home/jan/agentland.saarland/libs/mcp/src/start_server.js`
 - **Features**:
@@ -99,7 +99,7 @@ useA2AManager("send", { to: "git-agent", message: "status" })
 ## Architecture
 
 ```
-Claude (with MCP) <-> MCP Server <-> AGENT_LAND.SAARLAND
+Claude (with MCP) <-> MCP Server <-> agentland.saarland
                            |
                            ├── Sequential Planner
                            ├── Memory Server
@@ -149,4 +149,4 @@ If MCP connection fails:
 3. Experiment with color schema updates
 4. Set up agent-to-agent communication
 
-Your AGENT_LAND.SAARLAND dashboard is now fully integrated with Claude's MCP capabilities!
+Your agentland.saarland dashboard is now fully integrated with Claude's MCP capabilities!

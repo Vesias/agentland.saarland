@@ -4,7 +4,7 @@
  * Simple MCP Server
  * ================
  * 
- * A minimal MCP server implementation for AGENT_LAND.SAARLAND
+ * A minimal MCP server implementation for agentland.saarland
  */
 
 const express = require('express');

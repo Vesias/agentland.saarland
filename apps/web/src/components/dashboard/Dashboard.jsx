@@ -5,12 +5,12 @@ import { FaCog, FaSyncAlt, FaPlus, FaTimes, FaGripLines } from 'react-icons/fa';
  * Dashboard Component
  * 
  * A modular dashboard with draggable and configurable widgets
- * for the AGENT_LAND.SAARLAND Dashboard Concept V1
+ * for the agentland.saarland Dashboard Concept V1
  */
 const Dashboard = ({ 
   widgets = [],
   availableWidgets = [],
-  title = 'AGENT_LAND.SAARLAND',
+  title = 'agentland.saarland',
   subtitle = 'Dashboard',
   onLayoutChange = () => {}
 }) => {

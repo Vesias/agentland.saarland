@@ -61,7 +61,7 @@ async function loadProfile(profileId) {
         name: "Example User",
         email: "user@example.com",
         location: "Saarland, Germany",
-        bio: "Ein Beispielbenutzer für das AGENT_LAND.SAARLAND Dashboard",
+        bio: "Ein Beispielbenutzer für das agentland.saarland Dashboard",
         skills: ["JavaScript", "React"]
       },
       preferences: {

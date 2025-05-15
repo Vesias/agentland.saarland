@@ -5,7 +5,7 @@ import { FaShieldAlt, FaKey, FaCheck, FaTimes, FaExclamationTriangle, FaUserShie
  * A2AMissionAuthWidget Component
  * 
  * Displays the mission authorization controls and status for agent-to-agent
- * communication in the AGENT_LAND.SAARLAND security dashboard
+ * communication in the agentland.saarland security dashboard
  */
 const A2AMissionAuthWidget = ({ className = "", agent = null }) => {
   const [missionAuthData, setMissionAuthData] = useState({

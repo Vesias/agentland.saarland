@@ -4,7 +4,7 @@ import { SecurityProvider } from '../contexts/SecurityContext';
 
 /**
  * Example component demonstrating how to integrate the security
- * components into the AGENT_LAND_SAARLAND dashboard
+ * components into the agentland.saarland dashboard
  */
 const SecurityIntegrationExample = () => {
   return (
@@ -12,7 +12,7 @@ const SecurityIntegrationExample = () => {
       <div className="example-container">
         <header className="example-header">
           <div className="header-left">
-            <div className="header-logo">AGENT_LAND.SAARLAND</div>
+            <div className="header-logo">agentland.saarland</div>
             <nav className="header-nav">
               <a href="#dashboard" className="nav-item active">Dashboard</a>
               <a href="#agent" className="nav-item">Mein Agent</a>
@@ -102,7 +102,7 @@ const SecurityIntegrationExample = () => {
             {/* News Feed Widget */}
             <div className="dashboard-widget news-feed">
               <div className="widget-header">
-                <h2>AGENT_LAND.SAARLAND Aktuell</h2>
+                <h2>agentland.saarland Aktuell</h2>
               </div>
               <div className="widget-content">
                 <div className="news-item">

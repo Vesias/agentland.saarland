@@ -30,7 +30,7 @@ export const ProfileProvider = ({ children }) => {
             name: 'Max Mustermann',
             email: 'max@example.com',
             location: 'Saarland, Germany',
-            bio: 'Ein Beispielbenutzer für das AGENT_LAND.SAARLAND Dashboard',
+            bio: 'Ein Beispielbenutzer für das agentland.saarland Dashboard',
             skills: ['JavaScript', 'React']
           },
           preferences: {

@@ -15,7 +15,7 @@ import { useTheme } from '../dashboard/ThemeProvider';
 /**
  * DashboardNavbar Component
  * 
- * A responsive navbar for the AGENT_LAND.SAARLAND dashboard
+ * A responsive navbar for the agentland.saarland dashboard
  * with search, notifications, profile, and language options
  */
 const DashboardNavbar = ({ onSearch }) => {
@@ -168,7 +168,7 @@ const DashboardNavbar = ({ onSearch }) => {
             <FaRobot className="robot-icon" />
           </div>
           <div className="brand-text">
-            <span className="brand-name">AGENT_LAND</span>
+            <span className="brand-name">agentland</span>
             <span className="brand-region">.SAARLAND</span>
           </div>
         </div>

@@ -254,7 +254,7 @@ const LoginForm = ({ onLogin, onSwitchToRegister }) => {
 
       <div className="form-header">
         <h2>Anmeldung</h2>
-        <p>Willkommen zurück bei AGENT_LAND.SAARLAND</p>
+        <p>Willkommen zurück bei agentland.saarland</p>
       </div>
 
       <form onSubmit={handleSubmit}>

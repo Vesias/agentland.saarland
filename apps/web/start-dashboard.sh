@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# AGENT_LAND.SAARLAND Dashboard Startup Script (Improved)
+# agentland.saarland Dashboard Startup Script (Improved)
 
-echo "=== AGENT_LAND.SAARLAND Dashboard Starter ==="
-echo "Starte das Dashboard für AGENT_LAND.SAARLAND..."
+echo "=== agentland.saarland Dashboard Starter ==="
+echo "Starte das Dashboard für agentland.saarland..."
 
 # Navigate to the project directory
 cd "$(dirname "$0")"

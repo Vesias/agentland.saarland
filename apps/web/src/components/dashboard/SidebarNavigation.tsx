@@ -25,6 +25,10 @@ const navigationItems: Array<NavItem> = [
   { name: 'Knowledge Management', href: '/dashboard/knowledge', icon: ExampleIcon, current: false },
   { name: 'Regional Integration', href: '/dashboard/regional', icon: ExampleIcon, current: false },
   { name: 'System Health', href: '/dashboard/health', icon: ExampleIcon, current: false },
+  { name: 'Onboard New Agent', href: '/onboard-agent', icon: ExampleIcon, current: false },
+  { name: 'Prompt Engineering', href: '/prompt-engineering', icon: ExampleIcon, current: false },
+  { name: 'Workflow Designer', href: '/workflow-designer', icon: ExampleIcon, current: false },
+  { name: 'MCP Tool Manager', href: '/mcp-tool-manager', icon: ExampleIcon, current: false },
   { name: 'Settings', href: '/dashboard/settings', icon: ExampleIcon, current: false },
   // TODO: Add more navigation items based on the dashboard evolution plan
 ];
@@ -54,13 +58,15 @@ const SidebarNavigation: React.FC = () => {
             `}
           >
             {item.icon && (
-              <item.icon
-                className={`
-                  mr-3 flex-shrink-0 h-6 w-6
-                  ${item.current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300'}
-                `}
-                aria-hidden="true"
-              />
+              <span className="mr-3 flex-shrink-0 h-6 w-6 flex items-center justify-center">
+                <item.icon
+                  className={`
+                    h-5 w-5 
+                    ${item.current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300'}
+                  `}
+                  aria-hidden="true"
+                />
+              </span>
             )}
             {item.name}
           </a>

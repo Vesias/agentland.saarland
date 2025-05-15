@@ -275,7 +275,7 @@ const RegisterForm = ({ onRegister, onSwitchToLogin }) => {
 
       <div className="form-header">
         <h2>Registrierung</h2>
-        <p>Erstellen Sie Ihr AGENT_LAND.SAARLAND Konto</p>
+        <p>Erstellen Sie Ihr agentland.saarland Konto</p>
       </div>
 
       <form onSubmit={handleSubmit}>

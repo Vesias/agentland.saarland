@@ -32,7 +32,7 @@ const DashboardLayout = ({ children }) => {
         <div className="container">
           <div className="footer-content">
             <div className="footer-copyright">
-              &copy; {new Date().getFullYear()} AGENT_LAND.SAARLAND
+              &copy; {new Date().getFullYear()} agentland.saarland
             </div>
             <div className="footer-links">
               <a href="#about">{t('common.about')}</a>

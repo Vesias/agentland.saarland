@@ -1,9 +1,21 @@
 {
   "run": {
-    "command": "nx run-many --target=serve --parallel=3",
-    "startTime": "2025-05-15T10:22:25.597Z",
-    "endTime": "2025-05-15T10:48:27.860Z",
+    "command": "nx serve web --port 5001",
+    "startTime": "2025-05-15T16:38:05.756Z",
+    "endTime": "2025-05-15T16:38:06.092Z",
     "inner": false
   },
-  "tasks": []
+  "tasks": [
+    {
+      "taskId": "web:serve",
+      "target": "serve",
+      "projectName": "web",
+      "hash": "10679832387139695071",
+      "startTime": "2025-05-15T16:38:05.761Z",
+      "endTime": "2025-05-15T16:38:06.091Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
 }

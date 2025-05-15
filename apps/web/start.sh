@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# AGENT_LAND.SAARLAND Dashboard Starter Script
+# agentland.saarland Dashboard Starter Script
 # This script helps to start the dashboard development server
 
-echo "=== AGENT_LAND.SAARLAND Dashboard ==="
-echo "Starte das AGENT_LAND.SAARLAND Dashboard mit folgendem Befehl:"
+echo "=== agentland.saarland Dashboard ==="
+echo "Starte das agentland.saarland Dashboard mit folgendem Befehl:"
 echo ""
 echo "cd $(pwd) && npm install && npm run dev"
 echo ""

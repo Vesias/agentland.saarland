@@ -15,7 +15,7 @@ import { NewsFeedWidget } from '../components/news';
  * DashboardPage Component
  * 
  * Main dashboard page that uses the modular Dashboard component
- * to render the AGENT_LAND.SAARLAND dashboard
+ * to render the agentland.saarland dashboard
  */
 const DashboardPage = () => {
   const [dashboardWidgets, setDashboardWidgets] = useState([]);
@@ -41,7 +41,7 @@ const DashboardPage = () => {
       },
       {
         type: 'news-feed',
-        title: 'Neues aus dem AGENT_LAND',
+        title: 'Neues aus dem agentland',
         description: 'Aktuelle Nachrichten, Tutorials und Community-Events',
         icon: <FaNewspaper />,
         component: <NewsFeedWidget />
@@ -136,7 +136,7 @@ const DashboardPage = () => {
       <Dashboard 
         widgets={dashboardWidgets}
         availableWidgets={availableWidgets}
-        title="AGENT_LAND.SAARLAND"
+        title="agentland.saarland"
         subtitle="Dein persönliches Dashboard"
         onLayoutChange={handleLayoutChange}
       />

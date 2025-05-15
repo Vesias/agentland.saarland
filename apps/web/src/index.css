@@ -31,7 +31,7 @@
   --danger-color: #f44336;
   --info-color: #2196f3;
   
-  --background-color: #F8F9FC;
+  --background-color: #EFF2F7; /* Updated for better contrast with white surfaces */
   --surface-color: #ffffff;
   --text-color: #202124;
   --text-secondary-color: #5F6368;

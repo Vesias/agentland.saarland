@@ -1,11 +1,23 @@
 import React from 'react';
-import DashboardLayout from '../components/dashboard/DashboardLayout';
-import ActiveAgentsOverview from '../components/dashboard/agent-orchestration/ActiveAgentsOverview';
-import MCPToolUsageMonitor from '../components/dashboard/agent-orchestration/MCPToolUsageMonitor';
-import SystemStatusIndicator from '../components/dashboard/system-health/SystemStatusIndicator';
-import KnowledgeBaseExplorer from '../components/dashboard/knowledge-management/KnowledgeBaseExplorer';
-import LighthouseAppSpotlight from '../components/dashboard/regional-integration/LighthouseAppSpotlight';
-// Import other widgets as needed
+import {
+  DashboardLayout,
+  ActiveAgentsOverview,
+  MCPToolUsageMonitor,
+  SystemStatusIndicator,
+  KnowledgeBaseExplorer,
+  LighthouseAppSpotlight,
+  AuditV4ProgressOverview,
+  TestCoverageDashboard,
+  OpenTODOCounter,
+  MCPServiceStatusPanel,
+  LiveAgentGraph,
+  VectorStoreHealth,
+  KnowledgeSourceMonitor,
+  WorkflowProgressTracker,
+  SovereignAIComplianceCheck,
+  PublicBenefitImpactMetrics
+  // Import other widgets as needed from '../components/dashboard'
+} from '../components/dashboard';
 
 const DashboardPage: React.FC = () => {
   return (
@@ -19,15 +31,25 @@ const DashboardPage: React.FC = () => {
           
           {/* Main Column (lg:col-span-2) */}
           <section className="lg:col-span-2 space-y-6">
+            <LiveAgentGraph />
+            <WorkflowProgressTracker />
+            <AuditV4ProgressOverview />
+            <TestCoverageDashboard />
             <ActiveAgentsOverview />
             <MCPToolUsageMonitor />
-            <KnowledgeBaseExplorer /> 
+            <KnowledgeBaseExplorer />
+            <VectorStoreHealth />
+            <KnowledgeSourceMonitor />
+            <SovereignAIComplianceCheck />
+            <PublicBenefitImpactMetrics />
             {/* Add more primary widgets here */}
           </section>
 
           {/* Sidebar Column (lg:col-span-1) */}
           <section className="space-y-6">
             <SystemStatusIndicator />
+            <MCPServiceStatusPanel />
+            <OpenTODOCounter />
             <LighthouseAppSpotlight />
             {/* Add more secondary/sidebar widgets here, e.g., RecentEmbeddingsFeed, TaskQueueManager */}
             {/* Example:

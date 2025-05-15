@@ -16,8 +16,7 @@ import {
   FaInfoCircle
 } from 'react-icons/fa';
 import { useSecurity } from '../../contexts/SecurityContext';
-import { SecurityWidget } from './index';
-import { DNSSecurityStatus } from './DNSSecurityStatus';
+import { SecurityWidget, DNSSecurityStatus, SecurityAuditHighlights, EnvVariableStatus } from './index'; // Import DNSSecurityStatus and SecurityAuditHighlights from barrel file
 
 /**
  * Security Dashboard Page
@@ -107,7 +106,8 @@ const SecurityDashboardPage = () => {
               </div>
             </div>
           </div>
-          
+          <SecurityAuditHighlights />
+          <EnvVariableStatus />
           <div className="dashboard-card">
             <div className="card-header">
               <FaUsers className="card-icon" />

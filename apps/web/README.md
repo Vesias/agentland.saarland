@@ -1,6 +1,6 @@
-# AGENT_LAND.SAARLAND Dashboard
+# agentland.saarland Dashboard
 
-Dieses Dashboard ist die zentrale Oberfläche für die AGENT_LAND.SAARLAND Plattform und bietet eine modulare, anpassbare Benutzeroberfläche mit Fokus auf "Real-Life Agent" Missionen und regionale Identität des Saarlandes.
+Dieses Dashboard ist die zentrale Oberfläche für die agentland.saarland Plattform und bietet eine modulare, anpassbare Benutzeroberfläche mit Fokus auf "Real-Life Agent" Missionen und regionale Identität des Saarlandes.
 
 ## Schnellstart (EMPFOHLEN)
 

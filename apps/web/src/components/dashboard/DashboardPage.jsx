@@ -14,11 +14,9 @@ import {
   FaKey,
   FaUserShield
 } from 'react-icons/fa';
-import { SecurityWidget } from '../security';
-import { DNSSecurityStatus } from '../security/DNSSecurityStatus';
-import { A2AMissionAuthWidget } from '../security';
+import { SecurityWidget, DNSSecurityStatus, A2AMissionAuthWidget } from '../security'; // Consolidate imports from security barrel file
 import EnhancedAgentCockpit from './EnhancedAgentCockpit';
-import { useGameState } from '../../hooks/mcp/useGameState';
+import { useGameState } from '../../hooks/mcp'; // Import from the barrel file
 
 // Mock components for widgets - would be replaced with real components
 const AgentCockpitWidget = () => {
@@ -521,7 +519,7 @@ const SupportWidget = () => (
 /**
  * DashboardPage Component
  * 
- * Main dashboard page for AGENT_LAND.SAARLAND that uses the modular Dashboard component
+ * Main dashboard page for agentland.saarland that uses the modular Dashboard component
  */
 const DashboardPage = () => {
   const [dashboardWidgets, setDashboardWidgets] = useState([]);
@@ -553,7 +551,7 @@ const DashboardPage = () => {
       },
       {
         type: 'news-feed',
-        title: 'Neues aus dem AGENT_LAND',
+        title: 'Neues aus dem agentland',
         description: 'Aktuelle Nachrichten, Tutorials und Community-Events',
         icon: <FaNewspaper />,
         component: <NewsFeedWidget />
@@ -670,7 +668,7 @@ const DashboardPage = () => {
     <Dashboard 
       widgets={dashboardWidgets}
       availableWidgets={availableWidgets}
-      title="AGENT_LAND.SAARLAND"
+      title="agentland.saarland"
       subtitle="Dein persönliches Dashboard"
       onLayoutChange={handleLayoutChange}
     />

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Model Context Protocol (MCP) is a standardized way for LLMs to interact with external tools and services. In AGENT_LAND.SAARLAND, MCP provides the bridge between Claude and your dashboard, enabling sophisticated interactions and persistent state management.
+The Model Context Protocol (MCP) is a standardized way for LLMs to interact with external tools and services. In agentland.saarland, MCP provides the bridge between Claude and your dashboard, enabling sophisticated interactions and persistent state management.
 
 ## Core Concepts
 
@@ -14,7 +14,7 @@ MCP is a protocol that allows AI models to:
 - Coordinate with external systems
 - Provide structured responses to user requests
 
-### AGENT_LAND.SAARLAND Implementation
+### agentland.saarland Implementation
 
 In this project, MCP enables:
 - Sequential planning and execution
@@ -28,7 +28,7 @@ In this project, MCP enables:
 
 ```
 ┌─────────────┐     ┌──────────────┐     ┌─────────────────────┐
-│    Claude   │────▶│  MCP Server  │────▶│ AGENT_LAND.SAARLAND │
+│    Claude   │────▶│  MCP Server  │────▶│  agentland.saarland  │
 └─────────────┘     └──────────────┘     └─────────────────────┘
                            │
                            ├── Sequential Planner
@@ -42,7 +42,7 @@ In this project, MCP enables:
 
 ## Available MCP Servers
 
-### 1. Internal AGENT_LAND.SAARLAND Server
+### 1. Internal agentland.saarland Server
 
 Location: `/home/jan/agentland.saarland/libs/mcp/src/start_server.js`
 
@@ -457,7 +457,7 @@ Planned features for MCP integration:
 
 - [MCP Specification](https://modelcontextprotocol.com)
 - [Claude Documentation](https://docs.anthropic.com)
-- [AGENT_LAND.SAARLAND Repository](https://github.com/agentland/saarland)
+- [agentland.saarland Repository](https://github.com/agentland/saarland)
 - [Examples and Tutorials](/ai_docs/examples/)
 
 ## Support
@@ -471,4 +471,4 @@ For issues and questions:
 
 ---
 
-*This documentation is part of the AGENT_LAND.SAARLAND project. For updates and contributions, please refer to the main repository.*
+*This documentation is part of the agentland.saarland project. For updates and contributions, please refer to the main repository.*

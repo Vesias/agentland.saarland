@@ -1,6 +1,6 @@
-# AGENT_LAND.SAARLAND Dashboard - Konzept und Implementierung
+# agentland.saarland Dashboard - Konzept und Implementierung
 
-Dieses Dokument beschreibt das Konzept und die Implementierung des AGENT_LAND.SAARLAND Dashboards nach dem Dashboard Konzept V1.
+Dieses Dokument beschreibt das Konzept und die Implementierung des agentland.saarland Dashboards nach dem Dashboard Konzept V1.
 
 ## Vision
 

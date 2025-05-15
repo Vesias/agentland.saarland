@@ -1,0 +1,18 @@
+
+> web@1.0.0 serve
+> vite --port 5001
+
+[1G[0K[31merror when starting dev server:
+Error: Port 5001 is already in use
+    at Server.onError (file:///home/jan/Schreibtisch/agentland.saarland/node_modules/vite/dist/node/chunks/dep-827b23df.js:54873:28)
+    at Server.emit (node:events:518:28)
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)[39m
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m Lifecycle script `serve` failed with error:
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mcode[39m [33m1[39m
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mpath[39m /home/jan/Schreibtisch/agentland.saarland/apps/web
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mworkspace[39m web@1.0.0
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mlocation[39m /home/jan/Schreibtisch/agentland.saarland/apps/web
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m command failed
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mcommand[39m sh -c vite --port 5001
+[1G[0K⠙[1G[0K

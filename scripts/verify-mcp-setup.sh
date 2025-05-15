@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🔍 Verifying AGENT_LAND.SAARLAND MCP Setup..."
+echo "🔍 Verifying agentland.saarland MCP Setup..."
 echo ""
 
 # Check if MCP config exists
@@ -10,9 +10,9 @@ if [ -f ~/.config/claude/claude_config.json ]; then
     
     # Check if agentland-saarland server is configured
     if grep -q "agentland-saarland" ~/.config/claude/claude_config.json; then
-        echo "✅ AGENT_LAND.SAARLAND MCP server is configured"
+        echo "✅ agentland.saarland MCP server is configured"
     else
-        echo "❌ AGENT_LAND.SAARLAND MCP server not found in configuration"
+        echo "❌ agentland.saarland MCP server not found in configuration"
     fi
 else
     echo "❌ Claude MCP configuration not found"
@@ -49,7 +49,7 @@ for file in "${MCP_FILES[@]}"; do
 done
 
 echo ""
-echo "To start the MCP server for AGENT_LAND.SAARLAND, run:"
+echo "To start the MCP server for agentland.saarland, run:"
 echo "  cd /home/jan/agentland.saarland"
 echo "  node libs/mcp/src/start_server.js"
 echo ""

@@ -1,8 +1,8 @@
-# AGENT_LAND.SAARLAND Dependency Analysis
+# agentland.saarland Dependency Analysis
 
 ## Overview
 
-This document provides a comprehensive analysis of all dependencies used in the AGENT_LAND.SAARLAND project. The project uses a monorepo structure managed by Nx, with separate workspaces for applications and libraries.
+This document provides a comprehensive analysis of all dependencies used in the agentland.saarland project. The project uses a monorepo structure managed by Nx, with separate workspaces for applications and libraries.
 
 ## Project Structure
 
@@ -205,7 +205,7 @@ The core library has minimal dependencies, relying mostly on the root dependenci
 
 ## Conclusion
 
-The AGENT_LAND.SAARLAND project has a well-structured dependency architecture with:
+The agentland.saarland project has a well-structured dependency architecture with:
 - Clear separation between production and development dependencies
 - Modern tooling (Nx, Vite, TypeScript)
 - Comprehensive type coverage

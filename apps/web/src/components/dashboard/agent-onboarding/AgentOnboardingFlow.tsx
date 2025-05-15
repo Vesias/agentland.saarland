@@ -30,9 +30,22 @@ const AgentOnboardingFlow: React.FC = () => {
     description: '',
     capabilities: [],
     mcpToolsAccess: [],
-    a2aPolicies: { allowIncomingFrom: [], allowOutgoingTo: [] },
+    a2aPolicies: { allowIncomingFrom: ['*'], allowOutgoingTo: ['*'] }, // Default to allow all
+    initialPrompt: '',
+    apiKey: '',
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // Simulated available options (would typically come from backend/config)
+  const [availableCapabilities, setAvailableCapabilities] = useState([
+    'Data Analysis', 'Natural Language Processing', 'File System Operations', 
+    'API Interaction', 'User Interface Generation', 'Code Execution', 'Image Generation'
+  ]);
+  const [availableMcpTools, setAvailableMcpTools] = useState([
+    'sequentialthinking', 'context7', 'desktop-commander', 
+    'brave-search', 'github-mcp-issue-creator', 'google-calendar-reader'
+  ]);
+
 
   const handleNext = () => {
     if (currentStep < STEPS.length) {
@@ -94,10 +107,9 @@ const AgentOnboardingFlow: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Agent Capabilities</label>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Select the core functions this agent will perform.</p>
-              {/* Placeholder for a multi-select or checkbox group for capabilities */}
-              <div className="space-y-2">
-                {['Data Analysis', 'Natural Language Processing', 'File System Operations', 'API Interaction', 'User Interface Generation'].map(cap => (
-                  <label key={cap} className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
+              <div className="grid grid-cols-2 gap-2">
+                {availableCapabilities.map(cap => (
+                  <label key={cap} className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600">
                     <input 
                       type="checkbox" 
                       name="capabilities" 
@@ -122,10 +134,9 @@ const AgentOnboardingFlow: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">MCP Tool Access</label>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Select MCP tools this agent requires access to.</p>
-              {/* Placeholder for a multi-select or checkbox group for MCP tools */}
-              <div className="space-y-2">
-                {['sequentialthinking', 'context7', 'desktop-commander', 'brave-search'].map(tool => (
-                   <label key={tool} className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
+              <div className="grid grid-cols-2 gap-2">
+                {availableMcpTools.map(tool => (
+                   <label key={tool} className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600">
                     <input 
                       type="checkbox" 
                       name="mcpToolsAccess" 
@@ -166,8 +177,11 @@ const AgentOnboardingFlow: React.FC = () => {
                     type="text" 
                     name="allowIncomingFrom" 
                     id="allowIncomingFrom" 
-                    value={agentConfig.a2aPolicies?.allowIncomingFrom.join(', ') || ''}
-                    onChange={(e) => setAgentConfig(prev => ({ ...prev, a2aPolicies: { ...(prev.a2aPolicies!), allowIncomingFrom: e.target.value.split(',').map(s => s.trim()).filter(Boolean) }}))}
+                    value={agentConfig.a2aPolicies?.allowIncomingFrom?.join(', ') || ''}
+                    onChange={(e) => {
+                      const incoming = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
+                      setAgentConfig(prev => ({ ...prev, a2aPolicies: { ...(prev.a2aPolicies!), allowIncomingFrom: incoming }}));
+                    }}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white" 
                     placeholder="agent-alpha, agent-beta, *"
                   />
@@ -178,8 +192,11 @@ const AgentOnboardingFlow: React.FC = () => {
                     type="text" 
                     name="allowOutgoingTo" 
                     id="allowOutgoingTo" 
-                    value={agentConfig.a2aPolicies?.allowOutgoingTo.join(', ') || ''}
-                    onChange={(e) => setAgentConfig(prev => ({ ...prev, a2aPolicies: { ...(prev.a2aPolicies!), allowOutgoingTo: e.target.value.split(',').map(s => s.trim()).filter(Boolean) }}))}
+                    value={agentConfig.a2aPolicies?.allowOutgoingTo?.join(', ') || ''}
+                     onChange={(e) => {
+                      const outgoing = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
+                      setAgentConfig(prev => ({ ...prev, a2aPolicies: { ...(prev.a2aPolicies!), allowOutgoingTo: outgoing }}));
+                    }}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white" 
                     placeholder="agent-gamma, *"
                   />
@@ -205,38 +222,33 @@ const AgentOnboardingFlow: React.FC = () => {
         return (
           <div className="space-y-4">
             <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">Review Agent Configuration</h3>
-            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md space-y-3 text-sm">
-              <div><strong className="text-gray-600 dark:text-gray-300">Name:</strong> {agentConfig.name || 'Not set'}</div>
-              <div><strong className="text-gray-600 dark:text-gray-300">Type:</strong> {agentConfig.type || 'Not set'}</div>
-              <div><strong className="text-gray-600 dark:text-gray-300">Description:</strong> {agentConfig.description || 'Not set'}</div>
-              <div>
-                <strong className="text-gray-600 dark:text-gray-300">Capabilities:</strong> 
-                {agentConfig.capabilities && agentConfig.capabilities.length > 0 ? agentConfig.capabilities.join(', ') : 'None selected'}
-              </div>
-              <div>
-                <strong className="text-gray-600 dark:text-gray-300">MCP Tools Access:</strong> 
-                {agentConfig.mcpToolsAccess && agentConfig.mcpToolsAccess.length > 0 ? agentConfig.mcpToolsAccess.join(', ') : 'None selected'}
-              </div>
-              <div>
-                <strong className="text-gray-600 dark:text-gray-300">Initial Prompt:</strong> 
-                {agentConfig.initialPrompt ? (
-                  <pre className="whitespace-pre-wrap bg-gray-100 dark:bg-gray-600 p-2 rounded text-xs max-h-24 overflow-y-auto">{agentConfig.initialPrompt}</pre>
-                ) : 'Not set'}
-              </div>
-              <div>
-                <strong className="text-gray-600 dark:text-gray-300">A2A Incoming Policy:</strong> 
-                {agentConfig.a2aPolicies?.allowIncomingFrom?.join(', ') || 'Not set'}
-              </div>
-              <div>
-                <strong className="text-gray-600 dark:text-gray-300">A2A Outgoing Policy:</strong> 
-                {agentConfig.a2aPolicies?.allowOutgoingTo?.join(', ') || 'Not set'}
-              </div>
-              <div>
-                <strong className="text-gray-600 dark:text-gray-300">Agent API Key:</strong> 
-                {agentConfig.apiKey ? 'Set (hidden)' : 'Not set'}
-              </div>
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md shadow">
+              <dl className="space-y-2">
+                {[
+                  { label: 'Name', value: agentConfig.name },
+                  { label: 'Type', value: agentConfig.type },
+                  { label: 'Description', value: agentConfig.description, pre: true },
+                  { label: 'Capabilities', value: agentConfig.capabilities?.join(', ') || 'None' },
+                  { label: 'MCP Tools Access', value: agentConfig.mcpToolsAccess?.join(', ') || 'None' },
+                  { label: 'Initial Prompt', value: agentConfig.initialPrompt, pre: true, maxHeight: 'max-h-32' },
+                  { label: 'A2A Incoming Policy', value: agentConfig.a2aPolicies?.allowIncomingFrom?.join(', ') || 'Default' },
+                  { label: 'A2A Outgoing Policy', value: agentConfig.a2aPolicies?.allowOutgoingTo?.join(', ') || 'Default' },
+                  { label: 'Agent API Key', value: agentConfig.apiKey ? 'Set (hidden)' : 'Not set' },
+                ].map(item => (
+                  item.value || item.label === "Agent API Key" || (item.label === "Initial Prompt" && agentConfig.initialPrompt !== undefined) ? ( // Show if value exists, or it's API key, or initialPrompt is explicitly set (even if empty string)
+                    <div key={item.label} className="grid grid-cols-3 gap-x-4 py-1">
+                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 col-span-1">{item.label}:</dt>
+                      {item.pre ? (
+                        <dd className={`text-sm text-gray-900 dark:text-white col-span-2 whitespace-pre-wrap bg-gray-100 dark:bg-gray-600 p-2 rounded ${item.maxHeight || ''} overflow-y-auto`}>{item.value || 'Not set'}</dd>
+                      ) : (
+                        <dd className="text-sm text-gray-900 dark:text-white col-span-2">{item.value || 'Not set'}</dd>
+                      )}
+                    </div>
+                  ) : null
+                ))}
+              </dl>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
               Please review the agent configuration carefully. Once submitted, the agent will be provisioned based on these settings.
             </p>
           </div>

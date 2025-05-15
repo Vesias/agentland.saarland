@@ -4,7 +4,7 @@ import { useI18n } from '../i18n';
 /**
  * NewsFeedWidget Component
  * 
- * Displays the latest news and updates from AGENT_LAND.SAARLAND
+ * Displays the latest news and updates from agentland.saarland
  */
 const NewsFeedWidget = () => {
   const { t } = useI18n();

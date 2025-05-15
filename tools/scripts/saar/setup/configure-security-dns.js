@@ -4,7 +4,7 @@
  * DNS Security Configuration Tool
  * ==============================
  * 
- * This tool configures DNS security settings for the AGENT_LAND_SAARLAND domain,
+ * This tool configures DNS security settings for the agentland.saarland domain,
  * including SPF, DKIM, DMARC, and security TXT records for agent authentication.
  */
 
@@ -174,7 +174,7 @@ async function saveDNSRecords(records) {
  * @returns {String} Formatted DNS records
  */
 function formatDNSRecordsForDisplay(records) {
-  let output = chalk.bold('DNS Records for AGENT_LAND_SAARLAND Security:\n\n');
+  let output = chalk.bold('DNS Records for agentland.saarland Security:\n\n');
   
   Object.entries(records).forEach(([key, record]) => {
     output += chalk.bold(`${key.toUpperCase()} Record:\n`);
@@ -192,7 +192,7 @@ function formatDNSRecordsForDisplay(records) {
  */
 async function main() {
   try {
-    console.log(chalk.bold('AGENT_LAND_SAARLAND DNS Security Configuration\n'));
+    console.log(chalk.bold('agentland.saarland DNS Security Configuration\n'));
     
     // Generate DKIM keys
     const dkimKeys = await generateDKIMKeys();

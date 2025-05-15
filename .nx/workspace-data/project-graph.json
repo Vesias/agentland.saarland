@@ -3403,6 +3403,60 @@
         "hash": "sha512-3nVv+e2FQwsW8Aw6qTU6f+1rfcJ3hrcnvH/mu9i8YhxO+9sqbOfpL8m6PbET5+xKOlz/VSbp0RoYWYCtIsnmuA=="
       }
     },
+    "npm:@reactflow/background": {
+      "type": "npm",
+      "name": "npm:@reactflow/background",
+      "data": {
+        "version": "11.3.14",
+        "packageName": "@reactflow/background",
+        "hash": "sha512-Gewd7blEVT5Lh6jqrvOgd4G6Qk17eGKQfsDXgyRSqM+CTwDqRldG2LsWN4sNeno6sbqVIC2fZ+rAUBFA9ZEUDA=="
+      }
+    },
+    "npm:@reactflow/controls": {
+      "type": "npm",
+      "name": "npm:@reactflow/controls",
+      "data": {
+        "version": "11.2.14",
+        "packageName": "@reactflow/controls",
+        "hash": "sha512-MiJp5VldFD7FrqaBNIrQ85dxChrG6ivuZ+dcFhPQUwOK3HfYgX2RHdBua+gx+40p5Vw5It3dVNp/my4Z3jF0dw=="
+      }
+    },
+    "npm:@reactflow/core": {
+      "type": "npm",
+      "name": "npm:@reactflow/core",
+      "data": {
+        "version": "11.11.4",
+        "packageName": "@reactflow/core",
+        "hash": "sha512-H4vODklsjAq3AMq6Np4LE12i1I4Ta9PrDHuBR9GmL8uzTt2l2jh4CiQbEMpvMDcp7xi4be0hgXj+Ysodde/i7Q=="
+      }
+    },
+    "npm:@reactflow/minimap": {
+      "type": "npm",
+      "name": "npm:@reactflow/minimap",
+      "data": {
+        "version": "11.7.14",
+        "packageName": "@reactflow/minimap",
+        "hash": "sha512-mpwLKKrEAofgFJdkhwR5UQ1JYWlcAAL/ZU/bctBkuNTT1yqV+y0buoNVImsRehVYhJwffSWeSHaBR5/GJjlCSQ=="
+      }
+    },
+    "npm:@reactflow/node-resizer": {
+      "type": "npm",
+      "name": "npm:@reactflow/node-resizer",
+      "data": {
+        "version": "2.2.14",
+        "packageName": "@reactflow/node-resizer",
+        "hash": "sha512-fwqnks83jUlYr6OHcdFEedumWKChTHRGw/kbCxj0oqBd+ekfs+SIp4ddyNU0pdx96JIm5iNFS0oNrmEiJbbSaA=="
+      }
+    },
+    "npm:@reactflow/node-toolbar": {
+      "type": "npm",
+      "name": "npm:@reactflow/node-toolbar",
+      "data": {
+        "version": "1.3.14",
+        "packageName": "@reactflow/node-toolbar",
+        "hash": "sha512-rbynXQnH/xFNu4P9H+hVqlEUafDCkEoCy0Dg9mG22Sg+rY/0ck6KkrAQrYrTgXusd+cEJOMK0uOOFCK2/5rSGQ=="
+      }
+    },
     "npm:@rspack/binding": {
       "type": "npm",
       "name": "npm:@rspack/binding",
@@ -3916,6 +3970,285 @@
         "hash": "sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug=="
       }
     },
+    "npm:@types/d3": {
+      "type": "npm",
+      "name": "npm:@types/d3",
+      "data": {
+        "version": "7.4.3",
+        "packageName": "@types/d3",
+        "hash": "sha512-lZXZ9ckh5R8uiFVt8ogUNf+pIrK4EsWrx2Np75WvF/eTpJ0FMHNhjXk8CKEx/+gpHbNQyJWehbFaTvqmHWB3ww=="
+      }
+    },
+    "npm:@types/d3-array": {
+      "type": "npm",
+      "name": "npm:@types/d3-array",
+      "data": {
+        "version": "3.2.1",
+        "packageName": "@types/d3-array",
+        "hash": "sha512-Y2Jn2idRrLzUfAKV2LyRImR+y4oa2AntrgID95SHJxuMUrkNXmanDSed71sRNZysveJVt1hLLemQZIady0FpEg=="
+      }
+    },
+    "npm:@types/d3-axis": {
+      "type": "npm",
+      "name": "npm:@types/d3-axis",
+      "data": {
+        "version": "3.0.6",
+        "packageName": "@types/d3-axis",
+        "hash": "sha512-pYeijfZuBd87T0hGn0FO1vQ/cgLk6E1ALJjfkC0oJ8cbwkZl3TpgS8bVBLZN+2jjGgg38epgxb2zmoGtSfvgMw=="
+      }
+    },
+    "npm:@types/d3-brush": {
+      "type": "npm",
+      "name": "npm:@types/d3-brush",
+      "data": {
+        "version": "3.0.6",
+        "packageName": "@types/d3-brush",
+        "hash": "sha512-nH60IZNNxEcrh6L1ZSMNA28rj27ut/2ZmI3r96Zd+1jrZD++zD3LsMIjWlvg4AYrHn/Pqz4CF3veCxGjtbqt7A=="
+      }
+    },
+    "npm:@types/d3-chord": {
+      "type": "npm",
+      "name": "npm:@types/d3-chord",
+      "data": {
+        "version": "3.0.6",
+        "packageName": "@types/d3-chord",
+        "hash": "sha512-LFYWWd8nwfwEmTZG9PfQxd17HbNPksHBiJHaKuY1XeqscXacsS2tyoo6OdRsjf+NQYeB6XrNL3a25E3gH69lcg=="
+      }
+    },
+    "npm:@types/d3-color": {
+      "type": "npm",
+      "name": "npm:@types/d3-color",
+      "data": {
+        "version": "3.1.3",
+        "packageName": "@types/d3-color",
+        "hash": "sha512-iO90scth9WAbmgv7ogoq57O9YpKmFBbmoEoCHDB2xMBY0+/KVrqAaCDyCE16dUspeOvIxFFRI+0sEtqDqy2b4A=="
+      }
+    },
+    "npm:@types/d3-contour": {
+      "type": "npm",
+      "name": "npm:@types/d3-contour",
+      "data": {
+        "version": "3.0.6",
+        "packageName": "@types/d3-contour",
+        "hash": "sha512-BjzLgXGnCWjUSYGfH1cpdo41/hgdWETu4YxpezoztawmqsvCeep+8QGfiY6YbDvfgHz/DkjeIkkZVJavB4a3rg=="
+      }
+    },
+    "npm:@types/d3-delaunay": {
+      "type": "npm",
+      "name": "npm:@types/d3-delaunay",
+      "data": {
+        "version": "6.0.4",
+        "packageName": "@types/d3-delaunay",
+        "hash": "sha512-ZMaSKu4THYCU6sV64Lhg6qjf1orxBthaC161plr5KuPHo3CNm8DTHiLw/5Eq2b6TsNP0W0iJrUOFscY6Q450Hw=="
+      }
+    },
+    "npm:@types/d3-dispatch": {
+      "type": "npm",
+      "name": "npm:@types/d3-dispatch",
+      "data": {
+        "version": "3.0.6",
+        "packageName": "@types/d3-dispatch",
+        "hash": "sha512-4fvZhzMeeuBJYZXRXrRIQnvUYfyXwYmLsdiN7XXmVNQKKw1cM8a5WdID0g1hVFZDqT9ZqZEY5pD44p24VS7iZQ=="
+      }
+    },
+    "npm:@types/d3-drag": {
+      "type": "npm",
+      "name": "npm:@types/d3-drag",
+      "data": {
+        "version": "3.0.7",
+        "packageName": "@types/d3-drag",
+        "hash": "sha512-HE3jVKlzU9AaMazNufooRJ5ZpWmLIoc90A37WU2JMmeq28w1FQqCZswHZ3xR+SuxYftzHq6WU6KJHvqxKzTxxQ=="
+      }
+    },
+    "npm:@types/d3-dsv": {
+      "type": "npm",
+      "name": "npm:@types/d3-dsv",
+      "data": {
+        "version": "3.0.7",
+        "packageName": "@types/d3-dsv",
+        "hash": "sha512-n6QBF9/+XASqcKK6waudgL0pf/S5XHPPI8APyMLLUHd8NqouBGLsU8MgtO7NINGtPBtk9Kko/W4ea0oAspwh9g=="
+      }
+    },
+    "npm:@types/d3-ease": {
+      "type": "npm",
+      "name": "npm:@types/d3-ease",
+      "data": {
+        "version": "3.0.2",
+        "packageName": "@types/d3-ease",
+        "hash": "sha512-NcV1JjO5oDzoK26oMzbILE6HW7uVXOHLQvHshBUW4UMdZGfiY6v5BeQwh9a9tCzv+CeefZQHJt5SRgK154RtiA=="
+      }
+    },
+    "npm:@types/d3-fetch": {
+      "type": "npm",
+      "name": "npm:@types/d3-fetch",
+      "data": {
+        "version": "3.0.7",
+        "packageName": "@types/d3-fetch",
+        "hash": "sha512-fTAfNmxSb9SOWNB9IoG5c8Hg6R+AzUHDRlsXsDZsNp6sxAEOP0tkP3gKkNSO/qmHPoBFTxNrjDprVHDQDvo5aA=="
+      }
+    },
+    "npm:@types/d3-force": {
+      "type": "npm",
+      "name": "npm:@types/d3-force",
+      "data": {
+        "version": "3.0.10",
+        "packageName": "@types/d3-force",
+        "hash": "sha512-ZYeSaCF3p73RdOKcjj+swRlZfnYpK1EbaDiYICEEp5Q6sUiqFaFQ9qgoshp5CzIyyb/yD09kD9o2zEltCexlgw=="
+      }
+    },
+    "npm:@types/d3-format": {
+      "type": "npm",
+      "name": "npm:@types/d3-format",
+      "data": {
+        "version": "3.0.4",
+        "packageName": "@types/d3-format",
+        "hash": "sha512-fALi2aI6shfg7vM5KiR1wNJnZ7r6UuggVqtDA+xiEdPZQwy/trcQaHnwShLuLdta2rTymCNpxYTiMZX/e09F4g=="
+      }
+    },
+    "npm:@types/d3-geo": {
+      "type": "npm",
+      "name": "npm:@types/d3-geo",
+      "data": {
+        "version": "3.1.0",
+        "packageName": "@types/d3-geo",
+        "hash": "sha512-856sckF0oP/diXtS4jNsiQw/UuK5fQG8l/a9VVLeSouf1/PPbBE1i1W852zVwKwYCBkFJJB7nCFTbk6UMEXBOQ=="
+      }
+    },
+    "npm:@types/d3-hierarchy": {
+      "type": "npm",
+      "name": "npm:@types/d3-hierarchy",
+      "data": {
+        "version": "3.1.7",
+        "packageName": "@types/d3-hierarchy",
+        "hash": "sha512-tJFtNoYBtRtkNysX1Xq4sxtjK8YgoWUNpIiUee0/jHGRwqvzYxkq0hGVbbOGSz+JgFxxRu4K8nb3YpG3CMARtg=="
+      }
+    },
+    "npm:@types/d3-interpolate": {
+      "type": "npm",
+      "name": "npm:@types/d3-interpolate",
+      "data": {
+        "version": "3.0.4",
+        "packageName": "@types/d3-interpolate",
+        "hash": "sha512-mgLPETlrpVV1YRJIglr4Ez47g7Yxjl1lj7YKsiMCb27VJH9W8NVM6Bb9d8kkpG/uAQS5AmbA48q2IAolKKo1MA=="
+      }
+    },
+    "npm:@types/d3-path": {
+      "type": "npm",
+      "name": "npm:@types/d3-path",
+      "data": {
+        "version": "3.1.1",
+        "packageName": "@types/d3-path",
+        "hash": "sha512-VMZBYyQvbGmWyWVea0EHs/BwLgxc+MKi1zLDCONksozI4YJMcTt8ZEuIR4Sb1MMTE8MMW49v0IwI5+b7RmfWlg=="
+      }
+    },
+    "npm:@types/d3-polygon": {
+      "type": "npm",
+      "name": "npm:@types/d3-polygon",
+      "data": {
+        "version": "3.0.2",
+        "packageName": "@types/d3-polygon",
+        "hash": "sha512-ZuWOtMaHCkN9xoeEMr1ubW2nGWsp4nIql+OPQRstu4ypeZ+zk3YKqQT0CXVe/PYqrKpZAi+J9mTs05TKwjXSRA=="
+      }
+    },
+    "npm:@types/d3-quadtree": {
+      "type": "npm",
+      "name": "npm:@types/d3-quadtree",
+      "data": {
+        "version": "3.0.6",
+        "packageName": "@types/d3-quadtree",
+        "hash": "sha512-oUzyO1/Zm6rsxKRHA1vH0NEDG58HrT5icx/azi9MF1TWdtttWl0UIUsjEQBBh+SIkrpd21ZjEv7ptxWys1ncsg=="
+      }
+    },
+    "npm:@types/d3-random": {
+      "type": "npm",
+      "name": "npm:@types/d3-random",
+      "data": {
+        "version": "3.0.3",
+        "packageName": "@types/d3-random",
+        "hash": "sha512-Imagg1vJ3y76Y2ea0871wpabqp613+8/r0mCLEBfdtqC7xMSfj9idOnmBYyMoULfHePJyxMAw3nWhJxzc+LFwQ=="
+      }
+    },
+    "npm:@types/d3-scale": {
+      "type": "npm",
+      "name": "npm:@types/d3-scale",
+      "data": {
+        "version": "4.0.9",
+        "packageName": "@types/d3-scale",
+        "hash": "sha512-dLmtwB8zkAeO/juAMfnV+sItKjlsw2lKdZVVy6LRr0cBmegxSABiLEpGVmSJJ8O08i4+sGR6qQtb6WtuwJdvVw=="
+      }
+    },
+    "npm:@types/d3-scale-chromatic": {
+      "type": "npm",
+      "name": "npm:@types/d3-scale-chromatic",
+      "data": {
+        "version": "3.1.0",
+        "packageName": "@types/d3-scale-chromatic",
+        "hash": "sha512-iWMJgwkK7yTRmWqRB5plb1kadXyQ5Sj8V/zYlFGMUBbIPKQScw+Dku9cAAMgJG+z5GYDoMjWGLVOvjghDEFnKQ=="
+      }
+    },
+    "npm:@types/d3-selection": {
+      "type": "npm",
+      "name": "npm:@types/d3-selection",
+      "data": {
+        "version": "3.0.11",
+        "packageName": "@types/d3-selection",
+        "hash": "sha512-bhAXu23DJWsrI45xafYpkQ4NtcKMwWnAC/vKrd2l+nxMFuvOT3XMYTIj2opv8vq8AO5Yh7Qac/nSeP/3zjTK0w=="
+      }
+    },
+    "npm:@types/d3-shape": {
+      "type": "npm",
+      "name": "npm:@types/d3-shape",
+      "data": {
+        "version": "3.1.7",
+        "packageName": "@types/d3-shape",
+        "hash": "sha512-VLvUQ33C+3J+8p+Daf+nYSOsjB4GXp19/S/aGo60m9h1v6XaxjiT82lKVWJCfzhtuZ3yD7i/TPeC/fuKLLOSmg=="
+      }
+    },
+    "npm:@types/d3-time": {
+      "type": "npm",
+      "name": "npm:@types/d3-time",
+      "data": {
+        "version": "3.0.4",
+        "packageName": "@types/d3-time",
+        "hash": "sha512-yuzZug1nkAAaBlBBikKZTgzCeA+k1uy4ZFwWANOfKw5z5LRhV0gNA7gNkKm7HoK+HRN0wX3EkxGk0fpbWhmB7g=="
+      }
+    },
+    "npm:@types/d3-time-format": {
+      "type": "npm",
+      "name": "npm:@types/d3-time-format",
+      "data": {
+        "version": "4.0.3",
+        "packageName": "@types/d3-time-format",
+        "hash": "sha512-5xg9rC+wWL8kdDj153qZcsJ0FWiFt0J5RB6LYUNZjwSnesfblqrI/bJ1wBdJ8OQfncgbJG5+2F+qfqnqyzYxyg=="
+      }
+    },
+    "npm:@types/d3-timer": {
+      "type": "npm",
+      "name": "npm:@types/d3-timer",
+      "data": {
+        "version": "3.0.2",
+        "packageName": "@types/d3-timer",
+        "hash": "sha512-Ps3T8E8dZDam6fUyNiMkekK3XUsaUEik+idO9/YjPtfj2qruF8tFBXS7XhtE4iIXBLxhmLjP3SXpLhVf21I9Lw=="
+      }
+    },
+    "npm:@types/d3-transition": {
+      "type": "npm",
+      "name": "npm:@types/d3-transition",
+      "data": {
+        "version": "3.0.9",
+        "packageName": "@types/d3-transition",
+        "hash": "sha512-uZS5shfxzO3rGlu0cC3bjmMFKsXv+SmZZcgp0KD22ts4uGXp5EVYGzu/0YdwZeKmddhcAccYtREJKkPfXkZuCg=="
+      }
+    },
+    "npm:@types/d3-zoom": {
+      "type": "npm",
+      "name": "npm:@types/d3-zoom",
+      "data": {
+        "version": "3.0.8",
+        "packageName": "@types/d3-zoom",
+        "hash": "sha512-iqMC4/YlFCSlO8+2Ii1GGGliCAY4XdeG748w5vQUbevlbDu0zSjH/+jojorQVBK/se0j6DUFNPBGSqD3YWYnDw=="
+      }
+    },
     "npm:@types/eslint": {
       "type": "npm",
       "name": "npm:@types/eslint",
@@ -3968,6 +4301,15 @@
         "version": "1.18.1",
         "packageName": "@types/express-session",
         "hash": "sha512-S6TkD/lljxDlQ2u/4A70luD8/ZxZcrU5pQwI1rVXCiaVIywoFgbA+PIUNDjPhQpPdK0dGleLtYc/y7XWBfclBg=="
+      }
+    },
+    "npm:@types/geojson": {
+      "type": "npm",
+      "name": "npm:@types/geojson",
+      "data": {
+        "version": "7946.0.16",
+        "packageName": "@types/geojson",
+        "hash": "sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg=="
       }
     },
     "npm:@types/glob": {
@@ -5248,6 +5590,15 @@
         "hash": "sha512-9z8TZaGM1pfswYeXrUpzPrkx8UnWYdhJclsiYMm6x/w5+nN+8Tf/LnAgfLGQCm59qAOxU8WwHEq2vNwF6i4j+Q=="
       }
     },
+    "npm:classcat": {
+      "type": "npm",
+      "name": "npm:classcat",
+      "data": {
+        "version": "5.0.5",
+        "packageName": "classcat",
+        "hash": "sha512-JhZUT7JFcQy/EzW605k/ktHtncoo9vnyW/2GspNYwFlN1C/WmjuV/xtS04e9SOkL2sTdw0VAZ2UGCcQ9lR6p6w=="
+      }
+    },
     "npm:cli-cursor": {
       "type": "npm",
       "name": "npm:cli-cursor",
@@ -5579,6 +5930,87 @@
         "version": "3.1.3",
         "packageName": "csstype",
         "hash": "sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw=="
+      }
+    },
+    "npm:d3-color": {
+      "type": "npm",
+      "name": "npm:d3-color",
+      "data": {
+        "version": "3.1.0",
+        "packageName": "d3-color",
+        "hash": "sha512-zg/chbXyeBtMQ1LbD/WSoW2DpC3I0mpmPdW+ynRTj/x2DAWYrIY7qeZIHidozwV24m4iavr15lNwIwLxRmOxhA=="
+      }
+    },
+    "npm:d3-dispatch": {
+      "type": "npm",
+      "name": "npm:d3-dispatch",
+      "data": {
+        "version": "3.0.1",
+        "packageName": "d3-dispatch",
+        "hash": "sha512-rzUyPU/S7rwUflMyLc1ETDeBj0NRuHKKAcvukozwhshr6g6c5d8zh4c2gQjY2bZ0dXeGLWc1PF174P2tVvKhfg=="
+      }
+    },
+    "npm:d3-drag": {
+      "type": "npm",
+      "name": "npm:d3-drag",
+      "data": {
+        "version": "3.0.0",
+        "packageName": "d3-drag",
+        "hash": "sha512-pWbUJLdETVA8lQNJecMxoXfH6x+mO2UQo8rSmZ+QqxcbyA3hfeprFgIT//HW2nlHChWeIIMwS2Fq+gEARkhTkg=="
+      }
+    },
+    "npm:d3-ease": {
+      "type": "npm",
+      "name": "npm:d3-ease",
+      "data": {
+        "version": "3.0.1",
+        "packageName": "d3-ease",
+        "hash": "sha512-wR/XK3D3XcLIZwpbvQwQ5fK+8Ykds1ip7A2Txe0yxncXSdq1L9skcG7blcedkOX+ZcgxGAmLX1FrRGbADwzi0w=="
+      }
+    },
+    "npm:d3-interpolate": {
+      "type": "npm",
+      "name": "npm:d3-interpolate",
+      "data": {
+        "version": "3.0.1",
+        "packageName": "d3-interpolate",
+        "hash": "sha512-3bYs1rOD33uo8aqJfKP3JWPAibgw8Zm2+L9vBKEHJ2Rg+viTR7o5Mmv5mZcieN+FRYaAOWX5SJATX6k1PWz72g=="
+      }
+    },
+    "npm:d3-selection": {
+      "type": "npm",
+      "name": "npm:d3-selection",
+      "data": {
+        "version": "3.0.0",
+        "packageName": "d3-selection",
+        "hash": "sha512-fmTRWbNMmsmWq6xJV8D19U/gw/bwrHfNXxrIN+HfZgnzqTHp9jOmKMhsTUjXOJnZOdZY9Q28y4yebKzqDKlxlQ=="
+      }
+    },
+    "npm:d3-timer": {
+      "type": "npm",
+      "name": "npm:d3-timer",
+      "data": {
+        "version": "3.0.1",
+        "packageName": "d3-timer",
+        "hash": "sha512-ndfJ/JxxMd3nw31uyKoY2naivF+r29V+Lc0svZxe1JvvIRmi8hUsrMvdOwgS1o6uBHmiz91geQ0ylPP0aj1VUA=="
+      }
+    },
+    "npm:d3-transition": {
+      "type": "npm",
+      "name": "npm:d3-transition",
+      "data": {
+        "version": "3.0.1",
+        "packageName": "d3-transition",
+        "hash": "sha512-ApKvfjsSR6tg06xrL434C0WydLr7JewBB3V+/39RMHsaXTOG0zmt/OAXeng5M5LBm0ojmxJrpomQVZ1aPvBL4w=="
+      }
+    },
+    "npm:d3-zoom": {
+      "type": "npm",
+      "name": "npm:d3-zoom",
+      "data": {
+        "version": "3.0.0",
+        "packageName": "d3-zoom",
+        "hash": "sha512-b8AmV3kfQaqWAuacbPuNbL6vahnOJflOhexLzMMNLga62+/nh0JzvJ0aO/5a5MVgUFGS7Hu1P9P03o3fJkDCyw=="
       }
     },
     "npm:data-uri-to-buffer": {
@@ -9388,6 +9820,15 @@
         "hash": "sha512-z6F7K9bV85EfseRCp2bzrpyQ0Gkw1uLoCel9XBVWPg/TjRj94SkJzUTGfOa4bs7iJvBWtQG0Wq7wnI0syw3EBQ=="
       }
     },
+    "npm:reactflow": {
+      "type": "npm",
+      "name": "npm:reactflow",
+      "data": {
+        "version": "11.11.4",
+        "packageName": "reactflow",
+        "hash": "sha512-70FOtJkUWH3BAOsN+LU9lCrKoKbtOPnz2uq0CV2PLdNSwxTXOhCbsZr50GmZ+Rtw3jx8Uv7/vBFtCGixLfd4Og=="
+      }
+    },
     "npm:read-cache": {
       "type": "npm",
       "name": "npm:read-cache",
@@ -10432,6 +10873,15 @@
         "hash": "sha512-jk1+QP6ZJqyOiuEI9AEWQfju/nB2Pw466kbA0LEZljHwKeMgd9WrAEgEGxjPDD2+TNbbb37rTyhEfrCXfuKXnA=="
       }
     },
+    "npm:use-sync-external-store": {
+      "type": "npm",
+      "name": "npm:use-sync-external-store",
+      "data": {
+        "version": "1.5.0",
+        "packageName": "use-sync-external-store",
+        "hash": "sha512-Rb46I4cGGVBmjamjphe8L/UnvJD+uPPtTkNvX5mZgqdbavhI4EbgIWJiIHXJ8bc/i9EQGPRh4DwEURJ552Do0A=="
+      }
+    },
     "npm:util-deprecate": {
       "type": "npm",
       "name": "npm:util-deprecate",
@@ -10736,6 +11186,15 @@
         "version": "3.24.4",
         "packageName": "zod",
         "hash": "sha512-OdqJE9UDRPwWsrHjLN2F8bPxvwJBK22EHLWtanu0LSYr5YqzsaaW3RMgmjwr8Rypg5k+meEJdSPXJZXE/yqOMg=="
+      }
+    },
+    "npm:zustand": {
+      "type": "npm",
+      "name": "npm:zustand",
+      "data": {
+        "version": "4.5.7",
+        "packageName": "zustand",
+        "hash": "sha512-CHOUy7mu3lbD6o6LJLfllpjkzhHXSBlX8B9+qPddUsIfeF5S/UZ5q0kmCsnRqT1UHFQZchNFDDzMbQsuesHWlw=="
       }
     }
   },
@@ -16428,6 +16887,228 @@
         "type": "static"
       }
     ],
+    "npm:@reactflow/background": [
+      {
+        "source": "npm:@reactflow/background",
+        "target": "npm:react",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/background",
+        "target": "npm:react-dom",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/background",
+        "target": "npm:@reactflow/core",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/background",
+        "target": "npm:classcat",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/background",
+        "target": "npm:zustand",
+        "type": "static"
+      }
+    ],
+    "npm:@reactflow/controls": [
+      {
+        "source": "npm:@reactflow/controls",
+        "target": "npm:react",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/controls",
+        "target": "npm:react-dom",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/controls",
+        "target": "npm:@reactflow/core",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/controls",
+        "target": "npm:classcat",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/controls",
+        "target": "npm:zustand",
+        "type": "static"
+      }
+    ],
+    "npm:@reactflow/core": [
+      {
+        "source": "npm:@reactflow/core",
+        "target": "npm:react",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/core",
+        "target": "npm:react-dom",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/core",
+        "target": "npm:@types/d3",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/core",
+        "target": "npm:@types/d3-drag",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/core",
+        "target": "npm:@types/d3-selection",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/core",
+        "target": "npm:@types/d3-zoom",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/core",
+        "target": "npm:classcat",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/core",
+        "target": "npm:d3-drag",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/core",
+        "target": "npm:d3-selection",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/core",
+        "target": "npm:d3-zoom",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/core",
+        "target": "npm:zustand",
+        "type": "static"
+      }
+    ],
+    "npm:@reactflow/minimap": [
+      {
+        "source": "npm:@reactflow/minimap",
+        "target": "npm:react",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/minimap",
+        "target": "npm:react-dom",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/minimap",
+        "target": "npm:@reactflow/core",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/minimap",
+        "target": "npm:@types/d3-selection",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/minimap",
+        "target": "npm:@types/d3-zoom",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/minimap",
+        "target": "npm:classcat",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/minimap",
+        "target": "npm:d3-selection",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/minimap",
+        "target": "npm:d3-zoom",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/minimap",
+        "target": "npm:zustand",
+        "type": "static"
+      }
+    ],
+    "npm:@reactflow/node-resizer": [
+      {
+        "source": "npm:@reactflow/node-resizer",
+        "target": "npm:react",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/node-resizer",
+        "target": "npm:react-dom",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/node-resizer",
+        "target": "npm:@reactflow/core",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/node-resizer",
+        "target": "npm:classcat",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/node-resizer",
+        "target": "npm:d3-drag",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/node-resizer",
+        "target": "npm:d3-selection",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/node-resizer",
+        "target": "npm:zustand",
+        "type": "static"
+      }
+    ],
+    "npm:@reactflow/node-toolbar": [
+      {
+        "source": "npm:@reactflow/node-toolbar",
+        "target": "npm:react",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/node-toolbar",
+        "target": "npm:react-dom",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/node-toolbar",
+        "target": "npm:@reactflow/core",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/node-toolbar",
+        "target": "npm:classcat",
+        "type": "static"
+      },
+      {
+        "source": "npm:@reactflow/node-toolbar",
+        "target": "npm:zustand",
+        "type": "static"
+      }
+    ],
     "npm:@rspack/binding": [
       {
         "source": "npm:@rspack/binding",
@@ -16995,6 +17676,245 @@
       {
         "source": "npm:@types/connect",
         "target": "npm:@types/node",
+        "type": "static"
+      }
+    ],
+    "npm:@types/d3": [
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-array",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-axis",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-brush",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-chord",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-color",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-contour",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-delaunay",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-dispatch",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-drag",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-dsv",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-ease",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-fetch",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-force",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-format",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-geo",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-hierarchy",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-interpolate",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-path",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-polygon",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-quadtree",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-random",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-scale",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-scale-chromatic",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-selection",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-shape",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-time",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-time-format",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-timer",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-transition",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3",
+        "target": "npm:@types/d3-zoom",
+        "type": "static"
+      }
+    ],
+    "npm:@types/d3-axis": [
+      {
+        "source": "npm:@types/d3-axis",
+        "target": "npm:@types/d3-selection",
+        "type": "static"
+      }
+    ],
+    "npm:@types/d3-brush": [
+      {
+        "source": "npm:@types/d3-brush",
+        "target": "npm:@types/d3-selection",
+        "type": "static"
+      }
+    ],
+    "npm:@types/d3-contour": [
+      {
+        "source": "npm:@types/d3-contour",
+        "target": "npm:@types/d3-array",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3-contour",
+        "target": "npm:@types/geojson",
+        "type": "static"
+      }
+    ],
+    "npm:@types/d3-drag": [
+      {
+        "source": "npm:@types/d3-drag",
+        "target": "npm:@types/d3-selection",
+        "type": "static"
+      }
+    ],
+    "npm:@types/d3-fetch": [
+      {
+        "source": "npm:@types/d3-fetch",
+        "target": "npm:@types/d3-dsv",
+        "type": "static"
+      }
+    ],
+    "npm:@types/d3-geo": [
+      {
+        "source": "npm:@types/d3-geo",
+        "target": "npm:@types/geojson",
+        "type": "static"
+      }
+    ],
+    "npm:@types/d3-interpolate": [
+      {
+        "source": "npm:@types/d3-interpolate",
+        "target": "npm:@types/d3-color",
+        "type": "static"
+      }
+    ],
+    "npm:@types/d3-scale": [
+      {
+        "source": "npm:@types/d3-scale",
+        "target": "npm:@types/d3-time",
+        "type": "static"
+      }
+    ],
+    "npm:@types/d3-shape": [
+      {
+        "source": "npm:@types/d3-shape",
+        "target": "npm:@types/d3-path",
+        "type": "static"
+      }
+    ],
+    "npm:@types/d3-transition": [
+      {
+        "source": "npm:@types/d3-transition",
+        "target": "npm:@types/d3-selection",
+        "type": "static"
+      }
+    ],
+    "npm:@types/d3-zoom": [
+      {
+        "source": "npm:@types/d3-zoom",
+        "target": "npm:@types/d3-interpolate",
+        "type": "static"
+      },
+      {
+        "source": "npm:@types/d3-zoom",
+        "target": "npm:@types/d3-selection",
         "type": "static"
       }
     ],
@@ -18758,6 +19678,84 @@
       {
         "source": "npm:css-tree@2.2.1",
         "target": "npm:source-map-js",
+        "type": "static"
+      }
+    ],
+    "npm:d3-drag": [
+      {
+        "source": "npm:d3-drag",
+        "target": "npm:d3-dispatch",
+        "type": "static"
+      },
+      {
+        "source": "npm:d3-drag",
+        "target": "npm:d3-selection",
+        "type": "static"
+      }
+    ],
+    "npm:d3-interpolate": [
+      {
+        "source": "npm:d3-interpolate",
+        "target": "npm:d3-color",
+        "type": "static"
+      }
+    ],
+    "npm:d3-transition": [
+      {
+        "source": "npm:d3-transition",
+        "target": "npm:d3-selection",
+        "type": "static"
+      },
+      {
+        "source": "npm:d3-transition",
+        "target": "npm:d3-color",
+        "type": "static"
+      },
+      {
+        "source": "npm:d3-transition",
+        "target": "npm:d3-dispatch",
+        "type": "static"
+      },
+      {
+        "source": "npm:d3-transition",
+        "target": "npm:d3-ease",
+        "type": "static"
+      },
+      {
+        "source": "npm:d3-transition",
+        "target": "npm:d3-interpolate",
+        "type": "static"
+      },
+      {
+        "source": "npm:d3-transition",
+        "target": "npm:d3-timer",
+        "type": "static"
+      }
+    ],
+    "npm:d3-zoom": [
+      {
+        "source": "npm:d3-zoom",
+        "target": "npm:d3-dispatch",
+        "type": "static"
+      },
+      {
+        "source": "npm:d3-zoom",
+        "target": "npm:d3-drag",
+        "type": "static"
+      },
+      {
+        "source": "npm:d3-zoom",
+        "target": "npm:d3-interpolate",
+        "type": "static"
+      },
+      {
+        "source": "npm:d3-zoom",
+        "target": "npm:d3-selection",
+        "type": "static"
+      },
+      {
+        "source": "npm:d3-zoom",
+        "target": "npm:d3-transition",
         "type": "static"
       }
     ],
@@ -23856,6 +24854,48 @@
         "type": "static"
       }
     ],
+    "npm:reactflow": [
+      {
+        "source": "npm:reactflow",
+        "target": "npm:react",
+        "type": "static"
+      },
+      {
+        "source": "npm:reactflow",
+        "target": "npm:react-dom",
+        "type": "static"
+      },
+      {
+        "source": "npm:reactflow",
+        "target": "npm:@reactflow/background",
+        "type": "static"
+      },
+      {
+        "source": "npm:reactflow",
+        "target": "npm:@reactflow/controls",
+        "type": "static"
+      },
+      {
+        "source": "npm:reactflow",
+        "target": "npm:@reactflow/core",
+        "type": "static"
+      },
+      {
+        "source": "npm:reactflow",
+        "target": "npm:@reactflow/minimap",
+        "type": "static"
+      },
+      {
+        "source": "npm:reactflow",
+        "target": "npm:@reactflow/node-resizer",
+        "type": "static"
+      },
+      {
+        "source": "npm:reactflow",
+        "target": "npm:@reactflow/node-toolbar",
+        "type": "static"
+      }
+    ],
     "npm:read-cache": [
       {
         "source": "npm:read-cache",
@@ -25359,6 +26399,13 @@
         "type": "static"
       }
     ],
+    "npm:use-sync-external-store": [
+      {
+        "source": "npm:use-sync-external-store",
+        "target": "npm:react",
+        "type": "static"
+      }
+    ],
     "npm:v8-to-istanbul": [
       {
         "source": "npm:v8-to-istanbul",
@@ -25946,9 +26993,26 @@
         "target": "npm:yargs-parser",
         "type": "static"
       }
+    ],
+    "npm:zustand": [
+      {
+        "source": "npm:zustand",
+        "target": "npm:@types/react",
+        "type": "static"
+      },
+      {
+        "source": "npm:zustand",
+        "target": "npm:react",
+        "type": "static"
+      },
+      {
+        "source": "npm:zustand",
+        "target": "npm:use-sync-external-store",
+        "type": "static"
+      }
     ]
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1747326400958
+  "computedAt": 1747333841378
 }

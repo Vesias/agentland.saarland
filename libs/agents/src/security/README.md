@@ -1,6 +1,6 @@
 # A2A Security System
 
-This module provides a comprehensive security system for Agent-to-Agent (A2A) communication within the AGENT_LAND_SAARLAND framework. It includes authentication, authorization, message validation, and message prioritization features.
+This module provides a comprehensive security system for Agent-to-Agent (A2A) communication within the agentland.saarland framework. It includes authentication, authorization, message validation, and message prioritization features.
 
 ## Components
 

@@ -16,7 +16,7 @@ import { useTheme } from '../dashboard/ThemeProvider';
 /**
  * UserProfileMenu Component
  * 
- * A dropdown menu for user profile actions in the AGENT_LAND.SAARLAND dashboard
+ * A dropdown menu for user profile actions in the agentland.saarland dashboard
  */
 const UserProfileMenu = ({ 
   user = null, 
