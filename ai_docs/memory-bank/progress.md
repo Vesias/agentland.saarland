@@ -3,16 +3,16 @@ title: "Progress"
 date: "2025-05-16"
 status: "current"
 updated_by: "Claude"
-version: "1.2" # Incrementing version due to new RTEF execution log
+version: "1.5" # Incrementing version due to template system migration
 ---
 
-# Progress: Claude Neural Framework (agent.saarland) - Stand Audit v4
+# Progress: Claude Neural Framework (agentland.saarland) - Stand Audit v4
 
 ## 1. Aktueller Gesamtstatus
 
-Das Claude Neural Framework (agent.saarland) befindet sich in einer fortgeschrittenen Entwicklungsphase. Eine umfangreiche Codebasis und eine grundlegende modulare Architektur sind etabliert. Die "Audit v4 - Finalisierungs-Checkliste" wurde als Leitfaden für die letzten Schritte zur Erreichung des "Deployment-Ready"-Status erstellt. 
+Das Claude Neural Framework (agentland.saarland) befindet sich in einer fortgeschrittenen Entwicklungsphase. Eine umfangreiche Codebasis und eine grundlegende modulare Architektur sind etabliert. Die "Audit v4 - Finalisierungs-Checkliste" wurde als Leitfaden für die letzten Schritte zur Erreichung des "Deployment-Ready"-Status erstellt. 
 
-Die Memory Bank (`ai_docs/memory-bank/`) wurde erfolgreich eingerichtet und mit einem Memory-Controller-System ausgestattet, das ein systematisches Tracking von Änderungen ermöglicht. Die Abarbeitung der Audit v4 Checkliste wurde begonnen, mit ersten Fortschritten im Bereich der Sicherheitsmodule.
+Die Memory Bank (`ai_docs/memory-bank/`) wurde erfolgreich eingerichtet und mit einem Memory-Controller-System ausgestattet, das ein systematisches Tracking von Änderungen ermöglicht. Die Abarbeitung der Audit v4 Checkliste wurde begonnen, mit ersten Fortschritten im Bereich der Sicherheitsmodule. Ein umfassender Sicherheits-Audit wurde durchgeführt und entsprechende Empfehlungen dokumentiert.
 
 ## 2. Was funktioniert (Annahmen basierend auf vorhandenen Dokumenten und der Checkliste)
 
@@ -35,53 +35,65 @@ Die folgende Liste fasst die Hauptaufgaben zusammen, die im Rahmen der Audit v4 
 *   ⭕ `validateConfig` in `config-manager.ts` mit `zod` muss noch robuster implementiert werden.
 *   ⭕ `validateSchema` in `schema-loader.ts` (z.B. mit `ajv`) muss noch implementiert werden.
 
-### 3.2. Code-Qualität, Fehlerbehebung & Refactoring
-*   Mock-Implementierungen in Executor-Klassen und `SequentialPlanner` durch reale Logik ersetzen.
-*   Kritische Pfadfehler in Shell-Skripten (`setup_rag.sh`, `run_rag.sh`, `check_python_env.sh`) korrigieren.
-*   Inkonsistenz des `VENV_DIR`-Pfades beheben.
-*   `set -e` in Shell-Skripten für robustere Fehlerbehandlung erwägen.
-*   Existenz und Funktionalität von `saar.sh` im Root-Verzeichnis überprüfen/wiederherstellen.
-*   Konsistente Logger-Verwendung (Core-Logger statt Platzhalter) sicherstellen.
-*   Inkonsistenzen bei Importpfaden (`require` vs. `import`) beheben.
-*   Namenskonflikt für `sequential-execution-manager.ts` auflösen.
-*   Dupliziertes `ServerConfig`-Interface konsolidieren.
-*   Einheitliche Verwendung von `commander` für CLI-Tools sicherstellen.
-*   Logikfehler im `notify`-Schritt des `CICDPlanner` korrigieren.
-*   Lange Methoden/Funktionen refaktorisieren.
-*   Pfad-Logik im Kontext des Build-Prozesses prüfen und korrigieren.
-*   Konsequentere Nutzung von Validierungsbibliotheken (z.B. `zod`).
+### 3.2. Sicherheitsempfehlungen aus dem Sicherheits-Audit (NEU)
+*   ⭕ **Kritisch:** Entfernung hartcodierter JWT-Secret-Keys in `a2a-security-middleware.ts` und Verwendung von Umgebungsvariablen
+*   ⭕ **Kritisch:** Einführung einer sicheren Speicherlösung für API-Schlüssel anstelle von Klartext-JSON-Dateien
+*   ⭕ **Kritisch:** Umstellung auf `.env`-Dateien für sensible Konfigurationen (außerhalb der Versionskontrolle)
+*   ⭕ **Kritisch:** Implementierung einer umfassenden serverseitigen Validierung für alle Eingaben
+*   ⭕ **Hoch:** Vervollständigung der Sitzungsverwaltung mit ordnungsgemäßer Timeout-Behandlung
+*   ⭕ **Hoch:** Integration automatisierter Abhängigkeits-Scans (z.B. Dependabot, Snyk) in die CI/CD-Pipeline
+*   ⭕ **Hoch:** Implementierung automatisierter Sicherheitstests mit Tools wie OWASP ZAP
+*   ⭕ **Mittel:** Implementierung ordnungsgemäßer Verschlüsselung für sensible ruhende Daten
+*   ⭕ **Mittel:** Vervollständigung der Audit-Logging-Implementierung für Sicherheitsereignisse
+*   ⭕ **Mittel:** Implementierung von Content Security Policy (CSP) für alle Frontend-Komponenten
 
-### 3.3. Testabdeckung und CI-Integration
-*   Klare Testverzeichnisstruktur etablieren/überprüfen.
-*   Konfiguration des Test-Frameworks (Jest/Vitest) prüfen.
-*   Skripte in `package.json` für Testausführung und Coverage Reports definieren.
-*   GitHub Actions Workflow (`.github/workflows/test.yml`) für automatische Tests erstellen/anpassen.
-*   Optional: Coverage-Report in CI integrieren.
-*   `audit.yml` Workflow für `clauderules-validator.ts` hinzufügen.
+### 3.3. Code-Qualität, Fehlerbehebung & Refactoring
+*   ⭕ Mock-Implementierungen in Executor-Klassen und `SequentialPlanner` durch reale Logik ersetzen.
+*   ⭕ Kritische Pfadfehler in Shell-Skripten (`setup_rag.sh`, `run_rag.sh`, `check_python_env.sh`) korrigieren.
+*   ⭕ Inkonsistenz des `VENV_DIR`-Pfades beheben.
+*   ⭕ `set -e` in Shell-Skripten für robustere Fehlerbehandlung erwägen.
+*   ⭕ Existenz und Funktionalität von `saar.sh` im Root-Verzeichnis überprüfen/wiederherstellen.
+*   ⭕ Konsistente Logger-Verwendung (Core-Logger statt Platzhalter) sicherstellen.
+*   ⭕ Inkonsistenzen bei Importpfaden (`require` vs. `import`) beheben.
+*   ⭕ Namenskonflikt für `sequential-execution-manager.ts` auflösen.
+*   ⭕ Dupliziertes `ServerConfig`-Interface konsolidieren.
+*   ⭕ Einheitliche Verwendung von `commander` für CLI-Tools sicherstellen.
+*   ⭕ Logikfehler im `notify`-Schritt des `CICDPlanner` korrigieren.
+*   ⭕ Lange Methoden/Funktionen refaktorisieren.
+*   ⭕ Pfad-Logik im Kontext des Build-Prozesses prüfen und korrigieren.
+*   ⭕ Konsequentere Nutzung von Validierungsbibliotheken (z.B. `zod`).
 
-### 3.4. Dokumentation
-*   `ai_docs/README.md` überarbeiten (Inhaltsverzeichnis, Übersicht).
-*   `ai_docs/PROJECT-STRUCTURE-AUDIT.md` mit Links zu Audit-Berichten etc. aktualisieren.
-*   `ai_docs/FINAL_FILE_TREE.md` auf aktuellen Stand bringen.
-*   `saar.sh help` Ausgabe anpassen.
-*   Externe Abhängigkeiten dokumentieren.
+### 3.4. Testabdeckung und CI-Integration
+*   ⭕ Klare Testverzeichnisstruktur etablieren/überprüfen.
+*   ⭕ Konfiguration des Test-Frameworks (Jest/Vitest) prüfen.
+*   ⭕ Skripte in `package.json` für Testausführung und Coverage Reports definieren.
+*   ⭕ GitHub Actions Workflow (`.github/workflows/test.yml`) für automatische Tests erstellen/anpassen.
+*   ⭕ Optional: Coverage-Report in CI integrieren.
+*   ⭕ `audit.yml` Workflow für `clauderules-validator.ts` hinzufügen.
 
-### 3.5. `.clauderules` und `.claude/` Verzeichnis
-*   `.clauderules` überprüfen, erweitern (Regeln für `set -e`, Core-Logger, `zod`, `commander`, Teststruktur) und Validierung durch `clauderules-validator.ts` sicherstellen.
-*   `.claude/` Verzeichnis überprüfen, aktualisieren, dokumentieren und bereinigen.
+### 3.5. Dokumentation
+*   ⭕ `ai_docs/README.md` überarbeiten (Inhaltsverzeichnis, Übersicht).
+*   ⭕ `ai_docs/PROJECT-STRUCTURE-AUDIT.md` mit Links zu Audit-Berichten etc. aktualisieren.
+*   ⭕ `ai_docs/FINAL_FILE_TREE.md` auf aktuellen Stand bringen.
+*   ⭕ `saar.sh help` Ausgabe anpassen.
+*   ⭕ Externe Abhängigkeiten dokumentieren.
 
-### 3.6. Deployment & Automation (Optional)
-*   Dockerfile für `apps/cli` erstellen.
-*   `nx affected:build` in CI integrieren.
-*   `version` und `info` Befehle für `apps/cli` implementieren.
+### 3.6. `.clauderules` und `.claude/` Verzeichnis
+*   ⭕ `.clauderules` überprüfen, erweitern (Regeln für `set -e`, Core-Logger, `zod`, `commander`, Teststruktur) und Validierung durch `clauderules-validator.ts` sicherstellen.
+*   ⭕ `.claude/` Verzeichnis überprüfen, aktualisieren, dokumentieren und bereinigen.
 
-### 3.7. Finale Überprüfung und Bereinigung
-*   Skript `tools/scripts/finalize.sh` erstellen (Formatierung, Linting, Typcheck, Tests, Validator, Build).
-*   Manuelle Überprüfung auf vergessene Kommentare, nicht benötigte Dateien.
-*   Systematische Überprüfung und Adressierung aller `// TODO:` Kommentare (insb. UI-bezogene).
-*   Sicherstellen korrekter Konfigurationswerte für Deployment.
+### 3.7. Deployment & Automation (Optional)
+*   ⭕ Dockerfile für `apps/cli` erstellen.
+*   ⭕ `nx affected:build` in CI integrieren.
+*   ⭕ `version` und `info` Befehle für `apps/cli` implementieren.
 
-## 4. Bekannte Probleme und Herausforderungen (basierend auf der Audit v4 Checkliste)
+### 3.8. Finale Überprüfung und Bereinigung
+*   ⭕ Skript `tools/scripts/finalize.sh` erstellen (Formatierung, Linting, Typcheck, Tests, Validator, Build).
+*   ⭕ Manuelle Überprüfung auf vergessene Kommentare, nicht benötigte Dateien.
+*   ⭕ Systematische Überprüfung und Adressierung aller `// TODO:` Kommentare (insb. UI-bezogene).
+*   ⭕ Sicherstellen korrekter Konfigurationswerte für Deployment.
+
+## 4. Bekannte Probleme und Herausforderungen
 
 *   **Typisierung:** Unvollständige Typisierung und Vorkommen von `any`-Typen in kritischen Bereichen (z.B. Sicherheitsmodule).
 *   **Testabdeckung:** Fehlende oder unzureichende Unit-Tests für wichtige Funktionen.
@@ -93,6 +105,7 @@ Die folgende Liste fasst die Hauptaufgaben zusammen, die im Rahmen der Audit v4 
 *   **Refactoring-Bedarf:** Lange Methoden und Funktionen erschweren die Lesbarkeit und Wartbarkeit.
 *   **Build-Prozess:** Potenzielle Probleme mit Pfaden zu Ressourcen nach der Transpilierung.
 *   **TODOs:** Viele offene `// TODO:` Kommentare im Code, die adressiert werden müssen, darunter auch Hinweise auf fehlende UI-Elemente.
+*   **Sicherheitslücken:** Der Sicherheits-Audit hat mehrere kritische Sicherheitsprobleme identifiziert, insbesondere bei der Credential-Verwaltung, Eingabevalidierung und beim Abhängigkeitsmanagement.
 
 <memory_update date="2025-05-15" source="Initial Setup" trigger="Memory-Bank-Einrichtung">
 Der Fortschrittsbericht wurde mit YAML-Frontmatter für die Agent-Kompatibilität aktualisiert. Er bildet eine wichtige Grundlage für die Verfolgung des Projektstatus.
@@ -220,4 +233,403 @@ To ensure the project template accurately reflects all setup components, includi
 - Add new file definitions (items ### 27. onwards) in `TEMPLATE_INIT_agentland.saarland.md` for each of these 12 files, including their full content.
 
 **Status of original proposal:** Applied in this RTEF run.
+</memory_update>
+
+<memory_update date="2025-05-16" source="Security Audit" trigger="Comprehensive Security Assessment">
+
+## Security Audit Results and Recommendations
+
+Ein umfassender Sicherheits-Audit des agentland.saarland-Frameworks wurde durchgeführt und hat sowohl Stärken als auch Schwachstellen identifiziert. Der Bericht wurde in `ai_docs/security/security_audit_agentland_saarland.md` mit ausführlichen Analysen und Empfehlungen dokumentiert.
+
+### Identifizierte Stärken:
+1. Gut konzipierte mehrschichtige Sicherheitsarchitektur
+2. Starkes Authentifizierungsframework mit mehreren Methoden
+3. Spezialisierte A2A-Sicherheitskomponenten
+4. TypeScript-Typsicherheit für Sicherheitskomponenten
+5. Erfolgreiche Migration der Sicherheitsmodule zu TypeScript
+
+### Kritische Schwachstellen:
+1. Hartcodierte Anmeldeinformationen, einschließlich JWT-Secrets im Quellcode
+2. Unsichere Konfigurationsdateien mit sensiblen Informationen
+3. Unzureichende Eingabevalidierung in Frontend-Komponenten
+4. Mock-Implementierungen von Sicherheitsfunktionen im Produktionscode
+5. Fehlendes automatisiertes Security-Scanning im Build-Prozess
+
+<template_diff>
+Der durchgeführte Sicherheits-Audit hat zusätzliche Sicherheitsmaßnahmen identifiziert, die im TEMPLATE_INIT_agentland.saarland.md reflektiert werden sollten:
+
+1. Hinzufügen eines Abschnitts "Sichere Credential-Verwaltung" mit Best Practices
+2. Erstellen einer Checkliste für Sicherheits-Reviews bei Pull Requests
+3. Definieren einer Struktur für `.env`-Dateien zur sicheren Konfigurationsverwaltung
+4. Hinzufügen von Beispielen für Eingabevalidierung in Frontend-Komponenten
+5. Integration von Sicherheits-Scanning-Tools in die CI/CD-Pipeline
+6. Erstellen eines Verzeichnisses `ai_docs/security/` für Sicherheitsdokumentation
+</template_diff>
+
+<suggested_change>
+Basierend auf dem Sicherheits-Audit sollten folgende wichtige Änderungen am A2A-Security-Middleware implementiert werden:
+
+```typescript
+// Änderung in a2a-security-middleware.ts
+
+// Aktueller Code:
+this.authProvider = new A2AAuthProvider({
+  apiKeysFile: this.config.auditLogPath ? path.join(path.dirname(this.config.auditLogPath), 'api-keys.json') : undefined,
+  jwt: {
+    secretKey: process.env.A2A_JWT_SECRET || 'default-secret-key-that-should-be-changed',
+    issuer: 'a2a-manager',
+    audience: 'a2a-agents',
+    expiresIn: '1d' // 1 day
+  }
+});
+
+// Empfohlene Änderung:
+if (!process.env.A2A_JWT_SECRET) {
+  this.logger.error('A2A_JWT_SECRET Umgebungsvariable ist nicht gesetzt! Die Sicherheit ist beeinträchtigt.');
+  throw new Error('A2A_JWT_SECRET Umgebungsvariable ist erforderlich. Bitte in .env-Datei definieren.');
+}
+
+this.authProvider = new A2AAuthProvider({
+  apiKeysFile: process.env.API_KEYS_PATH || (this.config.auditLogPath ? 
+    path.join(path.dirname(this.config.auditLogPath), 'api-keys.encrypted.json') : undefined),
+  jwt: {
+    secretKey: process.env.A2A_JWT_SECRET,
+    issuer: process.env.A2A_JWT_ISSUER || 'a2a-manager',
+    audience: process.env.A2A_JWT_AUDIENCE || 'a2a-agents',
+    expiresIn: process.env.A2A_JWT_EXPIRES_IN || '1d'
+  }
+});
+```
+
+Dies würde sicherstellen, dass die Anwendung nicht mit unsicheren Standardwerten startet und auf Umgebungsvariablen für sensitive Informationen angewiesen ist.
+</suggested_change>
+
+Damit die festgestellten Sicherheitsprobleme systematisch angegangen werden, wurde im Abschnitt 3.2 "Sicherheitsempfehlungen aus dem Sicherheits-Audit (NEU)" eine nach Priorität geordnete Liste mit den wichtigsten zu implementierenden Sicherheitsverbesserungen hinzugefügt.
+</memory_update>
+
+<memory_update date="2025-05-16" source="Security Implementation" trigger="Security Implementation Plan">
+
+## Security Implementation Plan: Phase 1
+
+Basierend auf dem Sicherheits-Audit wurde ein strukturierter Implementierungsplan für die Verbesserung der Sicherheit des agentland.saarland-Frameworks entwickelt. Der Plan umfasst drei Phasen, wobei Phase 1 sich auf die kritischen Sicherheitsrisiken konzentriert und innerhalb von 1-2 Wochen umgesetzt werden soll.
+
+### Phase 1: Kritische Risikominderung (1-2 Wochen)
+
+<template_diff>
+Die folgenden Änderungen sind erforderlich, um die kritischsten Sicherheitsrisiken zu beheben:
+
+1. Ersetzung aller hartcodierten Secrets durch Umgebungsvariablen:
+   - A2A_JWT_SECRET, MCP_API_KEY, RAG_API_KEY usw.
+   - Einführung einer Validierungsfunktion, die beim Start prüft, ob alle erforderlichen Umgebungsvariablen vorhanden sind
+   - Fehlende Umgebungsvariablen sollten als kritischer Fehler behandelt werden
+
+2. Migration sensibler Konfigurationen zu `.env`-Dateien:
+   - Erstellung einer `.env.example`-Datei als Vorlage
+   - Ausschluss von `.env`-Dateien aus der Versionskontrolle (.gitignore)
+   - Dokumentation der erforderlichen Umgebungsvariablen
+   - Sicherstellen, dass beim Build ein Fehler angezeigt wird, wenn kritische Umgebungsvariablen fehlen
+
+3. Implementierung umfassender serverseitiger Validierung:
+   - Hinzufügen von Middlewares für die Validierung von API-Anfragen
+   - Erweiterung der vorhandenen Validierungsschemata
+   - Ergänzung der Frontend-Validierung durch entsprechende serverseitige Validierung
+   - Implementierung von Logging für Validierungsfehler
+</template_diff>
+
+<suggested_change>
+Um die Anforderungen aus Phase 1 systematisch umzusetzen, sollten folgende konkrete Änderungen vorgenommen werden:
+
+1. Erstellung einer `.env.example`-Datei im Root-Verzeichnis:
+```
+# A2A Security Configuration
+A2A_JWT_SECRET=
+A2A_JWT_ISSUER=a2a-manager
+A2A_JWT_AUDIENCE=a2a-agents
+A2A_JWT_EXPIRES_IN=1d
+
+# MCP API Configuration
+MCP_API_KEY=
+MCP_PROFILE=
+MCP_SERVER_URL=
+
+# RAG Configuration
+RAG_API_KEY=
+RAG_VECTOR_DB_PATH=
+
+# Web Security
+SESSION_SECRET=
+CORS_ORIGINS=http://localhost:5000
+CSP_REPORT_URI=
+```
+
+2. Aktualisierung der `.gitignore`-Datei:
+```
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.env
+
+# Secrets
+**/api-keys*.json
+**/secret*.json
+```
+
+3. Schaffung einer zentralen Umgebungsvariablen-Validierungsfunktion in `libs/core/src/config/env-validator.ts`:
+```typescript
+import { logger } from '../logging/logger';
+
+export interface EnvValidationOptions {
+  throwOnMissing?: boolean;
+  logLevel?: 'error' | 'warn' | 'info';
+}
+
+export interface EnvValidationResult {
+  isValid: boolean;
+  missingVars: string[];
+  message: string;
+}
+
+/**
+ * Validiert die erforderlichen Umgebungsvariablen
+ * @param requiredVars Liste der erforderlichen Umgebungsvariablen
+ * @param options Validierungsoptionen
+ * @returns Validierungsergebnis
+ */
+export function validateEnv(
+  requiredVars: string[],
+  options: EnvValidationOptions = { throwOnMissing: true, logLevel: 'error' }
+): EnvValidationResult {
+  const missingVars = requiredVars.filter(varName => !process.env[varName]);
+  
+  const isValid = missingVars.length === 0;
+  const message = isValid
+    ? 'Alle erforderlichen Umgebungsvariablen sind vorhanden.'
+    : `Fehlende erforderliche Umgebungsvariablen: ${missingVars.join(', ')}`;
+  
+  if (!isValid) {
+    if (options.logLevel === 'error') {
+      logger.error(message);
+    } else if (options.logLevel === 'warn') {
+      logger.warn(message);
+    } else {
+      logger.info(message);
+    }
+    
+    if (options.throwOnMissing) {
+      throw new Error(message);
+    }
+  }
+  
+  return { isValid, missingVars, message };
+}
+```
+
+Diese Änderungen legen die Grundlage für eine sichere Konfigurationsverwaltung und die Eliminierung von hartcodierten Geheimnissen im Code.
+</suggested_change>
+
+### CI/CD-Integration für Phase 1
+
+Um sicherzustellen, dass keine Geheimnisse in den Code gelangen, sollte ein CI-Lint für Secrets implementiert werden. Dies kann mit einem neuen GitHub Actions Workflow oder durch Erweiterung eines vorhandenen Workflows erfolgen:
+
+```yaml
+name: Security Checks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  secrets-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run secret scanning
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Check for hardcoded secrets
+        run: |
+          # Custom patterns for finding potential hardcoded secrets
+          ! grep -r --include="*.{ts,js,json}" -E "(secret|password|apikey|token)([ ]?[:=][ ]?[\'\"])[^\'\"]+" --exclude-dir={node_modules,.git,dist}
+```
+
+Diese Maßnahmen stellen den ersten Schritt dar, um die kritischen Sicherheitslücken zu beheben, die im Sicherheits-Audit identifiziert wurden. Weitere Phasen werden folgen, um die mittel- und langfristigen Sicherheitsverbesserungen umzusetzen.
+</memory_update>
+
+<memory_update date="2025-05-16" source="Template System Migration" trigger="Token Limit Solution">
+
+## Migration to Modular Template System
+
+Die Initialisierungsvorlage für agentland.saarland (`TEMPLATE_INIT_agentland.saarland.md`) wurde in ein modulares Templatesystem migriert, um die Token-Limitierung zu lösen und die Wartbarkeit zu verbessern. Die ursprüngliche monolithische Datei hatte mit über 45.000 Tokens die Verarbeitungsgrenzen des LLM-Systems überschritten.
+
+### Strukturelle Veränderung
+
+<template_diff>
+Die monolithische Vorlage wurde in spezialisierte Module aufgeteilt:
+
+1. Ein zentrales Index-Dokument `TEMPLATE_INIT_chain.md` als Einstiegspunkt
+2. Spezialisierte Templates für verschiedene Aspekte des Projekts:
+   - Verzeichnisstruktur (`template_structure.md`)
+   - Konfigurationen (`template_configurations.md`)
+   - CI/CD (`template_ci_cd.md`)
+   - Memory-Bank (`template_memory_bank.md`)
+   - Dashboard (`template_dashboard.md`)
+   - Sicherheit (`template_security.md`)
+   - Prompts (`template_prompts.md`)
+   - Guides (`template_guides.md`)
+   - Changelog (`template_changelog.md`)
+3. Umgestaltung der ursprünglichen Datei als Verweisdokument
+
+Diese Aufteilung ermöglicht es:
+- Die Token-Grenzen bei der Verarbeitung nicht mehr zu überschreiten
+- Module unabhängig voneinander zu aktualisieren
+- Eine bessere Organisation und strukturiertere Dokumentation zu gewährleisten
+- Module einzeln zu versionieren
+</template_diff>
+
+<suggested_change>
+Die folgenden Änderungen wurden umgesetzt:
+
+1. **Erstellen des Modularen Templatesystems**:
+   - Erstellung von 10 spezialisierten Templatedateien im Verzeichnis `ai_docs/templates/`
+   - Jedes Modul behandelt einen spezifischen Aspekt des Projekts
+   - Konsistente Formatierung und Struktur über alle Module hinweg
+
+2. **Umgestaltung der ursprünglichen Datei**:
+```markdown
+# agentland.saarland Template System
+
+**IMPORTANT: This monolithic template has been split into a modular template system**
+
+The original `TEMPLATE_INIT_agentland.saarland.md` file has been migrated to a modular template chain to improve maintainability and solve token limit issues. Please refer to the following files for the new template system:
+
+## Modular Template System
+
+The template is now organized into specialized modules:
+
+| Module | Purpose | Path |
+|--------|---------|------|
+| **Root Index** | Main entry point for template chain | [ai_docs/templates/TEMPLATE_INIT_chain.md](ai_docs/templates/TEMPLATE_INIT_chain.md) |
+| **Structure** | Directory tree and layout strategy | [ai_docs/templates/template_structure.md](ai_docs/templates/template_structure.md) |
+| ... other modules ...
+
+# Benefits, usage instructions, etc.
+```
+
+3. **Integration mit RTEF**:
+   - GitHub-Workflows zur Erkennung von Template-Änderungen
+   - Automatisierte Issue-Erstellung für Template-Updates
+   - Memory-Bank-Integration zur Verfolgung der Template-Evolution
+
+Diese Umstrukturierung löst nicht nur das Token-Limit-Problem, sondern verbessert auch die langfristige Wartbarkeit des Template-Systems erheblich.
+</suggested_change>
+
+### Vorteile des neuen Systems
+
+Das neue modulare Template-System bietet folgende Vorteile:
+
+1. **Verbesserte Wartbarkeit**: Jedes Modul kann unabhängig aktualisiert werden
+2. **Gelöste Token-Beschränkungen**: Keine Token-Limit-Probleme mehr bei der Verarbeitung
+3. **Bessere Organisation**: Klare Trennung der Zuständigkeiten für jeden Template-Bereich
+4. **Einfachere Updates**: Vereinfachter Prozess für die Aktualisierung bestimmter Template-Abschnitte
+5. **Versionskontrolle**: Jedes Modul hat seine eigene Version, was eine unabhängige Weiterentwicklung ermöglicht
+
+### Integration mit RTEF
+
+Das Template-System ist in den Recursive Template Evolution Flow (RTEF) integriert, der automatisch Änderungen erkennt und Aktualisierungsvorschläge erstellt. Dies gewährleistet, dass das Template-System kontinuierlich verbessert wird und mit den Projektanforderungen Schritt hält.
+
+</memory_update>
+
+<memory_update date="2025-05-16" source="Template System Enhancement" trigger="Cross-Reference Implementation">
+
+## Template System Cross-Reference Enhancement
+
+Die modularen Template-Dateien wurden durch umfassende Querverweise und Integrationshinweise verbessert, um die Beziehungen zwischen den verschiedenen Modulen zu verdeutlichen und die Navigation zu erleichtern.
+
+### Verbesserte Verknüpfung der Module
+
+<template_diff>
+Um die Beziehungen zwischen den Template-Modulen klarer hervorzuheben, wurden folgende Änderungen implementiert:
+
+1. Erweiterung der Modul-Tabelle im Root-Index-Dokument:
+   - Hinzufügen einer Spalte "Related Modules" zu jeder Template-Auflistung
+   - Systematische Auflistung aller Querverbindungen zwischen den Modulen
+
+2. Hinzufügen eines "Related Templates"-Abschnitts zu allen Modulen:
+   - Auflistung aller verwandten Templates
+   - Erklärung der Beziehung zwischen den Modulen
+   - Querverweise auf spezifische Abschnitte in anderen Modulen
+
+3. Hinzufügen eines "Integration Points"-Abschnitts zum Memory-Bank-Template:
+   - Erklärung, wie die Memory-Bank mit anderen Systemkomponenten integriert ist
+   - Hervorhebung der Rolle des RTEF-Systems
+   - Verdeutlichung der Verbindung zu CI/CD, Prompts und Dashboard
+</template_diff>
+
+<suggested_change>
+Die folgenden Änderungen wurden umgesetzt:
+
+1. **Erweiterung des Root-Index-Dokuments**:
+```markdown
+## Template Modules
+
+| Module | Purpose | Path | Related Modules |
+|--------|---------|------|----------------|
+| 📁 **Structure** | Directory tree and layout strategy | [template_structure.md](./template_structure.md) | Configurations, CI/CD |
+| ⚙️ **Configurations** | Config files and .env integration | [template_configurations.md](./template_configurations.md) | Structure, Security, Dashboard |
+...
+```
+
+2. **Hinzufügen von "Related Templates"-Abschnitten**:
+```markdown
+## Related Templates
+
+| Template | Relationship |
+|----------|--------------|
+| [Configurations](./template_configurations.md) | Defines how configuration files are structured and managed within this directory structure |
+| [CI/CD](./template_ci_cd.md) | Provides workflows for validating and testing components in this structure |
+| [Dashboard](./template_dashboard.md) | Implements the web application components defined in the structure |
+```
+
+3. **Hinzufügen einer "Integration Points"-Sektion zum Memory-Bank-Template**:
+```markdown
+## Integration Points
+
+The memory bank integrates with other components of the agentland.saarland system:
+
+1. **Recursive Template Evolution Flow (RTEF)** - Memory updates with `<template_diff>` tags trigger the RTEF system
+2. **CI/CD Pipeline** - Memory bank validation is part of documentation checks
+3. **AI Prompts** - Memory bank content provides context for AI prompts
+4. **Dashboard** - Memory bank status is displayed in the dashboard
+```
+
+Diese Erweiterungen verdeutlichen die Zusammenhänge zwischen den Komponenten und ermöglichen eine intuitivere Navigation durch die Template-Dokumentation.
+</suggested_change>
+
+### Vorteile der Querverweise
+
+Die verbesserten Querverweise bieten folgende Vorteile:
+
+1. **Ganzheitliches Verständnis**: Benutzer können die Verbindungen zwischen verschiedenen Systemkomponenten besser verstehen
+2. **Effizientere Navigation**: Einfacheres Auffinden relevanter Informationen in verwandten Modulen
+3. **Konsistente Implementierung**: Klarere Richtlinien für die Umsetzung von Funktionen, die mehrere Module betreffen
+4. **Lückenidentifikation**: Einfachere Erkennung von fehlenden oder unvollständigen Dokumentationsbereichen
+5. **Bessere Wartbarkeit**: Beim Aktualisieren eines Moduls können gezielt auch die verwandten Module überprüft werden
+
+### Integration in die Entwicklungs-Workflows
+
+Die Querverweise sind nicht nur ein Dokumentationsmerkmal, sondern unterstützen auch aktiv die Entwicklungs-Workflows:
+
+1. Bei der Implementierung neuer Funktionen können Entwickler schnell alle relevanten Template-Module identifizieren
+2. Bei Code-Reviews können Prüfer die Einhaltung der Standards in allen betroffenen Modulen überprüfen
+3. Bei Template-Updates werden Entwickler explizit auf abhängige Module hingewiesen, die möglicherweise ebenfalls aktualisiert werden müssen
+
+Diese Integration stellt sicher, dass das modulare Template-System nicht nur ein Referenzdokument ist, sondern ein aktives Werkzeug im Entwicklungsprozess.
+
 </memory_update>
