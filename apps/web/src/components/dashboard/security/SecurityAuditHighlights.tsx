@@ -1,86 +1,160 @@
 import React, { useState, useEffect } from 'react';
+import { FaShieldAlt, FaExclamationTriangle, FaInfoCircle, FaCheckCircle, FaSpinner } from 'react-icons/fa';
 
+// Interface aligned with the API response from /api/security/audit-summary
 interface AuditFinding {
   id: string;
-  severity: 'Critical' | 'High' | 'Medium' | 'Low' | 'Informational';
+  severity: 'critical' | 'high' | 'medium' | 'low' | 'info'; // Lowercase to match API
   description: string;
-  status: 'Open' | 'In Progress' | 'Remediated' | 'Risk Accepted';
-  recommendation?: string;
-  ticketLink?: string;
+  status: 'open' | 'resolved' | 'mitigated' | 'pending_review'; // Lowercase to match API
+  lastChecked: string; // Added from API
+  recommendation?: string; // Kept from original, though not in API
+  ticketLink?: string;     // Kept from original, though not in API
+}
+
+interface SecurityAuditSummary {
+  summaryDate: string;
+  criticalCount: number;
+  highCount: number;
+  mediumCount: number;
+  lowCount: number;
+  recentFindings: AuditFinding[];
 }
 
 const SecurityAuditHighlights: React.FC = () => {
-  // Placeholder data - in a real implementation, this would be fetched
-  // from a backend service or by parsing ai_docs/security/security_audit_agentland_saarland.md
-  const [auditFindings, setAuditFindings] = useState<AuditFinding[]>([
-    { id: 'SA-001', severity: 'Critical', description: 'Hardcoded JWT secret key in a2a-security-middleware.ts', status: 'In Progress', recommendation: 'Use environment variables for secrets.', ticketLink: '#issue-123' },
-    { id: 'SA-002', severity: 'Critical', description: 'API keys stored in plaintext JSON files', status: 'Open', recommendation: 'Implement secure secret storage solution (e.g., Vault, or encrypted env vars).', ticketLink: '#issue-124' },
-    { id: 'SA-003', severity: 'High', description: 'Incomplete session timeout handling', status: 'Open', recommendation: 'Implement proper session expiration and cleanup.', ticketLink: '#issue-125' },
-    { id: 'SA-004', severity: 'Medium', description: 'Lack of automated dependency vulnerability scanning', status: 'Remediated', recommendation: 'Integrate Dependabot/Snyk into CI/CD.', ticketLink: '#issue-101' },
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [auditSummary, setAuditSummary] = useState<SecurityAuditSummary | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   setIsLoading(true);
-  //   fetch('/api/security/audit-highlights') // Example API
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       setAuditFindings(data);
-  //       setIsLoading(false);
-  //     })
-  //     .catch(error => {
-  //       console.error("Failed to fetch security audit highlights:", error);
-  //       setIsLoading(false);
-  //     });
-  // }, []);
+  useEffect(() => {
+    const fetchAuditSummary = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('/api/security/audit-summary');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch security audit summary: ${response.statusText}`);
+        }
+        const data: SecurityAuditSummary | { error: string } = await response.json();
+        if ('error' in data) {
+          throw new Error(data.error);
+        }
+        setAuditSummary(data);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred');
+        }
+        setAuditSummary(null); // Clear or set fallback data
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAuditSummary();
+  }, []);
 
   const getSeverityColor = (severity: AuditFinding['severity']) => {
-    if (severity === 'Critical') return 'bg-red-600 text-white';
-    if (severity === 'High') return 'bg-red-400 text-red-900';
-    if (severity === 'Medium') return 'bg-yellow-400 text-yellow-900';
-    if (severity === 'Low') return 'bg-blue-400 text-blue-900';
-    return 'bg-gray-400 text-gray-900';
+    if (severity === 'critical') return 'bg-red-600 text-white';
+    if (severity === 'high') return 'bg-red-400 text-red-900 dark:text-red-100 dark:bg-red-500';
+    if (severity === 'medium') return 'bg-yellow-400 text-yellow-900 dark:text-yellow-100 dark:bg-yellow-500';
+    if (severity === 'low') return 'bg-blue-400 text-blue-900 dark:text-blue-100 dark:bg-blue-500';
+    return 'bg-gray-400 text-gray-900 dark:text-gray-100 dark:bg-gray-500';
   };
 
   const getStatusColor = (status: AuditFinding['status']) => {
-    if (status === 'Open') return 'text-red-500 dark:text-red-400';
-    if (status === 'In Progress') return 'text-blue-500 dark:text-blue-400';
-    if (status === 'Remediated') return 'text-green-500 dark:text-green-400';
+    if (status === 'open') return 'text-red-500 dark:text-red-400';
+    if (status === 'pending_review') return 'text-yellow-600 dark:text-yellow-400';
+    if (status === 'mitigated') return 'text-blue-500 dark:text-blue-400';
+    if (status === 'resolved') return 'text-green-500 dark:text-green-400';
     return 'text-gray-500 dark:text-gray-400';
+  };
+
+  const getStatusIcon = (status: AuditFinding['status']) => {
+    if (status === 'open') return <FaExclamationTriangle className="inline mr-1 text-red-500" />;
+    if (status === 'pending_review') return <FaInfoCircle className="inline mr-1 text-yellow-600" />;
+    if (status === 'resolved') return <FaCheckCircle className="inline mr-1 text-green-500" />;
+    return null;
   };
   
   if (isLoading) {
-    return <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 text-center">Lade Sicherheits-Audit Highlights...</div>;
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 text-center">
+        <FaSpinner className="animate-spin text-blue-500 text-2xl mx-auto mb-2" />
+        <p className="text-gray-600 dark:text-gray-300">Lade Sicherheits-Audit Highlights...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-red-500 dark:text-red-400 mb-2">
+          <FaExclamationTriangle className="inline mr-2" /> Fehler beim Laden der Audit Highlights
+        </h2>
+        <p className="text-red-600 dark:text-red-400">{error}</p>
+      </div>
+    );
+  }
+  
+  if (!auditSummary) {
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+         <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+          Sicherheits-Audit Highlights
+        </h2>
+        <p className="text-gray-500 dark:text-gray-400">Keine Audit-Daten verfügbar.</p>
+      </div>
+    );
   }
 
   return (
     <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-        Sicherheits-Audit Highlights
+      <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+        <FaShieldAlt className="mr-2 text-indigo-500" /> Sicherheits-Audit Highlights
       </h2>
-      <div className="space-y-4">
-        {auditFindings.map(finding => (
-          <div key={finding.id} className="border border-gray-200 dark:border-gray-700 rounded-md p-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-center">
+        <div>
+          <p className="text-2xl font-bold text-red-600 dark:text-red-400">{auditSummary.criticalCount}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Kritisch</p>
+        </div>
+        <div>
+          <p className="text-2xl font-bold text-red-500 dark:text-red-300">{auditSummary.highCount}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Hoch</p>
+        </div>
+        <div>
+          <p className="text-2xl font-bold text-yellow-500 dark:text-yellow-400">{auditSummary.mediumCount}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Mittel</p>
+        </div>
+        <div>
+          <p className="text-2xl font-bold text-blue-500 dark:text-blue-400">{auditSummary.lowCount}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Niedrig</p>
+        </div>
+      </div>
+      <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3">Aktuelle & offene Befunde:</h3>
+      <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
+        {auditSummary.recentFindings.filter(f => f.status === 'open' || f.status === 'pending_review').length === 0 && (
+          <p className="text-sm text-gray-500 dark:text-gray-400">Keine aktuellen offenen Befunde.</p>
+        )}
+        {auditSummary.recentFindings.filter(f => f.status === 'open' || f.status === 'pending_review').map(finding => (
+          <div key={finding.id} className="border border-gray-200 dark:border-gray-700 rounded-md p-3 hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start mb-1">
-              <h3 className="text-md font-semibold text-gray-700 dark:text-gray-200">{finding.id}: {finding.description}</h3>
-              <span className={`px-2 py-0.5 text-xs font-bold rounded-full ${getSeverityColor(finding.severity)}`}>
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 flex-1 mr-2">{finding.description}</h4>
+              <span className={`px-2 py-0.5 text-xs font-bold rounded-full ${getSeverityColor(finding.severity)} capitalize`}>
                 {finding.severity}
               </span>
             </div>
-            <p className={`text-sm font-medium ${getStatusColor(finding.status)} mb-1`}>Status: {finding.status}</p>
-            {finding.recommendation && 
-              <p className="text-xs text-gray-600 dark:text-gray-400"><strong>Empfehlung:</strong> {finding.recommendation}</p>
-            }
-            {finding.ticketLink && 
-              <a href={finding.ticketLink} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:underline dark:text-blue-400">
-                Tracking Ticket
-              </a>
-            }
+            <p className={`text-xs font-medium ${getStatusColor(finding.status)} mb-1 capitalize`}>
+              {getStatusIcon(finding.status)}
+              Status: {finding.status.replace('_', ' ')} (Geprüft: {new Date(finding.lastChecked).toLocaleDateString()})
+            </p>
+            {/* Recommendation and ticketLink could be added if present in API response */}
           </div>
         ))}
       </div>
       <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
-        Daten basierend auf <code>ai_docs/security/security_audit_agentland_saarland.md</code>.
+        Audit-Zusammenfassung vom: {new Date(auditSummary.summaryDate).toLocaleString()}.
       </p>
     </div>
   );

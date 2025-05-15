@@ -10,3 +10,7 @@ apps/cli/node_modules/
 .nx/workspace-data/**/*.db-wal
 
 mcp_servers_backup.tar.gz
+.nx/workspace-data/**/*.db-shm
+.nx/workspace-data/**/*.db-wal
+.nx/cache/terminalOutputs/*
+.nx/cache/run.json

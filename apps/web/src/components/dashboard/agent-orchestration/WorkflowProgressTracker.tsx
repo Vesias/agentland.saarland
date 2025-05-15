@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { FaSpinner } from 'react-icons/fa';
 
 interface WorkflowStep {
   id: string;
@@ -19,60 +20,41 @@ interface Workflow {
 }
 
 const WorkflowProgressTracker: React.FC = () => {
-  // Placeholder data
-  const [workflows, setWorkflows] = useState<Workflow[]>([
-    {
-      id: 'wf1',
-      name: 'Document Analysis Pipeline',
-      status: 'running',
-      currentStepId: 'step2',
-      progressPercentage: 45,
-      steps: [
-        { id: 'step1', name: 'Fetch Document', status: 'completed', startTime: '10:00', endTime: '10:01', details: 'Source: /docs/report.pdf' },
-        { id: 'step2', name: 'Extract Text', status: 'in-progress', startTime: '10:01', details: 'Using OCR Agent' },
-        { id: 'step3', name: 'Summarize Content', status: 'pending' },
-        { id: 'step4', name: 'Store Results', status: 'pending' },
-      ],
-    },
-    {
-      id: 'wf2',
-      name: 'Daily News Aggregation',
-      status: 'completed',
-      progressPercentage: 100,
-      steps: [
-        { id: 's1', name: 'Fetch Feeds', status: 'completed' },
-        { id: 's2', name: 'Filter Articles', status: 'completed' },
-        { id: 's3', name: 'Generate Briefing', status: 'completed' },
-      ],
-    },
-    {
-      id: 'wf3',
-      name: 'Codebase Audit',
-      status: 'failed',
-      currentStepId: 'audit-step2',
-      progressPercentage: 20,
-      steps: [
-        { id: 'audit-step1', name: 'Clone Repository', status: 'completed'},
-        { id: 'audit-step2', name: 'Static Analysis', status: 'error', details: 'Linter timeout' },
-        { id: 'audit-step3', name: 'Generate Report', status: 'pending' },
-      ],
-    }
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [workflows, setWorkflows] = useState<Workflow[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   setIsLoading(true);
-  //   fetch('/api/workflows/active') // Example API
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       setWorkflows(data);
-  //       setIsLoading(false);
-  //     })
-  //     .catch(error => {
-  //       console.error("Failed to fetch workflows:", error);
-  //       setIsLoading(false);
-  //     });
-  // }, []);
+  useEffect(() => {
+    const fetchWorkflows = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('/api/workflows/active-status');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch workflows: ${response.statusText}`);
+        }
+        const data = await response.json();
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        setWorkflows(data);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred');
+        }
+        setWorkflows([]); // Fallback to empty
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchWorkflows();
+    // Optional: Interval to refresh
+    // const intervalId = setInterval(fetchWorkflows, 10000); // every 10 seconds
+    // return () => clearInterval(intervalId);
+  }, []);
 
   const getStepStatusColor = (status: WorkflowStep['status']) => {
     if (status === 'completed') return 'bg-green-500';
@@ -90,7 +72,21 @@ const WorkflowProgressTracker: React.FC = () => {
   }
 
   if (isLoading) {
-    return <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 text-center">Lade Workflow-Fortschritt...</div>;
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 text-center">
+        <FaSpinner className="animate-spin text-blue-500 text-2xl mx-auto mb-2" />
+        <p className="text-gray-600 dark:text-gray-300">Lade Workflow-Fortschritt...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-red-500 dark:text-red-400 mb-4">Fehler bei Workflows</h2>
+        <p className="text-red-500 dark:text-red-400">{error}</p>
+      </div>
+    );
   }
 
   return (
@@ -99,7 +95,7 @@ const WorkflowProgressTracker: React.FC = () => {
       {workflows.length === 0 && (
         <p className="text-gray-500 dark:text-gray-400">Keine aktiven Workflows.</p>
       )}
-      <div className="space-y-6">
+      <div className="space-y-6 max-h-96 overflow-y-auto pr-2"> {/* Added max-h and overflow */}
         {workflows.map(wf => (
           <div key={wf.id} className={`p-4 border-l-4 ${getWorkflowStatusColor(wf.status)} bg-gray-50 dark:bg-gray-700 rounded-r-md`}>
             <div className="flex justify-between items-center mb-2">
