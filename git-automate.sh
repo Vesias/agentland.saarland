@@ -10,10 +10,13 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Verzeichnisse
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+CHANGELOG_FILE="$SCRIPT_DIR/CHANGELOG.md"
+VERSION_FILE="$SCRIPT_DIR/VERSION"
 
 # Funktionen
 show_help() {
@@ -21,66 +24,267 @@ show_help() {
   echo ""
   echo "Verwendung: ./git-automate.sh [Befehl] [Optionen]"
   echo ""
-  echo "Befehle:"
+  echo "Basisbefehle:"
   echo "  auto-commit [nachricht]        Automatisch alle Änderungen stagen und committen"
   echo "  auto-merge [branch]            Automatisches Mergen mit Konfliktlösung"
   echo "  auto-sync                      Aktualisiert den Branch und pusht Änderungen"
   echo "  auto-all [nachricht]           Führt auto-commit und auto-sync in einem Schritt durch"
   echo "  ignore-nx                      Aktualisiert .gitignore für NX-Build-Dateien"
   echo "  push                           Pusht alle lokalen Commits zum Remote"
+  echo ""
+  echo "Erweiterte Befehle:"
+  echo "  run-tests                      Führt alle Tests aus vor dem Commit"
+  echo "  bump-version [major|minor|patch] Erhöht die Versionsnummer"
+  echo "  update-changelog [changes]     Aktualisiert den Changelog"
+  echo "  create-release [version]       Erstellt eine neue Release mit Tag und Changelog"
+  echo "  ci-deploy [env]                Startet den CI/CD-Deployment-Prozess für die angegebene Umgebung"
   echo "  help                           Zeigt diese Hilfe an"
   echo ""
   echo "Beispiele:"
   echo "  ./git-automate.sh auto-commit \"Verbesserte Dashboard-Komponenten\""
   echo "  ./git-automate.sh auto-all \"Aktualisierung aller Komponenten\""
+  echo "  ./git-automate.sh bump-version minor"
+  echo "  ./git-automate.sh create-release v1.2.0"
 }
 
-# Fügt NX-Build-Dateien zur .gitignore hinzu, falls noch nicht vorhanden
-update_gitignore_for_nx() {
-  echo -e "${BLUE}=== Aktualisiere .gitignore für NX-Build-Dateien ===${NC}"
+# Führt alle Tests aus
+run_tests() {
+  echo -e "${BLUE}=== Führe Tests vor dem Commit aus ===${NC}"
   
-  NX_PATTERNS=(
-    ".nx/workspace-data/d/daemon.log"
-    ".nx/workspace-data/file-map.json"
-    ".nx/workspace-data/project-graph.json"
-    ".nx/workspace-data/**/*.db-shm"
-    ".nx/workspace-data/**/*.db-wal"
-    ".nx/cache/terminalOutputs/*"
-    ".nx/cache/run.json"
-  )
-  
-  GITIGNORE_FILE="$SCRIPT_DIR/.gitignore"
-  
-  if [ ! -f "$GITIGNORE_FILE" ]; then
-    echo -e "${YELLOW}.gitignore nicht gefunden, erstelle neu...${NC}"
-    touch "$GITIGNORE_FILE"
+  # Bestimmen, welcher Test-Runner verwendet werden soll (npm, nx, etc.)
+  if [ -f "$SCRIPT_DIR/nx.json" ]; then
+    echo "NX-Projekt erkannt, verwende NX für Tests..."
+    npx nx run-many --target=test --all --parallel
+  elif [ -f "$SCRIPT_DIR/package.json" ]; then
+    echo "Node.js-Projekt erkannt, verwende npm für Tests..."
+    npm test
+  else
+    echo -e "${YELLOW}Kein bekanntes Test-Framework gefunden. Überspringe Tests.${NC}"
+    return 0
   fi
   
-  UPDATED=0
-  
-  for pattern in "${NX_PATTERNS[@]}"; do
-    if ! grep -q "^$pattern$" "$GITIGNORE_FILE"; then
-      echo "$pattern" >> "$GITIGNORE_FILE"
-      echo -e "${GREEN}Hinzugefügt: $pattern${NC}"
-      UPDATED=1
-    fi
-  done
-  
-  if [ $UPDATED -eq 0 ]; then
-    echo -e "${GREEN}NX-Build-Dateien sind bereits in .gitignore eingetragen.${NC}"
+  # Prüfen des Exit-Status
+  if [ $? -eq 0 ]; then
+    echo -e "${GREEN}Alle Tests erfolgreich bestanden!${NC}"
+    return 0
   else
-    echo -e "${GREEN}.gitignore erfolgreich aktualisiert.${NC}"
+    echo -e "${RED}Tests fehlgeschlagen! Commit wird abgebrochen.${NC}"
+    echo -e "${YELLOW}Bitte beheben Sie die Fehler und versuchen Sie es erneut.${NC}"
+    return 1
+  fi
+}
+
+# Versionsnummer gemäß Semantic Versioning erhöhen
+bump_version() {
+  if [ ! -f "$VERSION_FILE" ]; then
+    echo "0.1.0" > "$VERSION_FILE"
+    echo -e "${YELLOW}VERSION-Datei nicht gefunden. Initialisiere mit 0.1.0${NC}"
+  fi
+  
+  CURRENT_VERSION=$(cat "$VERSION_FILE")
+  MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
+  MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
+  PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
+  
+  case "$1" in
+    major)
+      MAJOR=$((MAJOR + 1))
+      MINOR=0
+      PATCH=0
+      ;;
+    minor)
+      MINOR=$((MINOR + 1))
+      PATCH=0
+      ;;
+    patch)
+      PATCH=$((PATCH + 1))
+      ;;
+    *)
+      echo -e "${RED}Ungültiger Versionstyp. Verwenden Sie major, minor oder patch.${NC}"
+      return 1
+      ;;
+  esac
+  
+  NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+  echo "$NEW_VERSION" > "$VERSION_FILE"
+  echo -e "${GREEN}Version auf $NEW_VERSION erhöht${NC}"
+  
+  # Version auch in package.json aktualisieren, falls vorhanden
+  if [ -f "$SCRIPT_DIR/package.json" ]; then
+    # Verwende jq, falls verfügbar, sonst sed
+    if command -v jq &> /dev/null; then
+      jq ".version = \"$NEW_VERSION\"" "$SCRIPT_DIR/package.json" > temp.json && mv temp.json "$SCRIPT_DIR/package.json"
+    else
+      sed -i "s/\"version\": \".*\"/\"version\": \"$NEW_VERSION\"/" "$SCRIPT_DIR/package.json"
+    fi
+    echo -e "${GREEN}Version in package.json aktualisiert${NC}"
+  fi
+  
+  return 0
+}
+
+# Changelog aktualisieren
+update_changelog() {
+  if [ ! -f "$CHANGELOG_FILE" ]; then
+    echo "# Changelog" > "$CHANGELOG_FILE"
+    echo "" >> "$CHANGELOG_FILE"
+    echo "Alle wichtigen Änderungen an diesem Projekt werden hier dokumentiert." >> "$CHANGELOG_FILE"
+    echo "" >> "$CHANGELOG_FILE"
+  fi
+  
+  # Aktuelle Version aus VERSION_FILE lesen
+  CURRENT_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || echo "0.1.0")
+  DATE=$(date +"%Y-%m-%d")
+  
+  # Neue Einträge einfügen
+  TEMP_FILE=$(mktemp)
+  head -n 3 "$CHANGELOG_FILE" > "$TEMP_FILE"
+  echo "## [$CURRENT_VERSION] - $DATE" >> "$TEMP_FILE"
+  echo "" >> "$TEMP_FILE"
+  
+  # Änderungen hinzufügen
+  if [ -n "$1" ]; then
+    echo "$1" | sed 's/^/- /' >> "$TEMP_FILE"
+  else
+    # Falls keine Änderungen angegeben, Git-Commit-Logs seit dem letzten Tag verwenden
+    echo "### Geändert" >> "$TEMP_FILE"
+    git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 2>/dev/null || echo HEAD^)..HEAD >> "$TEMP_FILE"
+  fi
+  
+  echo "" >> "$TEMP_FILE"
+  tail -n +4 "$CHANGELOG_FILE" >> "$TEMP_FILE"
+  mv "$TEMP_FILE" "$CHANGELOG_FILE"
+  
+  echo -e "${GREEN}Changelog erfolgreich aktualisiert für Version $CURRENT_VERSION${NC}"
+  return 0
+}
+
+# Release erstellen
+create_release() {
+  if [ -z "$1" ]; then
+    echo -e "${RED}Bitte geben Sie eine Version an.${NC}"
+    return 1
+  fi
+  
+  VERSION=$1
+  
+  # Prüfen, ob die Version mit v beginnt
+  if [[ ! $VERSION == v* ]]; then
+    VERSION="v$VERSION"
+  fi
+  
+  # Version aus VERSION_FILE lesen und mit angegebener Version vergleichen
+  FILE_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || echo "0.1.0")
+  CLEAN_VERSION=${VERSION#v}
+  
+  if [ "$FILE_VERSION" != "$CLEAN_VERSION" ]; then
+    echo -e "${YELLOW}Warnung: Die angegebene Version ($CLEAN_VERSION) stimmt nicht mit der Version in VERSION ($FILE_VERSION) überein.${NC}"
+    read -p "Möchten Sie trotzdem fortfahren? (j/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Jj]$ ]]; then
+      echo -e "${RED}Release-Erstellung abgebrochen.${NC}"
+      return 1
+    fi
+  fi
+  
+  # Sicherstellen, dass alle Änderungen committed sind
+  if ! git diff-index --quiet HEAD --; then
+    echo -e "${RED}Es gibt nicht-committete Änderungen. Bitte committen oder stashen Sie diese zuerst.${NC}"
+    return 1
+  fi
+  
+  # Prüfen, ob das Tag bereits existiert
+  if git tag | grep -q "$VERSION"; then
+    echo -e "${RED}Das Tag $VERSION existiert bereits.${NC}"
+    return 1
+  fi
+  
+  # Changelog aktualisieren
+  update_changelog
+  
+  # Änderungen am Changelog committen
+  git add "$CHANGELOG_FILE" "$VERSION_FILE"
+  git commit -m "Release $VERSION"
+  
+  # Tag erstellen
+  git tag -a "$VERSION" -m "Release $VERSION"
+  
+  echo -e "${GREEN}Release $VERSION erfolgreich erstellt!${NC}"
+  echo -e "${YELLOW}Führen Sie 'git push && git push --tags' aus, um den Release zu veröffentlichen.${NC}"
+  
+  return 0
+}
+
+# CI/CD-Deployment starten
+ci_deploy() {
+  ENV=$1
+  
+  if [ -z "$ENV" ]; then
+    echo -e "${RED}Bitte geben Sie eine Umgebung an (z.B. staging, production).${NC}"
+    return 1
+  fi
+  
+  echo -e "${BLUE}=== Starte CI/CD-Deployment für $ENV ===${NC}"
+  
+  # Prüfen, ob GitHub Actions verwendet wird
+  if [ -d ".github/workflows" ]; then
+    echo "GitHub Actions erkannt..."
     
-    # Entferne alle gestaged NX-Build-Dateien
-    git rm --cached ".nx/workspace-data/d/daemon.log" 2>/dev/null || true
-    git rm --cached ".nx/workspace-data/file-map.json" 2>/dev/null || true
-    git rm --cached ".nx/workspace-data/project-graph.json" 2>/dev/null || true
-    git rm --cached ".nx/workspace-data/**/*.db-shm" 2>/dev/null || true
-    git rm --cached ".nx/workspace-data/**/*.db-wal" 2>/dev/null || true
-    git rm --cached ".nx/cache/terminalOutputs/*" 2>/dev/null || true
-    git rm --cached ".nx/cache/run.json" 2>/dev/null || true
+    # Manuellen Workflow-Dispatch auslösen (falls GitHub CLI installiert ist)
+    if command -v gh &> /dev/null; then
+      echo "Verwende GitHub CLI zum Auslösen des Workflows..."
+      
+      # Finde den passenden Workflow für die Umgebung
+      WORKFLOW_FILE=$(find .github/workflows -type f -name "*$ENV*" -o -name "deploy.yml" | head -n 1)
+      
+      if [ -n "$WORKFLOW_FILE" ]; then
+        WORKFLOW_NAME=$(basename "$WORKFLOW_FILE")
+        gh workflow run "$WORKFLOW_NAME" -f environment="$ENV"
+        echo -e "${GREEN}Deployment-Workflow für $ENV wurde gestartet.${NC}"
+      else
+        echo -e "${RED}Kein passender Workflow für $ENV gefunden.${NC}"
+        return 1
+      fi
+    else
+      # Alternativ: Push zum Environment-Branch
+      CURRENT_BRANCH=$(git branch --show-current)
+      git push origin "$CURRENT_BRANCH:deploy-$ENV" -f
+      echo -e "${GREEN}Code zum deploy-$ENV Branch gepusht. CI/CD sollte automatisch starten.${NC}"
+    fi
+  # Prüfen, ob GitLab CI verwendet wird
+  elif [ -f ".gitlab-ci.yml" ]; then
+    echo "GitLab CI erkannt..."
     
-    echo -e "${GREEN}Ignorierte NX-Build-Dateien wurden aus dem Git-Index entfernt.${NC}"
+    # Manuellen Pipeline-Trigger auslösen
+    if command -v gitlab &> /dev/null; then
+      REPO_PATH=$(git remote get-url origin | sed 's/.*[:/]\([^/]*\/[^/]*\).git/\1/')
+      gitlab pipeline create -r "$REPO_PATH" -v "DEPLOY_ENV=$ENV"
+      echo -e "${GREEN}GitLab Pipeline für $ENV wurde gestartet.${NC}"
+    else
+      # Alternativ: mit API-Call 
+      echo -e "${YELLOW}GitLab CLI nicht gefunden. Bitte Pipeline manuell starten oder GitLab CLI installieren.${NC}"
+      return 1
+    fi
+  else
+    echo -e "${YELLOW}Kein bekanntes CI/CD-System erkannt.${NC}"
+    echo -e "${YELLOW}Prüfen Sie manuell, ob ein CI/CD-System konfiguriert ist und wie man Deployments auslöst.${NC}"
+    return 1
+  fi
+  
+  return 0
+}
+
+# Auto-Commit mit Test-Integration
+auto_commit_with_tests() {
+  # Zuerst Tests ausführen
+  run_tests
+  
+  # Nur committen, wenn Tests bestanden wurden
+  if [ $? -eq 0 ]; then
+    auto_commit "$1"
+    return $?
+  else
+    return 1
   fi
 }
 
@@ -397,6 +601,24 @@ case "$COMMAND" in
     ;;
   "push")
     push_commits
+    ;;
+  "run-tests")
+    run_tests
+    ;;
+  "bump-version")
+    bump_version "$1"
+    ;;
+  "update-changelog")
+    update_changelog "$1"
+    ;;
+  "create-release")
+    create_release "$1"
+    ;;
+  "ci-deploy")
+    ci_deploy "$1"
+    ;;
+  "auto-commit-with-tests")
+    auto_commit_with_tests "$1"
     ;;
   "help")
     show_help

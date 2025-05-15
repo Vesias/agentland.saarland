@@ -1,229 +1,175 @@
-# Automatisierter Git-Workflow für agentland.saarland
+# Erweiterte Git-Automation für agentland.saarland
 
-Dieses Dokument beschreibt den automatisierten Git-Workflow für das agentland.saarland Projekt. Mit den hier beschriebenen Werkzeugen können Sie Git-Operationen ohne manuelle Eingriffe bei Diffs durchführen und haben eine modernisierte Lösung für Commits, Merges und Konfliktlösungen.
+Dieses Dokument beschreibt die erweiterte Git-Automatisierung für das agentland.saarland Projekt. Mit den hier beschriebenen Werkzeugen können Sie Git-Operationen ohne manuelle Eingriffe durchführen und haben eine vollständige Lösung für den gesamten Git-Workflow.
 
-> [!NOTE]
-> Ein **neues, verbessertes Tool** `git-automate.sh` wurde entwickelt, um den Workflow zu optimieren.
-> Siehe den Abschnitt "Neues Git-Automatisierungs-Tool" unten für weitere Details.
+> [!IMPORTANT]
+> Die erweiterte Version des `git-automate.sh` Skripts bietet jetzt **neue fortgeschrittene Funktionen**:
+> - Automatische Testausführung vor Commits
+> - Semantische Versionierung (SemVer)
+> - Automatisierte Changelog-Verwaltung
+> - Release-Management-Integration
+> - CI/CD-Pipeline-Integration
 
-## Hauptfunktionen
+## Basis-Funktionen
 
-Das `auto-git-helper.sh` Skript bietet folgende automatisierte Git-Funktionen:
+Das `git-automate.sh` Skript stellt folgende Grundfunktionen bereit:
 
-1. **Intelligente Commits**: Analyse der Änderungen und automatisches Gruppieren nach Features
-2. **Automatische Konfliktlösung**: Smarte Lösung von Merge-Konflikten
-3. **Statusanalyse**: Verbesserter Git-Status mit Empfehlungen
-4. **Git-Hooks**: Automatische Qualitätschecks vor Commits und nach Merges
-5. **Cherry-Picking**: Intelligentes Cherry-Picking von Commits für bestimmte Issues
-
-## Schnellstart
+- **Automatisches Committen** (`auto-commit`): Committed alle Änderungen mit intelligenter Commit-Nachrichtengenerierung
+- **Automatisches Mergen** (`auto-merge`): Merged Branches mit automatischer Konfliktlösung
+- **Automatische Synchronisierung** (`auto-sync`): Führt Pull mit Rebase und Push aus
+- **All-in-One** (`auto-all`): Kombiniert alle Schritte in einem Befehl
+- **NX-Integration** (`ignore-nx`): Konfiguriert .gitignore für NX-Build-System-Dateien
 
 ```bash
-# Git-Hooks installieren (einmalig)
-./auto-git-helper.sh install-hooks
+# Alle Änderungen committen und pushen
+./git-automate.sh auto-all "Implementierung der regionalen Integration"
 
-# Status mit Empfehlungen anzeigen
-./auto-git-helper.sh status
+# Nur committen
+./git-automate.sh auto-commit "Verbesserung der Dashboard-Komponenten"
 
-# Alle Änderungen automatisch committen (gruppiert nach Features)
-./auto-git-helper.sh auto-commit
-
-# Intelligenten Merge durchführen
-./auto-git-helper.sh merge develop
+# Branch mergen mit automatischer Konfliktlösung
+./git-automate.sh auto-merge main
 ```
 
-## Detaillierte Befehlsübersicht
+## Erweiterte Funktionen
 
-### Intelligente Commits
+### Automatisierte Tests
 
 ```bash
-# Änderungen manuell stagen (git add)
-git add .
-
-# Intelligenten Commit durchführen (interaktiv)
-./auto-git-helper.sh commit
-
-# Alle Änderungen automatisch stagen und committen
-./auto-git-helper.sh auto-commit
+./git-automate.sh run-tests
 ```
 
-Der intelligente Commit analysiert Ihre Änderungen mithilfe des `staged-split-features.js` Tools und gruppiert sie automatisch in logische Feature-Commits. Dies führt zu einer saubereren Commit-Historie und besserer Nachvollziehbarkeit.
+Führt automatisch alle Tests im Projekt aus und zeigt die Ergebnisse an. Das Skript erkennt automatisch, ob NX oder npm als Test-Runner verwendet werden soll.
 
-### Intelligenter Merge
+Sie können Tests auch in den Commit-Prozess integrieren:
 
 ```bash
-# Von einem anderen Branch mergen
-./auto-git-helper.sh merge develop
-
-# Von Remote mergen
-./auto-git-helper.sh merge origin/main
+./git-automate.sh auto-commit-with-tests "Neue Feature-Implementation"
 ```
 
-Der intelligente Merge versucht, Konflikte automatisch zu lösen. Es werden verschiedene Strategien angewendet:
-- Für Nicht-Code-Dateien: Die neuere Version wird bevorzugt
-- Für Code-Dateien: Beide Änderungen werden intelligent kombiniert
-- Für komplexere Konflikte: Beide Versionen werden beibehalten
+Dies führt erst die Tests aus und committet nur, wenn alle Tests bestanden wurden.
 
-### Git-Hooks
+### Semantische Versionierung
 
 ```bash
-# Git-Hooks installieren
-./auto-git-helper.sh install-hooks
+./git-automate.sh bump-version [major|minor|patch]
 ```
 
-Installiert folgende Git-Hooks:
-- **Pre-Commit**: Führt Qualitätschecks für Ihre Änderungen durch
-- **Post-Merge**: Aktualisiert Abhängigkeiten automatisch nach Merges
+Erhöht die Versionsnummer gemäß Semantic Versioning (SemVer):
+- `major`: Erhöht die erste Ziffer (z.B. 1.0.0 → 2.0.0) für größere Änderungen, die nicht abwärtskompatibel sind
+- `minor`: Erhöht die zweite Ziffer (z.B. 1.0.0 → 1.1.0) für neue Features, die abwärtskompatibel sind
+- `patch`: Erhöht die dritte Ziffer (z.B. 1.0.0 → 1.0.1) für Bug-Fixes und kleinere Änderungen
 
-### Cherry-Picking
+Die Version wird sowohl in der `VERSION`-Datei als auch in `package.json` aktualisiert.
+
+### Changelog-Management
 
 ```bash
-# Commits für Issue #123 cherry-picken
-./auto-git-helper.sh cherry-pick 123
+./git-automate.sh update-changelog "Neue Dashboard-Komponenten hinzugefügt"
 ```
 
-Findet und cherry-pickt Commits, die mit einer bestimmten Issue-Nummer zusammenhängen, und löst dabei Konflikte automatisch.
+Aktualisiert automatisch den `CHANGELOG.md` mit strukturierter Formatierung:
+- Fügt einen neuen Abschnitt für die aktuelle Version hinzu
+- Datiert den Eintrag mit dem aktuellen Datum
+- Formatiert die Änderungen als Liste
+- Falls keine Änderungen angegeben, werden automatisch die Git-Commit-Logs seit dem letzten Tag verwendet
 
-### Commit-Lint
+### Release-Management
 
 ```bash
-# Commit-Nachrichten prüfen
-./auto-git-helper.sh lint
-
-# Commit-Nachrichten automatisch korrigieren
-./auto-git-helper.sh lint --fix
+./git-automate.sh create-release v1.2.0
 ```
 
-Überprüft Commit-Nachrichten auf Einhaltung der Konventionen und korrigiert sie bei Bedarf.
+Erstellt einen neuen Release mit folgenden Aktionen:
+- Aktualisiert den Changelog für die neue Version
+- Erstellt ein Git-Tag mit der angegebenen Version
+- Committet die Änderungen
 
-## Fortgeschrittene Funktionen
-
-Das Skript nutzt das umfangreiche Git-Toolkit des agentland.saarland Projekts:
-
-- **Code-Analyse**: Erkennt zusammengehörige Codeänderungen
-- **Commit-Nachrichtengenerierung**: Erstellt sinnvolle Commit-Nachrichten basierend auf den Änderungen
-- **Konfliktlösung**: Intelligente Strategien zur Lösung von Merge-Konflikten
-- **Statische Analyse**: Qualitätschecks vor dem Commit
-
-## Integration mit dem agentland.saarland Projekt
-
-Das Skript integriert sich nahtlos mit den bestehenden agentland.saarland Git-Werkzeugen:
-
-- Verwendet die SAAR Git-Skripte, falls verfügbar (unter `/tools/scripts/saar/git/`)
-- Fällt auf die Standard-Git-Tools zurück (unter `/tools/scripts/git/`)
-- Unterstützt die Debug-Workflow-Engine für Codeanalyse
-
-## Fehlerbehebung
-
-Falls Probleme auftreten:
-
-1. Stellen Sie sicher, dass Node.js installiert ist
-2. Überprüfen Sie, ob die Git-Werkzeuge vorhanden sind
-3. Bei Merge-Konflikten, die nicht automatisch gelöst werden können, zeigt das Tool die betroffenen Dateien an
-
-## Weitere Informationen
-
-Weitere Details zu den fortschrittlichen Git-Werkzeugen finden Sie in der Dokumentation:
-- `/tools/scripts/git/README.md` (Standard Git-Tools)
-- `/tools/scripts/saar/git/README.md` (SAAR Git-Tools)
-
----
-
-# Neues Git-Automatisierungs-Tool
-
-## Einführung zu git-automate.sh
-
-Das neue `git-automate.sh` Skript bietet einen noch optimierteren und zuverlässigeren Git-Workflow für agentland.saarland. Es wurde entwickelt, um die bestehenden Funktionen zu verbessern und gleichzeitig die Benutzung zu vereinfachen.
-
-## Hauptverbesserungen gegenüber auto-git-helper.sh
-
-- **Verbesserte Zuverlässigkeit**: Robustere Fehlerbehandlung und -prüfung
-- **NX-Build-Optimierung**: Automatische Erkennung und korrekte Behandlung von NX-Build-Dateien
-- **Vereinfachte Befehle**: Intuitivere Befehlsstruktur
-- **Intelligentere Konfliktlösung**: Typ-basierte Strategien für verschiedene Dateitypen
-- **Bessere Remote-Synchronisierung**: Sichere Push- und Pull-Strategien
-
-## Schnellstart für git-automate.sh
+### CI/CD-Integration
 
 ```bash
-# Alle Änderungen automatisch committen und zum Remote pushen (All-in-One)
-./git-automate.sh auto-all
+./git-automate.sh ci-deploy staging
+```
 
-# Nur Änderungen committen mit automatischer Nachrichtengenerierung
-./git-automate.sh auto-commit
+Startet den CI/CD-Deployment-Prozess für die angegebene Umgebung (z.B. staging, production). Das Tool erkennt automatisch:
+- GitHub Actions Workflows
+- GitLab CI Pipelines
 
-# Automatisch mit einem anderen Branch mergen
-./git-automate.sh auto-merge feature-branch
+Wenn die GitHub CLI oder GitLab CLI installiert ist, wird der Deployment-Prozess direkt gestartet, andernfalls wird ein Environment-Branch gepusht, der den CI/CD-Prozess auslöst.
 
-# Aktuelle Änderungen mit Remote synchronisieren
+## Komplette Beispiel-Workflows
+
+### Täglicher Entwicklungsworkflow
+
+```bash
+# Arbeiten an Features...
+
+# Tests ausführen und Änderungen committen
+./git-automate.sh auto-commit-with-tests "Implementierung des neuen Login-Flows"
+
+# Mit Remote synchronisieren
 ./git-automate.sh auto-sync
 ```
 
-## Befehle im Detail
-
-### auto-commit [nachricht]
-
-Fügt alle Änderungen zum Staging-Bereich hinzu und erstellt einen Commit. Die Nachricht ist optional - ohne Angabe wird eine intelligente Commit-Nachricht basierend auf den Änderungen generiert.
+### Release-Workflow
 
 ```bash
-./git-automate.sh auto-commit "Verbesserungen am Dashboard hinzugefügt"
+# Version erhöhen (minor für neue Features)
+./git-automate.sh bump-version minor
+
+# Changelog aktualisieren (optional, wird auch von create-release gemacht)
+./git-automate.sh update-changelog "
+- Neuer Login-Flow implementiert
+- Dashboard-UI verbessert
+- Performance-Optimierungen
+"
+
+# Release erstellen
+./git-automate.sh create-release v1.2.0
+
+# Zum Remote pushen
+./git-automate.sh push
+
+# Deployment in Staging-Umgebung starten
+./git-automate.sh ci-deploy staging
 ```
 
-Das Skript erkennt:
-- UI-Komponenten-Updates
-- API-Änderungen
-- Konfigurationsänderungen
-- Styling-Updates
-
-### auto-merge [branch]
-
-Führt einen Merge mit dem angegebenen Branch durch und löst Konflikte automatisch.
+### Feature-Branch Workflow
 
 ```bash
-./git-automate.sh auto-merge develop
-```
+# Neuen Feature-Branch erstellen
+git checkout -b feature/neue-komponente
 
-Die Konfliktlösung verwendet verschiedene Strategien je nach Dateityp:
-- JSON: "Ours"-Strategie, behält lokale Änderungen
-- Code-Dateien: "Theirs"-Strategie, übernimmt die neueren Änderungen
-- Andere Dateien: Standard-"Theirs"-Strategie
+# An Features arbeiten...
 
-### auto-sync
+# Committen mit Tests
+./git-automate.sh auto-commit-with-tests "Neue Komponente implementiert"
 
-Synchronisiert mit dem Remote-Repository (pull mit rebase und push).
-
-```bash
+# Mit Remote synchronisieren (erstellt auch den Branch remote)
 ./git-automate.sh auto-sync
+
+# Zurück zum main-Branch wechseln
+git checkout main
+
+# Feature-Branch automatisch mergen
+./git-automate.sh auto-merge feature/neue-komponente
 ```
 
-Falls Konflikte auftreten, werden Anweisungen zur Auflösung angezeigt.
+## Konfliktlösung
 
-### auto-all [nachricht]
+Das Skript unterstützt automatische Konfliktlösung bei Merges:
 
-Kombiniert alle Funktionen: Aktualisiert .gitignore für NX-Dateien, committet alle Änderungen und synchronisiert mit dem Remote.
+- **JSON-Dateien**: Verwendet die eigene Version (ours)
+- **Code-Dateien (TS, JS, TSX, JSX)**: Verwendet die eingehende Version (theirs)
+- **Andere Dateien**: Verwendet die eingehende Version (theirs)
 
-```bash
-./git-automate.sh auto-all "Wöchentliches Update"
-```
-
-### ignore-nx
-
-Aktualisiert die .gitignore, um NX-Build-Dateien auszuschließen und entfernt eventuell bereits im Repository verfolgte NX-Dateien.
-
-```bash
-./git-automate.sh ignore-nx
-```
+Die Konfliktlösungsstrategien können im Skript angepasst werden, um projektspezifische Bedürfnisse zu erfüllen.
 
 ## Integration mit staged-split-features.js
 
-Für eine fortgeschrittenere Feature-basierte Gruppierung von Commits kann das `staged-split-features.js` Skript mit der neuen Automatisierung kombiniert werden:
-
-### Integration mit einem Skript
-
-Erstellen Sie ein neues Skript namens `feature-commit.sh`:
+Für eine fortgeschrittenere Feature-basierte Gruppierung von Commits kann das `staged-split-features.js` Skript mit der erweiterten Automatisierung kombiniert werden:
 
 ```bash
-#!/bin/bash
 # Feature-basierte Commits mit intelligenter Gruppierung
 git add .
 node tools/scripts/saar/git/staged-split-features.js --auto
@@ -232,26 +178,25 @@ node tools/scripts/saar/git/staged-split-features.js --auto
 ./git-automate.sh auto-sync
 ```
 
-Machen Sie es ausführbar mit:
-```bash
-chmod +x feature-commit.sh
-```
+## Konfiguration und Erweiterung
 
-## Anpassen und Erweitern
+Die Funktionen des Systems können angepasst werden:
 
-Die Git-Automatisierung kann erweitert werden:
-
-1. Passen Sie die Kategorisierungslogik in `auto_commit()` an für domainspezifische Commit-Nachrichten
-2. Fügen Sie neue Konfliktlösungsstrategien in `auto_merge()` für projektspezifische Dateitypen hinzu
-3. Integrieren Sie mit CI/CD-Systemen durch zusätzliche Skripte oder Post-Commit-Hooks
+1. Test-Integration: Ändern Sie die `run_tests()` Funktion für spezifische Test-Frameworks
+2. Changelog-Format: Passen Sie `update_changelog()` an Ihre Präferenzen an
+3. CI/CD-Integration: Erweitern Sie `ci_deploy()` für andere CI/CD-Systeme
+4. Konfliktlösungsstrategien: Ändern Sie die Strategien in `auto_merge()` für spezifische Dateitypen
 
 ## Fehlerbehebung
 
-**Problem**: Probleme beim Synchronisieren mit Remote
-**Lösung**: Prüfen Sie Ihre Git-Konfiguration mit `git remote -v` und stellen Sie sicher, dass Sie die richtigen Berechtigungen haben
+**Problem**: Tests schlagen fehl beim Commit  
+**Lösung**: Beheben Sie die Testfehler oder verwenden Sie `auto-commit` statt `auto-commit-with-tests`, wenn Sie die Tests vorerst überspringen möchten
 
-**Problem**: Automatische Konfliktlösung funktioniert nicht wie erwartet
-**Lösung**: Bei komplexen Konflikten verwenden Sie `git merge --abort` und führen Sie dann einen manuellen Merge durch
+**Problem**: Versionierung funktioniert nicht  
+**Lösung**: Stellen Sie sicher, dass Sie Schreibrechte für die `VERSION`-Datei und `package.json` haben
 
-**Problem**: staged-split-features.js Integration funktioniert nicht
-**Lösung**: Überprüfen Sie den Pfad zum Skript und stellen Sie sicher, dass die erforderlichen Node.js-Module installiert sind
+**Problem**: CI/CD-Deployment startet nicht  
+**Lösung**: Prüfen Sie, ob die entsprechenden Workflows oder Pipelines konfiguriert sind und Sie über die nötigen Rechte verfügen
+
+**Problem**: Release-Erstellung schlägt fehl  
+**Lösung**: Stellen Sie sicher, dass Sie keine ungesicherten Änderungen haben und die Version nicht bereits als Tag existiert
