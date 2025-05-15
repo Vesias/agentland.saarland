@@ -3,5 +3,10 @@ node_modules/
 logs/
 .venv/
 apps/cli/node_modules/
+.nx/workspace-data/d/daemon.log
+.nx/workspace-data/file-map.json
+.nx/workspace-data/project-graph.json
+.nx/workspace-data/**/*.db-shm
+.nx/workspace-data/**/*.db-wal
 
 mcp_servers_backup.tar.gz
