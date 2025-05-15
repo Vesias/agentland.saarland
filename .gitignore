@@ -8,11 +8,21 @@ apps/cli/node_modules/
 .nx/workspace-data/project-graph.json
 .nx/workspace-data/**/*.db-shm
 .nx/workspace-data/**/*.db-wal
+.nx/workspace-data/**/*.db
+.nx/cache/terminalOutputs/*
+.nx/cache/run.json
+.nx/tmp/*
 
 mcp_servers_backup.tar.gz
-.nx/workspace-data/**/*.db-shm
-.nx/workspace-data/**/*.db-wal
-.nx/cache/terminalOutputs/*
+
+# Environment variables
+.env
+.env.*
+*.env
+
+# Secrets
+**/api-keys*.json
+**/secret*.json
 .nx/cache/run.json
 .nx/workspace-data/**/*.db-shm
 .nx/workspace-data/**/*.db-wal
