@@ -201,7 +201,46 @@ const AgentOnboardingFlow: React.FC = () => {
             </div>
           </div>
         );
-      case 4: return <div>Step 4: Review & Deploy (Placeholder - Show summary of agentConfig)</div>;
+      case 4: // Review & Deploy
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">Review Agent Configuration</h3>
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md space-y-3 text-sm">
+              <div><strong className="text-gray-600 dark:text-gray-300">Name:</strong> {agentConfig.name || 'Not set'}</div>
+              <div><strong className="text-gray-600 dark:text-gray-300">Type:</strong> {agentConfig.type || 'Not set'}</div>
+              <div><strong className="text-gray-600 dark:text-gray-300">Description:</strong> {agentConfig.description || 'Not set'}</div>
+              <div>
+                <strong className="text-gray-600 dark:text-gray-300">Capabilities:</strong> 
+                {agentConfig.capabilities && agentConfig.capabilities.length > 0 ? agentConfig.capabilities.join(', ') : 'None selected'}
+              </div>
+              <div>
+                <strong className="text-gray-600 dark:text-gray-300">MCP Tools Access:</strong> 
+                {agentConfig.mcpToolsAccess && agentConfig.mcpToolsAccess.length > 0 ? agentConfig.mcpToolsAccess.join(', ') : 'None selected'}
+              </div>
+              <div>
+                <strong className="text-gray-600 dark:text-gray-300">Initial Prompt:</strong> 
+                {agentConfig.initialPrompt ? (
+                  <pre className="whitespace-pre-wrap bg-gray-100 dark:bg-gray-600 p-2 rounded text-xs max-h-24 overflow-y-auto">{agentConfig.initialPrompt}</pre>
+                ) : 'Not set'}
+              </div>
+              <div>
+                <strong className="text-gray-600 dark:text-gray-300">A2A Incoming Policy:</strong> 
+                {agentConfig.a2aPolicies?.allowIncomingFrom?.join(', ') || 'Not set'}
+              </div>
+              <div>
+                <strong className="text-gray-600 dark:text-gray-300">A2A Outgoing Policy:</strong> 
+                {agentConfig.a2aPolicies?.allowOutgoingTo?.join(', ') || 'Not set'}
+              </div>
+              <div>
+                <strong className="text-gray-600 dark:text-gray-300">Agent API Key:</strong> 
+                {agentConfig.apiKey ? 'Set (hidden)' : 'Not set'}
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Please review the agent configuration carefully. Once submitted, the agent will be provisioned based on these settings.
+            </p>
+          </div>
+        );
       default: return null;
     }
   };
