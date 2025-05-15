@@ -1,0 +1,61 @@
+name: Documentation & Template Checks
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+jobs:
+  lint_markdown:
+    name: Lint Markdown Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install markdownlint-cli
+        run: npm install -g markdownlint-cli
+      - name: Run markdownlint
+        run: |
+          markdownlint --config ./.markdownlint.jsonc \
+            TEMPLATE_INIT_agentland.saarland.md \
+            README.md \
+            CLAUDE.md \
+            ai_docs/**/*.md \
+            specs/**/*.md \
+            .claude/**/*.md \
+            || echo "Markdown linting issues found."
+        continue-on-error: true # Allow pipeline to continue to see all errors
+
+  validate_toc:
+    name: Validate Table of Contents
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run TOC Validation (Placeholder)
+        run: |
+          echo "INFO: Implement TOC validation script, e.g., tools/ci/validate_toc.sh"
+          # This script would check if main READMEs or overview docs have up-to-date TOCs.
+          # For now, this step is a placeholder.
+          # Example: tools/ci/validate_toc.sh ai_docs/README.md
+          exit 0 # Placeholder success
+
+  format_prompts:
+    name: Check Prompt Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Prompt Formatting Check (Placeholder)
+        run: |
+          echo "INFO: Implement prompt formatting check script, e.g., tools/ci/check_prompt_format.sh ai_docs/prompts/"
+          # This script would check for consistent H2/H3 structure, code blocks, etc. in prompt files.
+          # For now, this step is a placeholder.
+          # Example: tools/ci/check_prompt_format.sh ai_docs/prompts/
+          exit 0 # Placeholder success

@@ -1923,3 +1923,1599 @@ Debugger attached.
 [NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.098Z - [WATCHER]: Stopping the watcher for /home/jan/agentland.saarland (sources)
 [NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.098Z - [WATCHER]: Stopping the watcher for /home/jan/agentland.saarland (outputs)
 [NX v21.0.3 Daemon Server] - 2025-05-14T10:24:52.098Z - Server stopped because: "Request to shutdown"
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:22.141Z - Started listening on: /tmp/c97d9995a2c7488e7353/d.sock
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:22.142Z - [WATCHER]: Subscribed to changes within: /home/jan/Schreibtisch/agentland.saarland (native)
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:22.144Z - Established a connection. Number of open connections: 1
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:22.144Z - Established a connection. Number of open connections: 2
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:22.145Z - Closed a connection. Number of open connections: 1
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:22.146Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:22.146Z - Done responding to the client Shutdown initiated
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:22.146Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 0.
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:22.148Z - [WATCHER]: Stopping the watcher for /home/jan/Schreibtisch/agentland.saarland (sources)
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:22.148Z - Closed a connection. Number of open connections: 0
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:22.148Z - [WATCHER]: Stopping the watcher for /home/jan/Schreibtisch/agentland.saarland (outputs)
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:22.148Z - Server stopped because: "Request to shutdown"
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.341Z - Started listening on: /tmp/c97d9995a2c7488e7353/d.sock
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.342Z - [WATCHER]: Subscribed to changes within: /home/jan/Schreibtisch/agentland.saarland (native)
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.343Z - Established a connection. Number of open connections: 1
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.343Z - Established a connection. Number of open connections: 2
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.344Z - Closed a connection. Number of open connections: 1
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.345Z - [REQUEST]: Client Request for Project Graph Received
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.352Z - Time taken for 'loadSpecifiedNxPlugins' 0.6794699999999949ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.429Z - Time taken for 'Load Nx Plugin: /home/jan/Schreibtisch/agentland.saarland/node_modules/nx/src/plugins/project-json/build-nodes/project-json' 83.57063300000002ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.443Z - Time taken for 'Load Nx Plugin: /home/jan/Schreibtisch/agentland.saarland/node_modules/nx/src/plugins/js' 97.64277ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.446Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.446Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.446Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.450Z - Time taken for 'loadDefaultNxPlugins' 100.45446000000001ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.468Z - Time taken for 'build-project-configs' 9.801592999999997ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.483Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.484Z - [REQUEST]: Responding to the client. project-graph
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.484Z - Time taken for 'total for creating and serializing project graph' 138.815089ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.485Z - Done responding to the client project-graph
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.485Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 139. Response time: 1.
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.488Z - [REQUEST]: Responding to the client. handleRunPreTasksExecution
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.488Z - Done responding to the client handleRunPreTasksExecution
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.488Z - Handled PRE_TASKS_EXECUTION. Handling time: 0. Response time: 0.
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.488Z - Time taken for 'preTasksExecution' 0.2578979999999831ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.595Z - [REQUEST]: Responding to the client. handleHashTasks
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.596Z - Done responding to the client handleHashTasks
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.596Z - Handled HASH_TASKS. Handling time: 15. Response time: 1.
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.604Z - [REQUEST]: Responding to the client. handleGetEstimatedTaskTimings
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.604Z - Done responding to the client handleGetEstimatedTaskTimings
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.604Z - Handled GET_ESTIMATED_TASK_TIMINGS. Handling time: 1. Response time: 0.
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.940Z - [WATCHER]: node_modules/web/vite.config.js.timestamp-1747304545887-4d8a3d5cb12ed.mjs was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:25.940Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:26.040Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:26.040Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:26.040Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:26.041Z - Time taken for 'hash changed files from watcher' 0.3641579999999749ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:26.050Z - Time taken for 'build-project-configs' 6.239170000000058ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:26.061Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:26.061Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:26.061Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:22:26.061Z - Time taken for 'total execution time for createProjectGraph()' 9.149907999999982ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:27:52.547Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:27:52.547Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:27:52.648Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:27:52.648Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:27:52.648Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:27:52.650Z - Time taken for 'hash changed files from watcher' 0.4195140000083484ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:27:52.665Z - Time taken for 'build-project-configs' 9.86443399998825ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:27:52.682Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:27:52.682Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:27:52.682Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:27:52.683Z - Time taken for 'total execution time for createProjectGraph()' 16.22925999999279ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:28:19.308Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:28:19.308Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:28:19.509Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:28:19.509Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:28:19.509Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:28:19.510Z - Time taken for 'hash changed files from watcher' 0.3951010000309907ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:28:19.519Z - Time taken for 'build-project-configs' 6.200316999980714ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:28:19.531Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:28:19.532Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:28:19.532Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:28:19.532Z - Time taken for 'total execution time for createProjectGraph()' 10.622985000023618ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:20.592Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:20.593Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:20.993Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:20.993Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:20.993Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:20.994Z - Time taken for 'hash changed files from watcher' 0.4025560000445694ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:21.004Z - Time taken for 'build-project-configs' 7.025339999992866ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:21.016Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:21.016Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:21.016Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:21.016Z - Time taken for 'total execution time for createProjectGraph()' 10.290709000022616ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:40.120Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:40.121Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:40.921Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:40.921Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:40.921Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:40.923Z - Time taken for 'hash changed files from watcher' 0.39664500002982095ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:40.935Z - Time taken for 'build-project-configs' 10.149804000044242ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:40.950Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:40.950Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:40.950Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:29:40.950Z - Time taken for 'total execution time for createProjectGraph()' 12.70075000001816ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:24.454Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:24.455Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:26.055Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:26.056Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:26.056Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:26.057Z - Time taken for 'hash changed files from watcher' 0.3884539999999106ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:26.066Z - Time taken for 'build-project-configs' 6.266494999988936ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:26.079Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:26.079Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:26.079Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:26.079Z - Time taken for 'total execution time for createProjectGraph()' 12.036107999971136ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:54.786Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:54.786Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:56.004Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:56.004Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:57.146Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:57.146Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:57.987Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:57.987Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:57.987Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:57.989Z - Time taken for 'hash changed files from watcher' 0.39867800002684817ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:57.998Z - Time taken for 'build-project-configs' 6.881454000016674ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:58.009Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:58.009Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:58.009Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:30:58.009Z - Time taken for 'total execution time for createProjectGraph()' 9.140253000019584ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:31:35.935Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:31:35.935Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:31:42.337Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:31:42.337Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:31:42.337Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:31:42.338Z - Time taken for 'hash changed files from watcher' 0.6647660000016913ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:31:42.348Z - Time taken for 'build-project-configs' 6.381997999968007ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:31:42.359Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:31:42.359Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:31:42.359Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:31:42.360Z - Time taken for 'total execution time for createProjectGraph()' 10.055037999991328ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:01.169Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:01.170Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:07.570Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:07.570Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:07.570Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:07.571Z - Time taken for 'hash changed files from watcher' 0.6069959999294952ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:07.580Z - Time taken for 'build-project-configs' 6.251669000019319ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:07.592Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:07.592Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:07.592Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:07.593Z - Time taken for 'total execution time for createProjectGraph()' 10.69431099994108ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:21.992Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:21.993Z - [WATCHER]: VISION-to-REALITY.pdf was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:22.093Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:22.093Z - [REQUEST]: VISION-to-REALITY.pdf
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:22.093Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:22.094Z - Time taken for 'hash changed files from watcher' 0.6454080000985414ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:22.104Z - Time taken for 'build-project-configs' 6.34811800008174ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:22.115Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:22.115Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:22.115Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:22.116Z - Time taken for 'total execution time for createProjectGraph()' 10.36326100002043ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:35.173Z - [WATCHER]: KI-Zukunft Saar: Technische Roadmap für AGENT_LAND_SAARLAND.pdf was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:35.174Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:35.275Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:35.275Z - [REQUEST]: KI-Zukunft Saar: Technische Roadmap für AGENT_LAND_SAARLAND.pdf
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:35.275Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:35.279Z - Time taken for 'hash changed files from watcher' 1.3136670000385493ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:35.296Z - Time taken for 'build-project-configs' 12.14396100002341ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:35.315Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:35.316Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:35.316Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:35.316Z - Time taken for 'total execution time for createProjectGraph()' 19.49980999995023ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:45.007Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:45.008Z - [WATCHER]: KI-Schmiede Saar: Technisches Konzept für den AGENT_LAND_SAARLAND Workspace.pdf was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:45.108Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:45.108Z - [REQUEST]: KI-Schmiede Saar: Technisches Konzept für den AGENT_LAND_SAARLAND Workspace.pdf
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:45.108Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:45.110Z - Time taken for 'hash changed files from watcher' 0.4532769999932498ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:45.121Z - Time taken for 'build-project-configs' 7.274081000010483ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:45.133Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:45.134Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:45.134Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:34:45.134Z - Time taken for 'total execution time for createProjectGraph()' 11.867755000013858ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:43:28.705Z - [WATCHER]: 1 file(s) created or restored, 0 file(s) modified, 1 file(s) deleted
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:43:28.705Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:43:28.806Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:43:28.806Z - [REQUEST]: Von der Vision zur Realität: Markenimplementierung für AGENT_LAND_SAARLAND.pdf
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:43:28.806Z - [REQUEST]: VISION-to-REALITY.pdf
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:43:28.807Z - Time taken for 'hash changed files from watcher' 0.4686040000524372ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:43:28.816Z - Time taken for 'build-project-configs' 6.464833999983966ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:43:28.828Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:43:28.828Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:43:28.828Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:43:28.829Z - Time taken for 'total execution time for createProjectGraph()' 9.873573999851942ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:48:27.864Z - [REQUEST]: Responding to the client. handleRecordTaskRuns
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:48:27.864Z - Done responding to the client handleRecordTaskRuns
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:48:27.864Z - Handled RECORD_TASK_RUNS. Handling time: 1. Response time: 0.
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:48:27.866Z - [REQUEST]: Responding to the client. handleGetFlakyTasks
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:48:27.867Z - Done responding to the client handleGetFlakyTasks
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:48:27.867Z - Handled GET_FLAKY_TASKS. Handling time: 0. Response time: 1.
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:48:27.875Z - [REQUEST]: Responding to the client. handleRunPostTasksExecution
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:48:27.875Z - Done responding to the client handleRunPostTasksExecution
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:48:27.876Z - Handled POST_TASKS_EXECUTION. Handling time: 1. Response time: 1.
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:48:27.876Z - Time taken for 'postTasksExecution' 0.5883730000350624ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:48:27.887Z - Closed a connection. Number of open connections: 0
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:49:11.489Z - [WATCHER]: 5 file(s) created or restored, 0 file(s) modified, 0 file(s) deleted
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:49:11.489Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:49:11.570Z - [WATCHER]: 2 file(s) created or restored, 0 file(s) modified, 0 file(s) deleted
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:49:11.570Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:49:11.590Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:49:11.590Z - [REQUEST]: MCP-Tools Implementierungsplan für AGENT_LAND_SAARLAND.pdf,AGENT_LAND_SAARLAND Initialisierungs-Template.pdf,UI-Verbesserungen für AGENT_LAND_SAARLAND.pdf,AGENT_LAND_SAARLAND Project Summary.pdf,Claude AI's hidden power tools: Configuration, commands, and workflows.pdf,Prompt Best-Practice für Claude Code CLI: AGENT_LAND_SAARLAND.pdf,Erweiterte Entwicklungsrichtlinien für AGENT_LAND_SAARLAND.pdf
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:49:11.590Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:49:11.591Z - Time taken for 'hash changed files from watcher' 0.8244630000554025ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:49:11.600Z - Time taken for 'build-project-configs' 6.7275350000709295ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:49:11.612Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:49:11.612Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:49:11.612Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T10:49:11.612Z - Time taken for 'total execution time for createProjectGraph()' 10.060425999807194ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:19:21.558Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:19:21.558Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:19:21.759Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:19:21.759Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:19:21.759Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:19:21.760Z - Time taken for 'hash changed files from watcher' 0.49260300025343895ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:19:21.769Z - Time taken for 'build-project-configs' 6.1419220003299415ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:19:21.780Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:19:21.780Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:19:21.780Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:19:21.780Z - Time taken for 'total execution time for createProjectGraph()' 9.620014999993145ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:23.402Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:23.403Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:23.806Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:23.806Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:23.806Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:23.812Z - Time taken for 'hash changed files from watcher' 2.1949530001729727ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:23.837Z - Time taken for 'build-project-configs' 21.08436800027266ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:23.851Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:23.851Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:23.851Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:23.851Z - Time taken for 'total execution time for createProjectGraph()' 14.723422000184655ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:28.408Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:28.408Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:29.208Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:29.208Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:29.208Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:29.210Z - Time taken for 'hash changed files from watcher' 0.4266089997254312ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:29.218Z - Time taken for 'build-project-configs' 5.853423000313342ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:29.229Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:29.229Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:29.229Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:29.229Z - Time taken for 'total execution time for createProjectGraph()' 9.784049000125378ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:31.870Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:31.871Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:33.474Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:33.474Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:33.474Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:33.480Z - Time taken for 'hash changed files from watcher' 2.138592999894172ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:33.498Z - Time taken for 'build-project-configs' 15.9651770000346ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:33.510Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:33.510Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:33.510Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:33.510Z - Time taken for 'total execution time for createProjectGraph()' 10.466142000164837ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:36.727Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:36.727Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:38.638Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:38.638Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:39.929Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:39.929Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:39.929Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:39.935Z - Time taken for 'hash changed files from watcher' 2.137027000077069ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:39.963Z - Time taken for 'build-project-configs' 17.422747999895364ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:39.978Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:39.978Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:39.978Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:39.978Z - Time taken for 'total execution time for createProjectGraph()' 17.299095999915153ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:43.543Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:43.544Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:47.945Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:47.945Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:49.945Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:49.945Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:49.945Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:49.948Z - Time taken for 'hash changed files from watcher' 0.6551810000091791ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:49.966Z - Time taken for 'build-project-configs' 10.971764999907464ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:49.966Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:49.967Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:49.989Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:49.989Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:49.989Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:49.989Z - Time taken for 'total execution time for createProjectGraph()' 24.85603199992329ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:56.367Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:56.367Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:56.367Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:56.368Z - Time taken for 'hash changed files from watcher' 0.41234600031748414ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:56.378Z - Time taken for 'build-project-configs' 6.974177999887615ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:56.393Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:56.393Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:56.393Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:20:56.393Z - Time taken for 'total execution time for createProjectGraph()' 12.531273999717087ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:32.412Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:32.412Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:35.314Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:35.314Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:38.815Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:38.815Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:38.815Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:38.821Z - Time taken for 'hash changed files from watcher' 2.089075999800116ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:38.845Z - Time taken for 'build-project-configs' 19.39956700010225ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:38.861Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:38.861Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:38.861Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:38.861Z - Time taken for 'total execution time for createProjectGraph()' 15.658366000279784ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:41.287Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:41.287Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:47.689Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:47.689Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:47.689Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:47.690Z - Time taken for 'hash changed files from watcher' 0.3982730000279844ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:47.699Z - Time taken for 'build-project-configs' 6.169056999962777ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:47.710Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:47.710Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:47.711Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:21:47.711Z - Time taken for 'total execution time for createProjectGraph()' 10.199810999911278ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:24:55.035Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:24:55.035Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:24:56.287Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:24:56.287Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:24:57.499Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:24:57.499Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:24:58.647Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:24:58.647Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:00.313Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:00.313Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:01.436Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:01.436Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:01.436Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:01.438Z - Time taken for 'hash changed files from watcher' 0.573165999725461ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:01.446Z - Time taken for 'build-project-configs' 6.241367999929935ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:01.458Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:01.458Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:01.458Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:01.458Z - Time taken for 'total execution time for createProjectGraph()' 9.640039999969304ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:01.686Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:01.686Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:03.047Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:03.047Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:04.425Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:04.425Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:05.851Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:05.851Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:07.153Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:07.153Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:08.086Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:08.086Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:08.086Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:08.087Z - Time taken for 'hash changed files from watcher' 0.42014400009065866ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:08.098Z - Time taken for 'build-project-configs' 7.653855999931693ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:08.109Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:08.110Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:08.110Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:08.110Z - Time taken for 'total execution time for createProjectGraph()' 10.013147000223398ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:08.270Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:08.271Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:09.448Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:09.448Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:10.636Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:10.636Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:11.904Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:11.904Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:13.238Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:13.239Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:14.508Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:14.508Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:14.671Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:14.671Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:14.671Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:14.673Z - Time taken for 'hash changed files from watcher' 0.41717399982735515ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:14.682Z - Time taken for 'build-project-configs' 6.199488999787718ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:14.696Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:14.696Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:14.696Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:14.696Z - Time taken for 'total execution time for createProjectGraph()' 13.147981999907643ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:15.723Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:15.723Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:16.975Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:16.976Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:18.166Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:18.166Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:19.355Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:19.355Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:20.566Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:20.566Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:21.907Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:21.907Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:22.124Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:22.124Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:22.124Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:22.126Z - Time taken for 'hash changed files from watcher' 0.4409079998731613ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:22.135Z - Time taken for 'build-project-configs' 6.337278999853879ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:22.148Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:22.148Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:22.148Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:22.148Z - Time taken for 'total execution time for createProjectGraph()' 11.906737999990582ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:23.101Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:23.101Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:24.336Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:24.336Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:25.506Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:25.507Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:26.726Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:26.726Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:27.870Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:27.870Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:28.991Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:28.992Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:29.502Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:29.503Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:29.503Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:29.504Z - Time taken for 'hash changed files from watcher' 0.3919049999676645ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:29.516Z - Time taken for 'build-project-configs' 8.23816499998793ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:29.529Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:29.530Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:29.530Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:29.530Z - Time taken for 'total execution time for createProjectGraph()' 12.697902000043541ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:30.103Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:30.103Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:31.325Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:31.325Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:32.537Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:32.537Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:33.737Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:33.737Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:34.977Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:34.977Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:36.141Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:36.141Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:36.505Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:36.505Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:36.505Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:36.506Z - Time taken for 'hash changed files from watcher' 0.5988290002569556ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:36.515Z - Time taken for 'build-project-configs' 6.053414999973029ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:36.528Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:36.528Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:36.528Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:36.528Z - Time taken for 'total execution time for createProjectGraph()' 11.936110999900848ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:37.385Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:37.386Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:38.526Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:38.526Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:39.734Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:39.734Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:40.978Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:40.979Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:42.317Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:42.317Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:43.543Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:43.544Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:43.787Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:43.787Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:43.787Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:43.789Z - Time taken for 'hash changed files from watcher' 0.5603430001065135ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:43.800Z - Time taken for 'build-project-configs' 7.033848999999464ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:43.813Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:43.813Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:43.813Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:43.813Z - Time taken for 'total execution time for createProjectGraph()' 11.92123100021854ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:44.784Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:44.784Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:45.927Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:45.927Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:47.171Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:47.171Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:48.300Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:48.300Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:49.610Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:49.610Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:50.839Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:50.839Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:51.185Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:51.185Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:51.185Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:51.187Z - Time taken for 'hash changed files from watcher' 0.3927659997716546ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:51.196Z - Time taken for 'build-project-configs' 6.658270000014454ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:51.208Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:51.208Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:51.208Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:51.208Z - Time taken for 'total execution time for createProjectGraph()' 10.574434000067413ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:51.967Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:51.968Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:53.143Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:53.143Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:54.401Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:54.401Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:55.559Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:55.559Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:56.733Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:56.734Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:57.987Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:57.987Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:58.368Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:58.368Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:58.368Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:58.370Z - Time taken for 'hash changed files from watcher' 0.5498529998585582ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:58.384Z - Time taken for 'build-project-configs' 9.610164999961853ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:58.397Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:58.398Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:58.398Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:58.398Z - Time taken for 'total execution time for createProjectGraph()' 12.802079000044614ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:59.262Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:25:59.262Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:00.407Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:00.408Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:01.588Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:01.588Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:02.823Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:02.824Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:04.094Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:04.094Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:05.252Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:05.252Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:05.663Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:05.663Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:05.663Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:05.664Z - Time taken for 'hash changed files from watcher' 0.44126000022515655ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:05.673Z - Time taken for 'build-project-configs' 6.100258000195026ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:05.684Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:05.684Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:05.684Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:05.684Z - Time taken for 'total execution time for createProjectGraph()' 9.428637000266463ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:06.525Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:06.525Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:07.705Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:07.706Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:08.836Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:08.836Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:09.960Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:09.960Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:11.171Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:11.172Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:12.330Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:12.330Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:12.926Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:12.926Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:12.926Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:12.928Z - Time taken for 'hash changed files from watcher' 0.42415300011634827ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:12.936Z - Time taken for 'build-project-configs' 6.26297999965027ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:12.947Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:12.947Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:12.947Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:12.947Z - Time taken for 'total execution time for createProjectGraph()' 9.439466000068933ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:13.453Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:13.453Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:14.595Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:14.595Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:15.618Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:15.618Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:16.808Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:16.808Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:18.133Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:18.133Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:19.273Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:19.273Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:19.853Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:19.853Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:19.853Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:19.854Z - Time taken for 'hash changed files from watcher' 0.43763400008901954ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:19.864Z - Time taken for 'build-project-configs' 6.249672000296414ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:19.877Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:19.877Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:19.877Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:19.877Z - Time taken for 'total execution time for createProjectGraph()' 11.796291000209749ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:20.405Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:20.405Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:21.549Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:21.549Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:22.743Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:22.743Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:23.852Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:23.852Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:24.874Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:24.874Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:25.992Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:25.992Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:26.807Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:26.807Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:26.807Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:26.808Z - Time taken for 'hash changed files from watcher' 0.41042800014838576ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:26.816Z - Time taken for 'build-project-configs' 5.301389000378549ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:26.827Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:26.827Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:26.827Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:26.827Z - Time taken for 'total execution time for createProjectGraph()' 9.870236000046134ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:27.187Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:27.187Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:28.206Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:28.207Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:29.366Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:29.367Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:30.377Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:30.378Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:31.389Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:31.390Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:32.537Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:32.537Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:33.588Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:33.588Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:33.589Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:33.590Z - Time taken for 'hash changed files from watcher' 0.42593799997121096ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:33.598Z - Time taken for 'build-project-configs' 5.578218000009656ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:33.612Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:33.612Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:33.612Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:33.612Z - Time taken for 'total execution time for createProjectGraph()' 12.314265000168234ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:33.652Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:33.652Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:34.674Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:34.674Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:35.684Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:35.684Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:36.801Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:36.801Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:37.960Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:37.960Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:39.072Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:39.072Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:40.053Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:40.053Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:40.053Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:40.055Z - Time taken for 'hash changed files from watcher' 0.4189629997126758ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:40.065Z - Time taken for 'build-project-configs' 6.26035699993372ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:40.075Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:40.075Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:40.075Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:40.075Z - Time taken for 'total execution time for createProjectGraph()' 8.805769999977201ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:40.188Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:40.188Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:41.207Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:41.207Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:42.219Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:42.220Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:43.241Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:43.241Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:44.267Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:44.267Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:45.284Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:45.285Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:46.400Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:46.400Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:46.590Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:46.590Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:46.590Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:46.591Z - Time taken for 'hash changed files from watcher' 0.6088840002194047ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:46.600Z - Time taken for 'build-project-configs' 6.314901999663562ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:46.611Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:46.612Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:46.612Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:46.612Z - Time taken for 'total execution time for createProjectGraph()' 9.971768000163138ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:47.421Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:47.421Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:48.436Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:48.436Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:49.552Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:49.552Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:50.720Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:50.721Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:51.832Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:51.832Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:52.990Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:52.991Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:53.822Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:53.822Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:53.822Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:53.825Z - Time taken for 'hash changed files from watcher' 0.6012909999117255ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:53.833Z - Time taken for 'build-project-configs' 5.456369999796152ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:53.845Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:53.845Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:53.845Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:53.845Z - Time taken for 'total execution time for createProjectGraph()' 11.230088000185788ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:54.001Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:54.001Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:55.157Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:55.158Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:56.170Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:56.170Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:57.318Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:57.318Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:58.335Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:58.335Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:59.450Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:26:59.450Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:00.401Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:00.401Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:00.401Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:00.403Z - Time taken for 'hash changed files from watcher' 0.448532999958843ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:00.411Z - Time taken for 'build-project-configs' 5.457179000135511ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:00.423Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:00.423Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:00.423Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:00.423Z - Time taken for 'total execution time for createProjectGraph()' 9.811269000172615ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:00.600Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:00.601Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:01.773Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:01.773Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:02.950Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:02.951Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:04.076Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:04.077Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:05.217Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:05.217Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:06.237Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:06.237Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:07.001Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:07.002Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:07.002Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:07.003Z - Time taken for 'hash changed files from watcher' 0.6106779999099672ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:07.014Z - Time taken for 'build-project-configs' 7.757695000153035ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:07.025Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:07.026Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:07.026Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:07.026Z - Time taken for 'total execution time for createProjectGraph()' 10.291042000055313ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:07.353Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:07.353Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:08.376Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:08.376Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:09.517Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:09.517Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:10.727Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:10.727Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:11.840Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:11.840Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:12.973Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:12.973Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:13.754Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:13.754Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:13.754Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:13.755Z - Time taken for 'hash changed files from watcher' 0.4320149999111891ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:13.764Z - Time taken for 'build-project-configs' 6.159926999825984ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:13.775Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:13.775Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:13.775Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:13.775Z - Time taken for 'total execution time for createProjectGraph()' 9.797590999864042ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:13.984Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:13.984Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:15.005Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:15.005Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:16.133Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:16.133Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:17.153Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:17.154Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:18.172Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:18.172Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:19.306Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:19.307Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:20.385Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:20.385Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:20.385Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:20.386Z - Time taken for 'hash changed files from watcher' 0.43742499966174364ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:20.394Z - Time taken for 'build-project-configs' 5.073137000203133ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:20.405Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:20.405Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:20.405Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:20.405Z - Time taken for 'total execution time for createProjectGraph()' 8.975066999904811ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:20.517Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:20.517Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:21.767Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:21.767Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:22.886Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:22.886Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:23.903Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:23.903Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:25.065Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:25.065Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:26.191Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:26.191Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:26.918Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:26.918Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:26.918Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:26.919Z - Time taken for 'hash changed files from watcher' 0.4464469999074936ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:26.928Z - Time taken for 'build-project-configs' 5.549147000070661ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:26.939Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:26.939Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:26.939Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:26.939Z - Time taken for 'total execution time for createProjectGraph()' 10.270544999744743ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:27.385Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:27.385Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:28.511Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:28.511Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:29.789Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:29.789Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:31.105Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:31.105Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:32.232Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:32.233Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:33.433Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:33.434Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:33.786Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:33.786Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:33.787Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:33.788Z - Time taken for 'hash changed files from watcher' 0.46463000029325485ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:33.797Z - Time taken for 'build-project-configs' 6.560374000109732ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:33.808Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:33.808Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:33.808Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:33.808Z - Time taken for 'total execution time for createProjectGraph()' 9.699661999940872ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:34.561Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:34.561Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:35.693Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:35.694Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:36.854Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:36.854Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:37.871Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:37.872Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:38.895Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:38.895Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:39.910Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:39.910Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:40.925Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:40.926Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:40.963Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:40.963Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:40.963Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:40.964Z - Time taken for 'hash changed files from watcher' 0.5793200000189245ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:40.974Z - Time taken for 'build-project-configs' 6.602491000201553ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:40.986Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:40.986Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:40.986Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:40.986Z - Time taken for 'total execution time for createProjectGraph()' 10.784881999716163ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:41.952Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:41.952Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:42.969Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:42.969Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:44.005Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:44.006Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:45.023Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:45.023Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:46.043Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:46.043Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:47.057Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:47.057Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:48.067Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:48.067Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:48.352Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:48.352Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:48.352Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:48.353Z - Time taken for 'hash changed files from watcher' 0.41254799999296665ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:48.363Z - Time taken for 'build-project-configs' 6.368198999669403ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:48.374Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:48.374Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:48.374Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:48.374Z - Time taken for 'total execution time for createProjectGraph()' 9.37338999984786ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:49.091Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:49.091Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:50.121Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:50.121Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:51.138Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:51.138Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:52.159Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:52.159Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:53.275Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:53.276Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:54.293Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:54.294Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:55.334Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:55.335Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:55.492Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:55.492Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:55.492Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:55.493Z - Time taken for 'hash changed files from watcher' 0.46663099993020296ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:55.502Z - Time taken for 'build-project-configs' 5.842749999836087ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:55.513Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:55.513Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:55.513Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:55.514Z - Time taken for 'total execution time for createProjectGraph()' 9.657937000039965ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:56.521Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:56.521Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:57.546Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:57.546Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:58.686Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:58.686Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:59.722Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:27:59.722Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:00.867Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:00.868Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:01.891Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:01.891Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:02.902Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:02.902Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:02.922Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:02.922Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:02.922Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:02.924Z - Time taken for 'hash changed files from watcher' 0.4347879998385906ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:02.933Z - Time taken for 'build-project-configs' 6.129979999735951ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:02.944Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:02.944Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:02.944Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:02.945Z - Time taken for 'total execution time for createProjectGraph()' 10.207903000060469ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:04.099Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:04.099Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:05.118Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:05.118Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:06.138Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:06.138Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:07.163Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:07.163Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:08.178Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:08.178Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:09.193Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:09.193Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:10.336Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:10.336Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:10.500Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:10.500Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:10.500Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:10.502Z - Time taken for 'hash changed files from watcher' 0.6222459999844432ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:10.514Z - Time taken for 'build-project-configs' 7.640884000342339ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:10.526Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:10.527Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:10.527Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:10.527Z - Time taken for 'total execution time for createProjectGraph()' 12.251667999662459ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:11.452Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:11.452Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:12.570Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:12.571Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:13.709Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:13.709Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:14.852Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:14.852Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:15.876Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:15.877Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:16.894Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:16.894Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:17.853Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:17.853Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:17.853Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:17.855Z - Time taken for 'hash changed files from watcher' 0.4448730000294745ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:17.864Z - Time taken for 'build-project-configs' 6.4966049999929965ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:17.878Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:17.878Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:17.878Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:17.878Z - Time taken for 'total execution time for createProjectGraph()' 12.612081999890506ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:17.909Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:17.909Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:18.920Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:18.920Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:19.952Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:19.952Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:21.111Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:21.111Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:22.125Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:22.125Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:23.143Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:23.144Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:24.190Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:24.190Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:24.309Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:24.309Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:24.309Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:24.310Z - Time taken for 'hash changed files from watcher' 0.3945279996842146ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:24.318Z - Time taken for 'build-project-configs' 5.773943000007421ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:24.329Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:24.329Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:24.329Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:24.329Z - Time taken for 'total execution time for createProjectGraph()' 9.35437300009653ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:26.215Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:26.216Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:27.352Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:27.352Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:28.391Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:28.391Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:29.404Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:29.404Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:30.434Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:30.434Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:31.457Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:31.457Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:32.474Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:32.474Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:32.616Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:32.616Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:32.616Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:32.617Z - Time taken for 'hash changed files from watcher' 0.44786199973896146ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:32.626Z - Time taken for 'build-project-configs' 6.010491999797523ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:32.637Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:32.637Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:32.637Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:32.637Z - Time taken for 'total execution time for createProjectGraph()' 8.843991000205278ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:33.492Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:33.492Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:34.621Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:34.621Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:35.934Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:35.934Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:37.049Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:37.049Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:38.235Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:38.236Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:39.443Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:39.443Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:39.893Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:39.893Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:39.893Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:39.895Z - Time taken for 'hash changed files from watcher' 0.6147789997048676ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:39.904Z - Time taken for 'build-project-configs' 6.317503000143915ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:39.915Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:39.916Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:39.916Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:39.916Z - Time taken for 'total execution time for createProjectGraph()' 10.225066000130028ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:40.628Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:40.628Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:41.784Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:41.784Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:43.055Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:43.055Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:44.073Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:44.073Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:45.237Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:45.238Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:46.369Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:46.369Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:47.029Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:47.029Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:47.029Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:47.031Z - Time taken for 'hash changed files from watcher' 0.42110100015997887ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:47.039Z - Time taken for 'build-project-configs' 5.531072999816388ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:47.050Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:47.050Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:47.050Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:47.051Z - Time taken for 'total execution time for createProjectGraph()' 10.167553000152111ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:47.565Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:47.566Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:48.729Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:48.730Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:53.967Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:53.967Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:53.967Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:53.968Z - Time taken for 'hash changed files from watcher' 0.5196940000168979ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:53.976Z - Time taken for 'build-project-configs' 5.481788999866694ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:53.986Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:53.987Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:53.987Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T11:28:53.987Z - Time taken for 'total execution time for createProjectGraph()' 9.193647000007331ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:23.614Z - [WATCHER]: .github/workflows/docs-check.yml was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:23.614Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:23.716Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:23.716Z - [REQUEST]: .github/workflows/docs-check.yml
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:23.716Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:23.717Z - Time taken for 'hash changed files from watcher' 0.43200100027024746ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:23.729Z - Time taken for 'build-project-configs' 8.41596799902618ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:23.741Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:23.742Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:23.742Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:23.742Z - Time taken for 'total execution time for createProjectGraph()' 11.679918000474572ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:28.442Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:28.442Z - [WATCHER]: .github/workflows/docs-check.yml was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:28.643Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:28.643Z - [REQUEST]: .github/workflows/docs-check.yml
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:28.643Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:28.644Z - Time taken for 'hash changed files from watcher' 0.4733700007200241ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:28.653Z - Time taken for 'build-project-configs' 6.33262800052762ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:28.665Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:28.666Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:28.666Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:28.666Z - Time taken for 'total execution time for createProjectGraph()' 10.689270000904799ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:58.420Z - [WATCHER]: .github/workflows/pr-main-checks.yml was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:58.420Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:58.521Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:58.521Z - [REQUEST]: .github/workflows/pr-main-checks.yml
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:58.521Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:58.524Z - Time taken for 'hash changed files from watcher' 0.5858609993010759ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:58.533Z - Time taken for 'build-project-configs' 6.066975001245737ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:58.549Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:58.549Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:58.549Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:04:58.549Z - Time taken for 'total execution time for createProjectGraph()' 14.416464999318123ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:05.423Z - [WATCHER]: .github/workflows/pr-main-checks.yml was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:05.423Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:05.624Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:05.624Z - [REQUEST]: .github/workflows/pr-main-checks.yml
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:05.624Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:05.625Z - Time taken for 'hash changed files from watcher' 0.41017800010740757ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:05.634Z - Time taken for 'build-project-configs' 5.907544000074267ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:05.645Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:05.645Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:05.645Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:05.645Z - Time taken for 'total execution time for createProjectGraph()' 9.836151000112295ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:37.319Z - [WATCHER]: .github/pull_request_template.md was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:37.320Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:37.420Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:37.420Z - [REQUEST]: .github/pull_request_template.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:37.420Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:37.421Z - Time taken for 'hash changed files from watcher' 0.592594999819994ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:37.430Z - Time taken for 'build-project-configs' 6.322212001308799ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:37.442Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:37.442Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:37.442Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:37.442Z - Time taken for 'total execution time for createProjectGraph()' 10.2716080006212ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:42.518Z - [WATCHER]: .github/pull_request_template.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:42.518Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:42.719Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:42.719Z - [REQUEST]: .github/pull_request_template.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:42.719Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:42.720Z - Time taken for 'hash changed files from watcher' 0.3861810006201267ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:42.728Z - Time taken for 'build-project-configs' 5.154480999335647ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:42.738Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:42.738Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:42.738Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:42.738Z - Time taken for 'total execution time for createProjectGraph()' 8.849340999498963ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:58.644Z - [WATCHER]: .markdownlint.jsonc was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:58.645Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:58.745Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:58.745Z - [REQUEST]: .markdownlint.jsonc
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:58.745Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:58.748Z - Time taken for 'hash changed files from watcher' 0.41432899981737137ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:58.760Z - Time taken for 'build-project-configs' 8.587105000391603ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:58.779Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:58.779Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:58.779Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:05:58.779Z - Time taken for 'total execution time for createProjectGraph()' 16.41185599938035ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:00.435Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:00.435Z - [WATCHER]: .markdownlint.jsonc was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:00.636Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:00.636Z - [REQUEST]: .markdownlint.jsonc
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:00.636Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:00.638Z - Time taken for 'hash changed files from watcher' 0.5530559998005629ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:00.648Z - Time taken for 'build-project-configs' 6.922236001119018ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:00.660Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:00.660Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:00.660Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:00.660Z - Time taken for 'total execution time for createProjectGraph()' 11.01843100041151ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:17.456Z - [WATCHER]: tools/ci/validate_toc.sh was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:17.456Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:17.557Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:17.557Z - [REQUEST]: tools/ci/validate_toc.sh
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:17.557Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:17.559Z - Time taken for 'hash changed files from watcher' 0.4156539998948574ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:17.568Z - Time taken for 'build-project-configs' 5.901526000350714ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:17.580Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:17.580Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:17.580Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:17.580Z - Time taken for 'total execution time for createProjectGraph()' 11.523421000689268ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:20.819Z - [WATCHER]: tools/ci/validate_toc.sh was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:20.819Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:21.020Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:21.020Z - [REQUEST]: tools/ci/validate_toc.sh
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:21.020Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:21.022Z - Time taken for 'hash changed files from watcher' 0.39670899882912636ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:21.030Z - Time taken for 'build-project-configs' 6.449246000498533ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:21.041Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:21.041Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:21.041Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:21.042Z - Time taken for 'total execution time for createProjectGraph()' 9.089687000960112ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:43.846Z - [WATCHER]: tools/ci/check_prompt_format.sh was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:43.846Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:43.947Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:43.948Z - [REQUEST]: tools/ci/check_prompt_format.sh
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:43.948Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:43.950Z - Time taken for 'hash changed files from watcher' 0.7534679993987083ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:43.995Z - Time taken for 'build-project-configs' 30.211856000125408ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:44.024Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:44.024Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:44.024Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:44.024Z - Time taken for 'total execution time for createProjectGraph()' 28.479835998266935ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:46.980Z - [WATCHER]: tools/ci/check_prompt_format.sh was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:46.980Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:47.181Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:47.181Z - [REQUEST]: tools/ci/check_prompt_format.sh
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:47.181Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:47.182Z - Time taken for 'hash changed files from watcher' 0.4100429993122816ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:47.190Z - Time taken for 'build-project-configs' 6.164823999628425ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:47.201Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:47.201Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:47.201Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:06:47.201Z - Time taken for 'total execution time for createProjectGraph()' 9.060074999928474ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:01.829Z - [WATCHER]: tools/ci/check_links.sh was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:01.829Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:01.931Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:01.931Z - [REQUEST]: tools/ci/check_links.sh
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:01.931Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:01.934Z - Time taken for 'hash changed files from watcher' 1.016364999115467ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:01.945Z - Time taken for 'build-project-configs' 8.719755999743938ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:01.959Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:01.959Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:01.959Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:01.959Z - Time taken for 'total execution time for createProjectGraph()' 11.931285999715328ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:05.549Z - [WATCHER]: tools/ci/check_links.sh was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:05.550Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:05.750Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:05.750Z - [REQUEST]: tools/ci/check_links.sh
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:05.750Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:05.752Z - Time taken for 'hash changed files from watcher' 0.4330390002578497ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:05.759Z - Time taken for 'build-project-configs' 5.266938000917435ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:05.770Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:05.770Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:05.770Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:05.771Z - Time taken for 'total execution time for createProjectGraph()' 9.303868999704719ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:17.349Z - [WATCHER]: tools/ci/check_structure.sh was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:17.349Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:17.451Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:17.451Z - [REQUEST]: tools/ci/check_structure.sh
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:17.451Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:17.452Z - Time taken for 'hash changed files from watcher' 0.5514560006558895ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:17.463Z - Time taken for 'build-project-configs' 6.462017999961972ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:17.475Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:17.475Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:17.475Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:17.475Z - Time taken for 'total execution time for createProjectGraph()' 11.938091998919845ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:22.851Z - [WATCHER]: tools/ci/check_structure.sh was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:22.851Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:23.053Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:23.053Z - [REQUEST]: tools/ci/check_structure.sh
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:23.053Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:23.054Z - Time taken for 'hash changed files from watcher' 0.4666379988193512ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:23.063Z - Time taken for 'build-project-configs' 5.9100160002708435ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:23.075Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:23.075Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:23.075Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:23.075Z - Time taken for 'total execution time for createProjectGraph()' 10.333664998412132ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:34.695Z - [WATCHER]: tools/ci/advanced_prompt_lint.sh was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:34.695Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:34.795Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:34.795Z - [REQUEST]: tools/ci/advanced_prompt_lint.sh
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:34.795Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:34.797Z - Time taken for 'hash changed files from watcher' 0.4654670003801584ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:34.813Z - Time taken for 'build-project-configs' 11.769222998991609ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:34.831Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:34.831Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:34.831Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:34.831Z - Time taken for 'total execution time for createProjectGraph()' 16.305196998640895ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:38.782Z - [WATCHER]: tools/ci/advanced_prompt_lint.sh was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:38.782Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:38.983Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:38.983Z - [REQUEST]: tools/ci/advanced_prompt_lint.sh
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:38.983Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:38.984Z - Time taken for 'hash changed files from watcher' 0.39862400107085705ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:38.992Z - Time taken for 'build-project-configs' 5.797950999811292ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:39.002Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:39.003Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:39.003Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:39.003Z - Time taken for 'total execution time for createProjectGraph()' 8.75845499895513ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:50.572Z - [WATCHER]: tools/ci/check_naming.sh was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:50.572Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:50.674Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:50.674Z - [REQUEST]: tools/ci/check_naming.sh
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:50.674Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:50.676Z - Time taken for 'hash changed files from watcher' 0.8018640000373125ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:50.690Z - Time taken for 'build-project-configs' 7.430676000192761ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:50.705Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:50.705Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:50.705Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:07:50.705Z - Time taken for 'total execution time for createProjectGraph()' 15.121935000643134ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:02.902Z - [WATCHER]: tools/ci/check_naming.sh was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:02.902Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:03.102Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:03.102Z - [REQUEST]: tools/ci/check_naming.sh
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:03.102Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:03.103Z - Time taken for 'hash changed files from watcher' 0.400348998606205ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:03.112Z - Time taken for 'build-project-configs' 6.11090200021863ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:03.124Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:03.124Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:03.124Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:03.124Z - Time taken for 'total execution time for createProjectGraph()' 10.413923000916839ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:11.082Z - [WATCHER]: tools/ci/check_memory_bank.sh was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:11.082Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:11.183Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:11.183Z - [REQUEST]: tools/ci/check_memory_bank.sh
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:11.184Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:11.187Z - Time taken for 'hash changed files from watcher' 0.6827949993312359ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:11.208Z - Time taken for 'build-project-configs' 15.004308000206947ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:11.229Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:11.230Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:11.230Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:11.230Z - Time taken for 'total execution time for createProjectGraph()' 20.59383499994874ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:15.780Z - [WATCHER]: tools/ci/check_memory_bank.sh was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:15.780Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:15.981Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:15.981Z - [REQUEST]: tools/ci/check_memory_bank.sh
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:15.981Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:15.982Z - Time taken for 'hash changed files from watcher' 0.3978829998522997ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:15.991Z - Time taken for 'build-project-configs' 6.351613000035286ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:16.001Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:16.001Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:16.001Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:08:16.001Z - Time taken for 'total execution time for createProjectGraph()' 8.954931000247598ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:35.423Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:35.423Z - [WATCHER]: ai_docs/memory-bank/activeContext.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:35.824Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:35.824Z - [REQUEST]: ai_docs/memory-bank/activeContext.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:35.824Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:35.825Z - Time taken for 'hash changed files from watcher' 0.5992740001529455ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:35.835Z - Time taken for 'build-project-configs' 6.374297000467777ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:35.847Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:35.847Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:35.847Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:35.848Z - Time taken for 'total execution time for createProjectGraph()' 11.129995001479983ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:45.275Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:45.275Z - [WATCHER]: ai_docs/memory-bank/productContext.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:46.075Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:46.075Z - [REQUEST]: ai_docs/memory-bank/productContext.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:46.075Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:46.077Z - Time taken for 'hash changed files from watcher' 0.6349870003759861ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:46.089Z - Time taken for 'build-project-configs' 8.993775000795722ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:46.101Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:46.101Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:46.101Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:46.101Z - Time taken for 'total execution time for createProjectGraph()' 10.12559900060296ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:59.040Z - [WATCHER]: ai_docs/memory-bank/progress.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:10:59.040Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:00.641Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:00.641Z - [REQUEST]: ai_docs/memory-bank/progress.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:00.641Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:00.642Z - Time taken for 'hash changed files from watcher' 0.4272489994764328ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:00.651Z - Time taken for 'build-project-configs' 6.240821000188589ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:00.663Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:00.663Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:00.663Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:00.663Z - Time taken for 'total execution time for createProjectGraph()' 10.196456000208855ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:12.334Z - [WATCHER]: ai_docs/memory-bank/projectbrief.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:12.335Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:15.537Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:15.538Z - [REQUEST]: ai_docs/memory-bank/projectbrief.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:15.538Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:15.544Z - Time taken for 'hash changed files from watcher' 2.1844720002263784ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:15.576Z - Time taken for 'build-project-configs' 24.049271000549197ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:15.596Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:15.597Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:15.597Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:15.597Z - Time taken for 'total execution time for createProjectGraph()' 20.123190000653267ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:24.774Z - [WATCHER]: ai_docs/memory-bank/systemPatterns.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:24.775Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:31.178Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:31.178Z - [REQUEST]: ai_docs/memory-bank/systemPatterns.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:31.178Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:31.185Z - Time taken for 'hash changed files from watcher' 2.1913869995623827ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:31.215Z - Time taken for 'build-project-configs' 22.464655999094248ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:31.236Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:31.236Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:31.236Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:31.236Z - Time taken for 'total execution time for createProjectGraph()' 20.8029529992491ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:35.759Z - [WATCHER]: ai_docs/memory-bank/techContext.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:35.759Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:42.162Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:42.162Z - [REQUEST]: ai_docs/memory-bank/techContext.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:42.162Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:42.168Z - Time taken for 'hash changed files from watcher' 1.6931929998099804ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:42.190Z - Time taken for 'build-project-configs' 19.964257000014186ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:42.204Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:42.204Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:42.204Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:11:42.204Z - Time taken for 'total execution time for createProjectGraph()' 12.365395000204444ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:12:06.911Z - [WATCHER]: ai_docs/memory-bank/memoryController.md was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:12:06.911Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:12:07.013Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:12:07.013Z - [REQUEST]: ai_docs/memory-bank/memoryController.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:12:07.013Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:12:07.018Z - Time taken for 'hash changed files from watcher' 2.1825520005077124ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:12:07.056Z - Time taken for 'build-project-configs' 29.20885599963367ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:12:07.073Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:12:07.073Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:12:07.073Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:12:07.073Z - Time taken for 'total execution time for createProjectGraph()' 18.54170100018382ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:09.244Z - [WATCHER]: ai_docs/memory-bank/memoryController.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:09.244Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:09.445Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:09.445Z - [REQUEST]: ai_docs/memory-bank/memoryController.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:09.445Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:09.446Z - Time taken for 'hash changed files from watcher' 0.41672599874436855ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:09.455Z - Time taken for 'build-project-configs' 6.021113000810146ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:09.465Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:09.466Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:09.466Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:09.466Z - Time taken for 'total execution time for createProjectGraph()' 9.585858000442386ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:42.265Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:42.266Z - [WATCHER]: ai_docs/memory-bank/activeContext.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:42.667Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:42.667Z - [REQUEST]: ai_docs/memory-bank/activeContext.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:42.667Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:42.668Z - Time taken for 'hash changed files from watcher' 0.4186709988862276ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:42.678Z - Time taken for 'build-project-configs' 7.021619999781251ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:42.690Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:42.690Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:42.690Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:42.690Z - Time taken for 'total execution time for createProjectGraph()' 10.45180399902165ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:58.067Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:58.068Z - [WATCHER]: ai_docs/memory-bank/productContext.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:58.871Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:58.871Z - [REQUEST]: ai_docs/memory-bank/productContext.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:58.871Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:58.876Z - Time taken for 'hash changed files from watcher' 2.3023659996688366ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:58.909Z - Time taken for 'build-project-configs' 25.031702000647783ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:58.929Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:58.929Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:58.929Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:14:58.929Z - Time taken for 'total execution time for createProjectGraph()' 20.03023000061512ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:15.865Z - [WATCHER]: ai_docs/memory-bank/progress.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:15.865Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:17.469Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:17.469Z - [REQUEST]: ai_docs/memory-bank/progress.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:17.469Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:17.474Z - Time taken for 'hash changed files from watcher' 2.192917000502348ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:17.493Z - Time taken for 'build-project-configs' 17.315213998779655ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:17.507Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:17.507Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:17.507Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:17.508Z - Time taken for 'total execution time for createProjectGraph()' 12.362447999417782ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:30.001Z - [WATCHER]: ai_docs/memory-bank/projectbrief.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:30.001Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:33.203Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:33.203Z - [REQUEST]: ai_docs/memory-bank/projectbrief.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:33.203Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:33.207Z - Time taken for 'hash changed files from watcher' 1.0373069997876883ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:33.231Z - Time taken for 'build-project-configs' 18.067579999566078ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:33.251Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:33.252Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:33.252Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:33.252Z - Time taken for 'total execution time for createProjectGraph()' 20.78777699917555ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:48.811Z - [WATCHER]: ai_docs/memory-bank/systemPatterns.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:48.811Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:55.212Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:55.212Z - [REQUEST]: ai_docs/memory-bank/systemPatterns.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:55.212Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:55.215Z - Time taken for 'hash changed files from watcher' 0.7821180000901222ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:55.235Z - Time taken for 'build-project-configs' 15.557620000094175ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:55.249Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:55.249Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:55.249Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:15:55.249Z - Time taken for 'total execution time for createProjectGraph()' 12.266001001000404ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:16:08.408Z - [WATCHER]: ai_docs/memory-bank/techContext.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:16:08.408Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:16:14.809Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:16:14.809Z - [REQUEST]: ai_docs/memory-bank/techContext.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:16:14.809Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:16:14.810Z - Time taken for 'hash changed files from watcher' 0.4251220002770424ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:16:14.820Z - Time taken for 'build-project-configs' 6.8473710007965565ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:16:14.834Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:16:14.834Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:16:14.834Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:16:14.834Z - Time taken for 'total execution time for createProjectGraph()' 11.827341999858618ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:16:55.802Z - [WATCHER]: ai_docs/memory-bank/progress.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:16:55.802Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:02.203Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:02.203Z - [REQUEST]: ai_docs/memory-bank/progress.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:02.203Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:02.208Z - Time taken for 'hash changed files from watcher' 1.0680370014160872ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:02.232Z - Time taken for 'build-project-configs' 16.065814999863505ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:02.255Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:02.256Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:02.256Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:02.256Z - Time taken for 'total execution time for createProjectGraph()' 23.316584998741746ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:52.127Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:52.127Z - [WATCHER]: ai_docs/memory-bank/activeContext.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:58.530Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:58.530Z - [REQUEST]: ai_docs/memory-bank/activeContext.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:58.530Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:58.537Z - Time taken for 'hash changed files from watcher' 2.2221849989145994ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:58.560Z - Time taken for 'build-project-configs' 19.232195999473333ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:58.574Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:58.575Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:58.575Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:17:58.575Z - Time taken for 'total execution time for createProjectGraph()' 14.208717001602054ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:18:27.030Z - [WATCHER]: ai_docs/memory-bank/memoryController.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:18:27.030Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:18:33.432Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:18:33.432Z - [REQUEST]: ai_docs/memory-bank/memoryController.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:18:33.433Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:18:33.439Z - Time taken for 'hash changed files from watcher' 2.207295000553131ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:18:33.458Z - Time taken for 'build-project-configs' 17.426009999588132ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:18:33.472Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:18:33.472Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:18:33.472Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:18:33.472Z - Time taken for 'total execution time for createProjectGraph()' 11.269704001024365ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:40.041Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:40.041Z - [WATCHER]: ai_docs/guides/recursive_template_evolution_flow.md was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:40.143Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:40.143Z - [REQUEST]: ai_docs/guides/recursive_template_evolution_flow.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:40.143Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:40.146Z - Time taken for 'hash changed files from watcher' 0.5657119993120432ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:40.161Z - Time taken for 'build-project-configs' 9.466804999858141ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:40.173Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:40.173Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:40.173Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:40.173Z - Time taken for 'total execution time for createProjectGraph()' 11.536019001156092ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:45.863Z - [WATCHER]: ai_docs/guides/recursive_template_evolution_flow.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:45.863Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:46.063Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:46.063Z - [REQUEST]: ai_docs/guides/recursive_template_evolution_flow.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:46.063Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:46.065Z - Time taken for 'hash changed files from watcher' 0.5783840008080006ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:46.076Z - Time taken for 'build-project-configs' 7.788782000541687ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:46.092Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:46.092Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:46.092Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:46.093Z - Time taken for 'total execution time for createProjectGraph()' 14.427575001493096ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:59.840Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:20:59.841Z - [WATCHER]: ai_docs/guides/recursive_template_evolution_flow.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:00.242Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:00.242Z - [REQUEST]: ai_docs/guides/recursive_template_evolution_flow.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:00.242Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:00.245Z - Time taken for 'hash changed files from watcher' 0.5603820011019707ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:00.261Z - Time taken for 'build-project-configs' 13.600817000493407ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:00.277Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:00.277Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:00.277Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:00.277Z - Time taken for 'total execution time for createProjectGraph()' 15.456624999642372ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:15.373Z - [WATCHER]: ai_docs/guides/recursive_template_evolution_flow.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:15.373Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:16.177Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:16.177Z - [REQUEST]: ai_docs/guides/recursive_template_evolution_flow.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:16.177Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:16.183Z - Time taken for 'hash changed files from watcher' 2.21335900016129ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:16.216Z - Time taken for 'build-project-configs' 24.955990999937057ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:16.232Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:16.233Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:16.233Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:16.233Z - Time taken for 'total execution time for createProjectGraph()' 16.90310199931264ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:36.474Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:36.474Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:38.074Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:38.074Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:38.074Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:38.075Z - Time taken for 'hash changed files from watcher' 0.450229000300169ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:38.086Z - Time taken for 'build-project-configs' 7.92807599902153ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:38.098Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:38.098Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:38.098Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:38.098Z - Time taken for 'total execution time for createProjectGraph()' 10.007314000278711ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:54.170Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:54.170Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:57.370Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:57.370Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:57.370Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:57.372Z - Time taken for 'hash changed files from watcher' 0.6506009995937347ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:57.386Z - Time taken for 'build-project-configs' 8.758148999884725ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:57.405Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:57.406Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:57.406Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:21:57.406Z - Time taken for 'total execution time for createProjectGraph()' 19.44119800068438ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:04.881Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:04.881Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:11.281Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:11.281Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:11.281Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:11.283Z - Time taken for 'hash changed files from watcher' 0.48863499984145164ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:11.291Z - Time taken for 'build-project-configs' 5.793522000312805ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:11.302Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:11.303Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:11.303Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:11.303Z - Time taken for 'total execution time for createProjectGraph()' 10.34307499974966ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:16.760Z - [WATCHER]: TEMPLATE_INIT_agentland.saarland.md was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:16.760Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:23.161Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:23.161Z - [REQUEST]: TEMPLATE_INIT_agentland.saarland.md
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:23.161Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:23.163Z - Time taken for 'hash changed files from watcher' 0.5239180009812117ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:23.173Z - Time taken for 'build-project-configs' 7.788927000015974ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:23.184Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:23.185Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:23.185Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:22:23.185Z - Time taken for 'total execution time for createProjectGraph()' 10.003961000591516ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:42.142Z - [WATCHER]: .github/workflows/rtef-trigger.yml was created or restored
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:42.142Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:42.242Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:42.242Z - [REQUEST]: .github/workflows/rtef-trigger.yml
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:42.242Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:42.243Z - Time taken for 'hash changed files from watcher' 0.41731799952685833ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:42.253Z - Time taken for 'build-project-configs' 6.972087999805808ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:42.265Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:42.266Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:42.266Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:42.266Z - Time taken for 'total execution time for createProjectGraph()' 10.83072100020945ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:56.637Z - [WATCHER]: .github/workflows/rtef-trigger.yml was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:56.637Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:56.837Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:56.837Z - [REQUEST]: .github/workflows/rtef-trigger.yml
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:56.837Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:56.838Z - Time taken for 'hash changed files from watcher' 0.41054300032556057ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:56.848Z - Time taken for 'build-project-configs' 6.700011000037193ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:56.863Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:56.863Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:56.863Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:56.863Z - Time taken for 'total execution time for createProjectGraph()' 13.431993000209332ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:58.085Z - [WATCHER]: .github/workflows/rtef-trigger.yml was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:58.085Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:58.486Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:58.486Z - [REQUEST]: .github/workflows/rtef-trigger.yml
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:58.486Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:58.487Z - Time taken for 'hash changed files from watcher' 0.40280100144445896ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:58.495Z - Time taken for 'build-project-configs' 5.79466599971056ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:58.507Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:58.508Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:58.508Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:26:58.508Z - Time taken for 'total execution time for createProjectGraph()' 10.818323999643326ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:27:13.599Z - [WATCHER]: Processing file changes in outputs
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:27:13.600Z - [WATCHER]: .github/workflows/rtef-trigger.yml was modified
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:27:14.401Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:27:14.401Z - [REQUEST]: .github/workflows/rtef-trigger.yml
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:27:14.401Z - [REQUEST]: 
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:27:14.403Z - Time taken for 'hash changed files from watcher' 0.38758299872279167ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:27:14.412Z - Time taken for 'build-project-configs' 5.8407739996910095ms
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:27:14.423Z - [SYNC]: collect registered sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:27:14.423Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:27:14.423Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v21.0.3 Daemon Server] - 2025-05-15T14:27:14.423Z - Time taken for 'total execution time for createProjectGraph()' 10.199365999549627ms

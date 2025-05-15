@@ -1,0 +1,10 @@
+{
+  "default": true,
+  "MD013": { "line_length": 120 },
+  "MD033": { "allowed_elements": ["details", "summary", "br", "sub", "sup"] },
+  "no-hard-tabs": true,
+  "whitespace": {
+    "list_indent": true,
+    "MD030": { "ul_single": 1, "ol_single": 1, "ul_multi": 1, "ol_multi": 1 }
+  }
+}

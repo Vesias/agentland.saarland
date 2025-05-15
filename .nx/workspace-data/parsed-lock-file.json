@@ -5058,6 +5058,15 @@
         "hash": "sha512-bQasjMfyDGyaeWKBIu33lHh9qlSR0MFE/Nmc6nMjf/iU9b3rSMdAYz1Baxrv4lPdGUsTqZudHA4jIGSJy0SWZQ=="
       }
     },
+    "npm:cors": {
+      "type": "npm",
+      "name": "npm:cors",
+      "data": {
+        "version": "2.8.5",
+        "packageName": "cors",
+        "hash": "sha512-KIHbLJqu73RGr/hnbrO9uBeixNGuvSQjul/jdFvS/KFSIH1hWVd1ng7zOHx+YrEfInLG7q4n6GHQ9cDtxv/P6g=="
+      }
+    },
     "npm:corser": {
       "type": "npm",
       "name": "npm:corser",
@@ -9826,6 +9835,15 @@
         "version": "1.0.1",
         "packageName": "utils-merge",
         "hash": "sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA=="
+      }
+    },
+    "npm:uuid": {
+      "type": "npm",
+      "name": "npm:uuid",
+      "data": {
+        "version": "11.1.0",
+        "packageName": "uuid",
+        "hash": "sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A=="
       }
     },
     "npm:v8-compile-cache-lib": {
@@ -18401,6 +18419,16 @@
     {
       "source": "npm:core-js-compat",
       "target": "npm:browserslist",
+      "type": "static"
+    },
+    {
+      "source": "npm:cors",
+      "target": "npm:object-assign",
+      "type": "static"
+    },
+    {
+      "source": "npm:cors",
+      "target": "npm:vary",
       "type": "static"
     },
     {

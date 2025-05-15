@@ -1,3 +1,11 @@
+---
+title: "Project Brief"
+date: "2025-05-15"
+status: "current"
+updated_by: "Claude"
+version: "1.0"
+---
+
 # Project Brief: Claude Neural Framework (agent.saarland)
 
 ## 1. Projektname und Zweck
@@ -47,3 +55,17 @@ Das Framework folgt einer Monorepo-Struktur (verwaltet mit Nx) mit klarer Modula
 ## 6. Angestrebter Zustand nach Audit v4
 
 Ein vollständig auditiertes, getestetes, dokumentiertes und einsatzbereites Claude Neural Framework, das den höchsten Qualitäts- und Sicherheitsstandards entspricht und für die nächsten Entwicklungsphasen (z.B. Beta-Release, produktiver Einsatz) vorbereitet ist.
+
+<memory_update date="2025-05-15" source="Initial Setup" trigger="Memory-Bank-Einrichtung">
+Das Projektbriefing wurde mit YAML-Frontmatter für die Agent-Kompatibilität aktualisiert. Es bildet eine zentrale Informationsquelle über den Zweck und die Ziele des Claude Neural Framework (agent.saarland).
+
+Dieses Dokument sollte als Referenz für alle Projektmitglieder dienen und bei bedeutenden strategischen Änderungen oder Erweiterungen des Projektumfangs aktualisiert werden. Der Fokus auf die Audit v4-Finalisierung bleibt bestehen, bis die in der Checkliste genannten Aufgaben abgeschlossen sind.
+</memory_update>
+
+<memory_update date="2025-05-15" source="System Enhancement" trigger="Memory Controller Erweiterung">
+Das Projektbriefing wurde in das erweiterte Memory-Bank-System integriert, mit Versions-Tracking im YAML-Frontmatter und dem erweiterten Format für <memory_update> Tags.
+
+Dies ermöglicht eine präzisere Verfolgung von Änderungen am Projektumfang und den strategischen Zielen. Die grundlegenden Projektziele und der Fokus auf die "Audit v4 - Finalisierungs-Checkliste" bleiben unverändert. 
+
+Mit dem erweiterten Memory-Bank-System werden zukünftige strategische Entscheidungen und Änderungen am Projektumfang nun systematisch mit Quell- und Auslöserangaben dokumentiert, was eine bessere Rückverfolgbarkeit und Begründung von Entscheidungen ermöglicht.
+</memory_update>

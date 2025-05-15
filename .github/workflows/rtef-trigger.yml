@@ -1,0 +1,75 @@
+name: Trigger Recursive Template Evolution Flow
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - 'ai_docs/**'
+      - 'specs/**'
+      - 'TEMPLATE_INIT_agentland.saarland.md'
+  workflow_dispatch: # Manual trigger option for devs
+
+jobs:
+  detect-and-trigger-rtef:
+    name: Run RTEF on Template-Relevant Changes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required to compare with ${{ github.event.before }}
+
+      - name: Set up Python (for future CLI tool or Claude call)
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Detect changed files
+        id: changes
+        # This needs to handle the case where github.event.before is null (e.g. new branch)
+        # For a push to a new branch, github.event.before will be '0000000000000000000000000000000000000000'
+        # For the first push to a branch, we might want to list all relevant files or handle differently.
+        # For simplicity here, we assume a normal push event.
+        run: |
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            echo "New branch or first push; consider strategy for initial RTEF run."
+            # As a fallback, list all relevant files in the current commit for a new branch scenario
+            # This might be too broad; specific handling for new branches might be needed.
+            # For now, we'll let it be empty if it's a new branch to avoid processing all files.
+            # Or, one could use: git ls-tree -r --name-only HEAD | grep -E '^(ai_docs/|specs/|TEMPLATE_INIT_agentland\.saarland\.md)'
+            # For this example, we'll focus on subsequent pushes.
+            echo "NEW_FILES=" >> $GITHUB_OUTPUT
+          else
+            echo "NEW_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '^(ai_docs/|specs/|TEMPLATE_INIT_agentland\.saarland\.md)' | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log changed files
+        run: |
+          echo "Detected changes: ${{ steps.changes.outputs.NEW_FILES }}"
+
+      - name: Placeholder – Call RTEF executor (e.g., Claude CLI, Gemini API)
+        if: steps.changes.outputs.NEW_FILES != ''
+        run: |
+          echo "Triggering Recursive Template Evolution Flow..."
+          # EXAMPLE future CLI call:
+          # ./scripts/trigger-rtef.sh --files "${{ steps.changes.outputs.NEW_FILES }}"
+          # or, if using a dedicated AI CLI tool:
+          # ai-tool run-rtef --changed-files "${{ steps.changes.outputs.NEW_FILES }}" --template "TEMPLATE_INIT_agentland.saarland.md" --progress-log "ai_docs/memory-bank/progress.md"
+          echo "RTEF execution simulation complete. (This is a placeholder)"
+          echo "In a real scenario, this step would invoke the RTEF logic detailed in ai_docs/guides/recursive_template_evolution_flow.md"
+          echo "The output (proposed diff and summary) would typically be written to ai_docs/memory-bank/progress.md by that script."
+
+      - name: Create PR or Issue with RTEF results
+        if: steps.changes.outputs.NEW_FILES != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Creating follow-up issue for template updates..."
+          # The body of the issue should ideally pull the latest entry from ai_docs/memory-bank/progress.md
+          # For now, it references the file and the changed files.
+          gh issue create \
+            --title "RTEF: Proposed Template Updates from Recent Changes" \
+            --body "Changes detected in monitored files:\n\n${{ steps.changes.outputs.NEW_FILES }}\n\nPlease review the output of the Recursive Template Evolution Flow, which should be logged in \`ai_docs/memory-bank/progress.md\`. This issue tracks the review and potential application of the proposed template updates." \
+            --label "rtef-proposal,documentation"
+          echo "Issue creation step complete."

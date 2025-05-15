@@ -1,0 +1,67 @@
+name: Main Branch PR Checks
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  integration_tests_docs:
+    name: Documentation Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Link Checker (Placeholder)
+        run: |
+          echo "INFO: Implement a link checker for markdown files, e.g., tools/ci/check_links.sh"
+          # This script would scan all .md files for broken internal and external links.
+          # Example: tools/ci/check_links.sh
+          exit 0 # Placeholder success
+      - name: Run Structural Integrity Check (Placeholder)
+        run: |
+          echo "INFO: Implement script to check for presence of 'must_have' folders from .clauderules, e.g., tools/ci/check_structure.sh"
+          # This script would parse .clauderules and verify that all directories listed in
+          # 'folders.enforce_structure.ai_docs.must_have' (and similar sections) exist.
+          # Example: tools/ci/check_structure.sh
+          exit 0 # Placeholder success
+
+  claude_prompt_linting:
+    name: Claude Prompt Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Advanced Prompt Linting (Placeholder)
+        run: |
+          echo "INFO: Implement advanced prompt linting, e.g., tools/ci/advanced_prompt_lint.sh ai_docs/prompts/"
+          # This could involve checks against ai_docs/guides/prompt_best_practices_agentland_saarland.md
+          # or even using an LLM for qualitative checks on clarity, completeness, and adherence to guidelines.
+          # Example: tools/ci/advanced_prompt_lint.sh ai_docs/prompts/
+          exit 0 # Placeholder success
+
+  naming_convention_check:
+    name: Naming Convention Checker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Naming Convention Check (Placeholder)
+        run: |
+          echo "INFO: Implement naming convention script, e.g., tools/ci/check_naming.sh"
+          # This script would check filenames (e.g., for kebab-case, _agentland_saarland suffix)
+          # and possibly H1/H2 headings in new/changed markdown files for 'agentland.saarland' namespace adherence
+          # and other conventions defined in development guidelines.
+          # Example: tools/ci/check_naming.sh
+          exit 0 # Placeholder success
+
+  memory_bank_completeness:
+    name: Memory Bank Completeness Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Memory Bank Check (Placeholder)
+        run: |
+          echo "INFO: Implement Memory Bank completeness script, e.g., tools/ci/check_memory_bank.sh ai_docs/memory-bank/"
+          # Checks for existence and non-emptiness of core files like projectbrief.md, productContext.md, etc.
+          # Example: tools/ci/check_memory_bank.sh ai_docs/memory-bank/
+          exit 0 # Placeholder success

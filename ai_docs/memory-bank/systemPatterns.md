@@ -1,3 +1,11 @@
+---
+title: "System Patterns"
+date: "2025-05-15"
+status: "current"
+updated_by: "Claude"
+version: "1.0"
+---
+
 # System Patterns: Claude Neural Framework (agent.saarland)
 
 ## 1. Gesamtarchitektur
@@ -79,3 +87,19 @@ Das Claude Neural Framework ist als **Monorepo** konzipiert und wird mit **Nx** 
 *   Skripte thematisch in Modulverzeichnisse oder `tools/scripts/` verschoben.
 *   `mcp_servers/` in `libs/mcp/` integriert.
 *   `projects/` aufgeteilt in `apps/` und `configs/`.
+
+<memory_update date="2025-05-15" source="Initial Setup" trigger="Memory-Bank-Einrichtung">
+Die Systempatterns-Dokumentation wurde mit YAML-Frontmatter für die Agent-Kompatibilität aktualisiert. Dieses Dokument bietet einen umfassenden Überblick über die Architekturmuster und Designentscheidungen des Claude Neural Framework.
+
+Diese Dokumentation sollte aktualisiert werden, wenn architektonische Änderungen vorgenommen werden oder wenn neue Designpatterns identifiziert werden. Bei der Implementierung der Audit v4-Checkliste sollten insbesondere Änderungen an den empfohlenen Bibliotheken und Werkzeugen (z.B. `zod`, `ajv`, `commander`) in diesem Dokument reflektiert werden.
+
+Besonderes Augenmerk sollte auf die Einhaltung der dokumentierten Muster bei der Vervollständigung der Mock-Implementierungen und der Refaktorierung langer Methoden gelegt werden.
+</memory_update>
+
+<memory_update date="2025-05-15" source="System Enhancement" trigger="Memory Controller Erweiterung">
+Die Systempatterns-Dokumentation wurde in das erweiterte Memory-Bank-System integriert, mit Versions-Tracking im YAML-Frontmatter und dem erweiterten Format für <memory_update> Tags.
+
+Dies ermöglicht eine systematischere Verfolgung von architektonischen Änderungen und Designentscheidungen. Bei der Umsetzung der "Audit v4 - Finalisierungs-Checkliste" werden architektonische Änderungen und neue Designpatterns nun mit klaren Quell- und Auslöserangaben dokumentiert.
+
+Besonders wichtig wird diese erweiterte Dokumentation bei der Ersetzung von Mock-Implementierungen durch reale Logik sein, da hier bedeutende architektonische Entscheidungen getroffen werden müssen, die den dokumentierten Mustern entsprechen sollten. Auch beim Refactoring langer Methoden und bei der Behebung von Inkonsistenzen in Importpfaden und Interface-Definitionen wird diese Dokumentation als Referenz dienen.
+</memory_update>
