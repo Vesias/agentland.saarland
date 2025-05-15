@@ -84,9 +84,24 @@ AGENT_LAND_SAARLAND/
 │   ├── integration-connectors/ # Konnektoren zu externen Datenquellen/Diensten (P7)
 │   ├── regional-data/          # Verarbeitete oder kuratierte regionale Daten (P7)
 │   └── tools/                  # Benutzerdefinierte Tool-Implementierung (bestehend)
+│       └── ci/                 # CI/CD Skripte
+│           ├── validate_toc.sh
+│           ├── check_prompt_format.sh
+│           ├── check_links.sh
+│           ├── check_structure.sh
+│           ├── advanced_prompt_lint.sh
+│           ├── check_naming.sh
+│           └── check_memory_bank.sh
+├── .github/                    # GitHub spezifische Konfigurationen
+│   └── workflows/              # GitHub Actions Workflows
+│       ├── docs-check.yml
+│       ├── pr-main-checks.yml
+│       └── rtef-trigger.yml
+│   └── pull_request_template.md # Standard PR Vorlage
 ├── config/                     # Konfigurationsdateien
 │   └── regional/               # Regionalspezifische Konfigurationen
 │       └── saarland.yaml       # Saarland-spezifische Konfiguration
+├── .markdownlint.jsonc         # Konfiguration für Markdown Linting
 └── README.md                   # Projekt-README
 ```
 
@@ -3184,6 +3199,523 @@ The flow iterates through each new piece of information provided.
 -   **Transparency**: The `progress.md` log provides a clear audit trail of how and why the template evolves.
 
 This flow provides a robust framework for managing the evolution of the `agentland.saarland` project template in an intelligent and maintainable way.
+```
+
+### 27. .markdownlint.jsonc
+```json
+{
+  "default": true,
+  "MD013": { "line_length": 120 },
+  "MD033": { "allowed_elements": ["details", "summary", "br", "sub", "sup"] },
+  "no-hard-tabs": true,
+  "whitespace": {
+    "list_indent": true,
+    "MD030": { "ul_single": 1, "ol_single": 1, "ul_multi": 1, "ol_multi": 1 }
+  }
+}
+```
+
+### 28. .github/pull_request_template.md
+```markdown
+## Description
+
+Please include a summary of the change and which issue is fixed or feature is implemented. Please also include relevant motivation and context. List any dependencies that are required for this change.
+
+Fixes # (issue) / Implements # (feature request)
+
+## Type of change
+
+Please delete options that are not relevant.
+
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Documentation update (changes to `TEMPLATE_INIT_agentland.saarland.md`, `ai_docs/`, `specs/`, etc.)
+- [ ] Chore (refactoring, build process, CI/CD, etc.)
+
+## Checklist:
+
+### General
+- [ ] My code follows the style guidelines of this project (see `.clauderules` and `ai_docs/guides/advanced_development_guidelines_agentland.saarland.md`).
+- [ ] I have performed a self-review of my own code and documentation.
+- [ ] I have commented my code, particularly in hard-to-understand areas.
+- [ ] I have made corresponding changes to the documentation (`TEMPLATE_INIT_agentland.saarland.md`, `CLAUDE.md`, relevant files in `ai_docs/` or `specs/`).
+- [ ] My changes generate no new warnings.
+- [ ] I have added tests that prove my fix is effective or that my feature works (if applicable).
+- [ ] New and existing unit tests pass locally with my changes (if applicable).
+
+### Documentation & Template Specific
+- [ ] **Namespace Adherence**: All new files, titles, and key internal references use the `agentland.saarland` namespace where appropriate.
+- [ ] **Prompt Formatting**: If prompts were added/modified in `ai_docs/prompts/`, they follow the established formatting rules (see `ai_docs/guides/prompt_best_practices_agentland.saarland.md`).
+- [ ] **Context7 Libraries**: If new external libraries/technologies were introduced, their Context7 IDs have been researched and documented (or noted if not found).
+- [ ] **Memory Bank Updates**: If changes impact core project scope, architecture, or context, the relevant files in `ai_docs/memory-bank/` have been updated or marked for update.
+- [ ] **TEMPLATE_INIT Update**: If new files/directories are part of the standard project structure, `TEMPLATE_INIT_agentland.saarland.md` has been updated (both diagram and file definitions).
+```
+
+### 29. .github/workflows/docs-check.yml
+```yaml
+name: Documentation & Template Checks
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+jobs:
+  lint_markdown:
+    name: Lint Markdown Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install markdownlint-cli
+        run: npm install -g markdownlint-cli
+      - name: Run markdownlint
+        run: |
+          markdownlint --config ./.markdownlint.jsonc \
+            TEMPLATE_INIT_agentland.saarland.md \
+            README.md \
+            CLAUDE.md \
+            ai_docs/**/*.md \
+            specs/**/*.md \
+            .claude/**/*.md \
+            || echo "Markdown linting issues found."
+        continue-on-error: true # Allow pipeline to continue to see all errors
+
+  validate_toc:
+    name: Validate Table of Contents
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run TOC Validation (Placeholder)
+        run: |
+          echo "INFO: Implement TOC validation script, e.g., tools/ci/validate_toc.sh"
+          # This script would check if main READMEs or overview docs have up-to-date TOCs.
+          # For now, this step is a placeholder.
+          # Example: tools/ci/validate_toc.sh ai_docs/README.md
+          exit 0 # Placeholder success
+
+  format_prompts:
+    name: Check Prompt Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Prompt Formatting Check (Placeholder)
+        run: |
+          echo "INFO: Implement prompt formatting check script, e.g., tools/ci/check_prompt_format.sh ai_docs/prompts/"
+          # This script would check for consistent H2/H3 structure, code blocks, etc. in prompt files.
+          # For now, this step is a placeholder.
+          # Example: tools/ci/check_prompt_format.sh ai_docs/prompts/
+          exit 0 # Placeholder success
+```
+
+### 30. .github/workflows/pr-main-checks.yml
+```yaml
+name: Main Branch PR Checks
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  integration_tests_docs:
+    name: Documentation Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Link Checker (Placeholder)
+        run: |
+          echo "INFO: Implement a link checker for markdown files, e.g., tools/ci/check_links.sh"
+          # This script would scan all .md files for broken internal and external links.
+          # Example: tools/ci/check_links.sh
+          exit 0 # Placeholder success
+      - name: Run Structural Integrity Check (Placeholder)
+        run: |
+          echo "INFO: Implement script to check for presence of 'must_have' folders from .clauderules, e.g., tools/ci/check_structure.sh"
+          # This script would parse .clauderules and verify that all directories listed in
+          # 'folders.enforce_structure.ai_docs.must_have' (and similar sections) exist.
+          # Example: tools/ci/check_structure.sh
+          exit 0 # Placeholder success
+
+  claude_prompt_linting:
+    name: Claude Prompt Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Advanced Prompt Linting (Placeholder)
+        run: |
+          echo "INFO: Implement advanced prompt linting, e.g., tools/ci/advanced_prompt_lint.sh ai_docs/prompts/"
+          # This could involve checks against ai_docs/guides/prompt_best_practices_agentland.saarland.md
+          # or even using an LLM for qualitative checks on clarity, completeness, and adherence to guidelines.
+          # Example: tools/ci/advanced_prompt_lint.sh ai_docs/prompts/
+          exit 0 # Placeholder success
+
+  naming_convention_check:
+    name: Naming Convention Checker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Naming Convention Check (Placeholder)
+        run: |
+          echo "INFO: Implement naming convention script, e.g., tools/ci/check_naming.sh"
+          # This script would check filenames (e.g., for kebab-case, _agentland_saarland suffix)
+          # and possibly H1/H2 headings in new/changed markdown files for 'agentland.saarland' namespace adherence
+          # and other conventions defined in development guidelines.
+          # Example: tools/ci/check_naming.sh
+          exit 0 # Placeholder success
+
+  memory_bank_completeness:
+    name: Memory Bank Completeness Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Memory Bank Check (Placeholder)
+        run: |
+          echo "INFO: Implement Memory Bank completeness script, e.g., tools/ci/check_memory_bank.sh ai_docs/memory-bank/"
+          # Checks for existence and non-emptiness of core files like projectbrief.md, productContext.md, etc.
+          # Example: tools/ci/check_memory_bank.sh ai_docs/memory-bank/
+          exit 0 # Placeholder success
+```
+
+### 31. .github/workflows/rtef-trigger.yml
+```yaml
+name: Trigger Recursive Template Evolution Flow
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - 'ai_docs/**'
+      - 'specs/**'
+      - 'TEMPLATE_INIT_agentland.saarland.md'
+  workflow_dispatch: # Manual trigger option for devs
+
+jobs:
+  detect-and-trigger-rtef:
+    name: Run RTEF on Template-Relevant Changes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required to compare with ${{ github.event.before }}
+
+      - name: Set up Python (for future CLI tool or Claude call)
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Detect changed files
+        id: changes
+        # This needs to handle the case where github.event.before is null (e.g. new branch)
+        # For a push to a new branch, github.event.before will be '0000000000000000000000000000000000000000'
+        # For the first push to a branch, we might want to list all relevant files or handle differently.
+        # For simplicity here, we assume a normal push event.
+        run: |
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            echo "New branch or first push; consider strategy for initial RTEF run."
+            # As a fallback, list all relevant files in the current commit for a new branch scenario
+            # This might be too broad; specific handling for new branches might be needed.
+            # For now, we'll let it be empty if it's a new branch to avoid processing all files.
+            # Or, one could use: git ls-tree -r --name-only HEAD | grep -E '^(ai_docs/|specs/|TEMPLATE_INIT_agentland\.saarland\.md)'
+            # For this example, we'll focus on subsequent pushes.
+            echo "NEW_FILES=" >> $GITHUB_OUTPUT
+          else
+            echo "NEW_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '^(ai_docs/|specs/|TEMPLATE_INIT_agentland\.saarland\.md)' | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log changed files
+        run: |
+          echo "Detected changes: ${{ steps.changes.outputs.NEW_FILES }}"
+
+      - name: Placeholder – Call RTEF executor (e.g., Claude CLI, Gemini API)
+        if: steps.changes.outputs.NEW_FILES != ''
+        run: |
+          echo "Triggering Recursive Template Evolution Flow..."
+          # EXAMPLE future CLI call:
+          # ./scripts/trigger-rtef.sh --files "${{ steps.changes.outputs.NEW_FILES }}"
+          # or, if using a dedicated AI CLI tool:
+          # ai-tool run-rtef --changed-files "${{ steps.changes.outputs.NEW_FILES }}" --template "TEMPLATE_INIT_agentland.saarland.md" --progress-log "ai_docs/memory-bank/progress.md"
+          echo "RTEF execution simulation complete. (This is a placeholder)"
+          echo "In a real scenario, this step would invoke the RTEF logic detailed in ai_docs/guides/recursive_template_evolution_flow.md"
+          echo "The output (proposed diff and summary) would typically be written to ai_docs/memory-bank/progress.md by that script."
+
+      - name: Create PR or Issue with RTEF results
+        if: steps.changes.outputs.NEW_FILES != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Creating follow-up issue for template updates..."
+          # The body of the issue should ideally pull the latest entry from ai_docs/memory-bank/progress.md
+          # For now, it references the file and the changed files.
+          gh issue create \
+            --title "RTEF: Proposed Template Updates from Recent Changes" \
+            --body "Changes detected in monitored files:\n\n${{ steps.changes.outputs.NEW_FILES }}\n\nPlease review the output of the Recursive Template Evolution Flow, which should be logged in \`ai_docs/memory-bank/progress.md\`. This issue tracks the review and potential application of the proposed template updates." \
+            --label "rtef-proposal,documentation"
+          echo "Issue creation step complete."
+```
+
+### 32. tools/ci/validate_toc.sh
+```bash
+#!/bin/bash
+echo "TOC Validation Script Placeholder - Implement logic here"
+# Example: Check if ai_docs/README.md contains links to all subdirectories/key files.
+# This script would need to parse markdown, identify TOC sections,
+# list actual files/directories, and compare.
+#
+# For a simple check, you might ensure certain key documents are linked in a main README:
+# MAIN_README="README.md"
+# REQUIRED_LINKS=(
+#   "ai_docs/guides/claude_power_tools_guide.md"
+#   "specs/technical_roadmap_agentland_saarland.md"
+# )
+#
+# for link in "${REQUIRED_LINKS[@]}"; do
+#   if ! grep -q "($link)" "$MAIN_README"; then
+#     echo "ERROR: Link to '$link' not found in $MAIN_README"
+#     exit 1
+#   fi
+# done
+#
+echo "TOC Validation (Placeholder) PASSED"
+exit 0
+```
+
+### 33. tools/ci/check_prompt_format.sh
+```bash
+#!/bin/bash
+PROMPT_DIR=$1
+
+if [ -z "$PROMPT_DIR" ]; then
+  echo "Usage: $0 <prompt_directory>"
+  exit 1
+fi
+
+echo "Checking prompt formatting in $PROMPT_DIR (Placeholder)"
+# Example: Check for specific headers or structures in *.md files in $PROMPT_DIR
+# find "$PROMPT_DIR" -name "*.md" -print0 | while IFS= read -r -d $'\0' file; do
+#   echo "Checking $file..."
+#   if ! grep -q "^## Kontext" "$file"; then
+#     echo "ERROR: Missing '## Kontext' section in $file"
+#     # exit 1 # Or collect all errors
+#   fi
+#   if ! grep -q "^## Anweisungen an Claude" "$file"; then # Or similar key sections
+#     echo "ERROR: Missing '## Anweisungen an Claude' section in $file"
+#     # exit 1
+#   fi
+# done
+
+echo "Prompt Formatting Check (Placeholder) PASSED for $PROMPT_DIR"
+exit 0
+```
+
+### 34. tools/ci/check_links.sh
+```bash
+#!/bin/bash
+echo "Link Checker Script Placeholder - Implement logic here"
+# Example: Use a tool like 'markdown-link-check'
+#
+# Ensure markdown-link-check is installed: npm install -g markdown-link-check
+#
+# FILES_TO_CHECK=$(find ai_docs specs .claude TEMPLATE_INIT_agentland.saarland.md README.md CLAUDE.md -name "*.md" 2>/dev/null)
+# ERROR_FOUND=0
+#
+# if [ -z "$FILES_TO_CHECK" ]; then
+#  echo "No markdown files found to check."
+#  exit 0
+# fi
+#
+# for file in $FILES_TO_CHECK; do
+#   echo "Checking links in $file..."
+#   if ! markdown-link-check "$file"; then
+#     echo "ERROR: Broken links found in $file"
+#     ERROR_FOUND=1
+#   fi
+# done
+#
+# if [ "$ERROR_FOUND" -eq 1 ]; then
+#   echo "Link check failed."
+#   exit 1
+# else
+#   echo "Link check PASSED."
+#   exit 0
+# fi
+echo "Link Check (Placeholder) PASSED"
+exit 0
+```
+
+### 35. tools/ci/check_structure.sh
+```bash
+#!/bin/bash
+echo "Structure Check Script Placeholder - Implement logic here"
+# Example: Parse .clauderules (e.g., using yq for TOML) and verify 'must_have' directories/files exist.
+#
+# CLAUDE_RULES_FILE=".clauderules"
+# ERROR_FOUND=0
+#
+# # Check ai_docs structure
+# MUST_HAVE_AI_DOCS=$(yq e '.folders.enforce_structure.ai_docs.must_have[]' $CLAUDE_RULES_FILE)
+# for item in $MUST_HAVE_AI_DOCS; do
+#   path_to_check="ai_docs/$item"
+#   if [ "${item: -1}" == "/" ]; then # It's a directory
+#     if [ ! -d "$path_to_check" ]; then
+#       echo "ERROR: Required directory '$path_to_check' from .clauderules is missing."
+#       ERROR_FOUND=1
+#     fi
+#   else # It's a file
+#     if [ ! -f "$path_to_check" ]; then
+#       echo "ERROR: Required file '$path_to_check' from .clauderules is missing."
+#       ERROR_FOUND=1
+#     fi
+#   fi
+# done
+#
+# if [ "$ERROR_FOUND" -eq 1 ]; then
+#   echo "Structure check failed."
+#   exit 1
+# else
+#   echo "Structure check (Placeholder) PASSED."
+#   exit 0
+# fi
+echo "Structure Check (Placeholder) PASSED"
+exit 0
+```
+
+### 36. tools/ci/advanced_prompt_lint.sh
+```bash
+#!/bin/bash
+PROMPT_DIR=$1
+
+if [ -z "$PROMPT_DIR" ]; then
+  echo "Usage: $0 <prompt_directory>"
+  exit 1
+fi
+
+echo "Advanced Prompt Linting for $PROMPT_DIR (Placeholder)"
+# This script could involve more sophisticated checks:
+# - Ensuring prompts align with guidelines in 'ai_docs/guides/prompt_best_practices_agentland.saarland.md'.
+# - Checking for clarity, completeness, and lack of ambiguity.
+# - Potentially using an LLM to evaluate prompt quality (this would require API calls and setup).
+# - Verifying that example outputs or expected behaviors are documented.
+#
+# find "$PROMPT_DIR" -name "*.md" -print0 | while IFS= read -r -d $'\0' file; do
+#   echo "Advanced linting for $file..."
+#   # Add specific checks here
+# done
+
+echo "Advanced Prompt Linting (Placeholder) PASSED for $PROMPT_DIR"
+exit 0
+```
+
+### 37. tools/ci/check_naming.sh
+```bash
+#!/bin/bash
+echo "Naming Convention Check Script Placeholder - Implement logic here"
+# This script would check filenames and possibly H1/H2 headings
+# in new/changed markdown files for 'agentland.saarland' namespace adherence
+# and other conventions defined in development guidelines (e.g., kebab-case for files).
+#
+# Example:
+# TARGET_DIRS="ai_docs specs .claude"
+# ERROR_FOUND=0
+#
+# # Iterate over files (e.g., only changed files in a PR context)
+# # For simplicity, this example iterates all .md files
+# find $TARGET_DIRS -name "*.md" -print0 | while IFS= read -r -d $'\0' file; do
+#   filename=$(basename "$file")
+#   # Check for kebab-case (simple check, doesn't allow single words like README.md)
+#   # if [[ "$filename" =~ [A-Z] ]] || [[ "$filename" =~ _ ]]; then
+#   #   if [[ "$filename" != "README.md" ]] && [[ "$filename" != "CLAUDE.md" ]] && [[ ! "$filename" =~ _agentland_saarland\.md$ ]]; then
+#   #     echo "ERROR: Filename '$filename' does not follow kebab-case convention."
+#   #     ERROR_FOUND=1
+#   #   fi
+#   # fi
+#
+#   # Check for _agentland_saarland suffix for specific docs
+#   if [[ "$file" == ai_docs/*/*_agentland_saarland.md ]] || [[ "$file" == specs/*/*_agentland_saarland.md ]]; then
+#     # This pattern is fine
+#     :
+#   elif [[ "$file" == ai_docs/*/*.md ]] && [[ "$filename" != "README.md" ]] && [[ "$filename" != "CLAUDE.md" ]]; then
+#      # Check if it should have the suffix based on some rule, e.g. if not in guides/ or prompts/
+#      if [[ ! "$file" =~ ^ai_docs/(guides|prompts|memory-bank)/ ]]; then
+#         if [[ ! "$filename" =~ _agentland_saarland\.md$ ]]; then
+#            # echo "WARNING: Filename '$filename' might be missing _agentland_saarland.md suffix."
+#            : # Relaxing this for now as it's complex
+#         fi
+#      fi
+#   fi
+#
+#   # Check H1 heading for 'agentland.saarland'
+#   # H1=$(grep -m1 -oP '^#\s*\K.*' "$file")
+#   # if [[ "$H1" != "" ]] && [[ ! "$H1" =~ agentland.saarland ]]; then
+#   #   echo "WARNING: H1 '$H1' in '$file' might be missing 'agentland.saarland' mention."
+#   # fi
+# done
+#
+# if [ "$ERROR_FOUND" -eq 1 ]; then
+#   echo "Naming convention check failed."
+#   exit 1
+# else
+#   echo "Naming Convention Check (Placeholder) PASSED."
+#   exit 0
+# fi
+echo "Naming Convention Check (Placeholder) PASSED"
+exit 0
+```
+
+### 38. tools/ci/check_memory_bank.sh
+```bash
+#!/bin/bash
+MEMORY_BANK_DIR=$1
+
+if [ -z "$MEMORY_BANK_DIR" ]; then
+  echo "Usage: $0 <memory_bank_directory>"
+  exit 1
+fi
+
+echo "Memory Bank Completeness Check for $MEMORY_BANK_DIR (Placeholder)"
+
+CORE_FILES=(
+  "projectbrief.md"
+  "productContext.md"
+  "systemPatterns.md"
+  "techContext.md"
+  "activeContext.md"
+  "progress.md"
+)
+ERROR_FOUND=0
+
+for core_file in "${CORE_FILES[@]}"; do
+  file_path="$MEMORY_BANK_DIR/$core_file"
+  if [ ! -f "$file_path" ]; then
+    echo "ERROR: Core Memory Bank file '$file_path' is missing."
+    ERROR_FOUND=1
+  elif [ ! -s "$file_path" ]; then # Check if file is not empty (-s)
+    echo "WARNING: Core Memory Bank file '$file_path' is empty."
+    # Depending on policy, this could also be an error.
+    # ERROR_FOUND=1 
+  fi
+done
+
+if [ "$ERROR_FOUND" -eq 1 ]; then
+  echo "Memory Bank Completeness Check FAILED."
+  exit 1
+else
+  echo "Memory Bank Completeness Check (Placeholder) PASSED for $MEMORY_BANK_DIR"
+  exit 0
+fi
 ```
 
 ## Benutzerdefinierte Befehle
