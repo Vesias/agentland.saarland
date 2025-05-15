@@ -1,6 +1,6 @@
 {
   "name": "agentland.saarland",
-  "version": "1.0.0",
+  "version": "0.1.2",
   "description": "Claude Neural Framework for AI Agent Integration",
   "private": true,
   "workspaces": [

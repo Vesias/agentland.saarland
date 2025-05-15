@@ -15,7 +15,7 @@ interface AuditSectionProgress {
 const parseProgressMarkdown = (markdownContent: string): AuditSectionProgress[] => {
   const sections: AuditSectionProgress[] = [];
   // Split content by lines
-  const lines = markdownContent.split('\\n');
+  const lines = markdownContent.split('\n'); // Corrected: split by newline character
   
   let currentSection: AuditSectionProgress | null = null;
 
@@ -62,32 +62,36 @@ export default async function handler(
 ) {
   if (req.method === 'GET') {
     try {
-      // Construct the absolute path to the progress.md file
-      // Assuming the API route is in apps/web/src/pages/api/
-      // and progress.md is at the root of the monorepo in ai_docs/memory-bank/
-      const progressFilePath = path.join(process.cwd(), '../../../../ai_docs/memory-bank/progress.md');
+      // process.cwd() for API routes in Next.js is typically the project root.
+      const progressFilePath = path.join(process.cwd(), 'ai_docs/memory-bank/progress.md');
       
       if (!fs.existsSync(progressFilePath)) {
-        // Try an alternative path if the above is incorrect relative to `process.cwd()` when deployed
-        // This path assumes `process.cwd()` is `apps/web`
-        const alternativePath = path.join(process.cwd(), '../ai_docs/memory-bank/progress.md');
-        if (fs.existsSync(alternativePath)) {
-            // This is not ideal for production, but for local dev it might work.
-            // A better solution would be to copy the file during build or use a config for the path.
-             const markdownContent = fs.readFileSync(alternativePath, 'utf-8');
-             const progressData = parseProgressMarkdown(markdownContent);
-             return res.status(200).json(progressData);
-        }
-        console.error(`File not found at ${progressFilePath} or ${alternativePath}`);
-        return res.status(404).json({ error: 'Progress file not found.' });
+        console.error(`Progress file not found at ${progressFilePath}`);
+        // Fallback data for consistent JSON response
+        return res.status(404).json([{ 
+          name: 'Error', 
+          completed: 0, 
+          inProgress: 0, 
+          pending: 1, 
+          total: 1 
+        }]);
       }
 
       const markdownContent = fs.readFileSync(progressFilePath, 'utf-8');
       const progressData = parseProgressMarkdown(markdownContent);
-      res.status(200).json(progressData);
+      
+      // Ensure progressData is always an array, even if empty, for valid JSON response
+      res.status(200).json(progressData.length > 0 ? progressData : []);
     } catch (error) {
       console.error('Error reading or parsing progress file:', error);
-      res.status(500).json({ error: 'Failed to retrieve audit progress.' });
+      // Fallback data for consistent JSON response
+      res.status(500).json([{ 
+        name: 'Error Processing File', 
+        completed: 0, 
+        inProgress: 0, 
+        pending: 1, 
+        total: 1 
+      }]);
     }
   } else {
     res.setHeader('Allow', ['GET']);

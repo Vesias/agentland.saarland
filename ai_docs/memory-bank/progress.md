@@ -31,14 +31,14 @@ Die folgende Liste fasst die Hauptaufgaben zusammen, die im Rahmen der Audit v4 
 *   ✅ Vollständige TypeScript-Typisierung für `libs/core/src/security/*.ts` sichergestellt.
 *   ⏳ Umfassende Unit-Tests für kritische Sicherheitsfunktionen in Arbeit.
 *   ✅ Alle `any`-Typen in den Sicherheitsmodulen eliminiert.
-*   ⏳ Migration von `tools/validators/clauderules-validator.js` nach TypeScript begonnen.
-*   ⭕ `validateConfig` in `config-manager.ts` mit `zod` muss noch robuster implementiert werden.
-*   ⭕ `validateSchema` in `schema-loader.ts` (z.B. mit `ajv`) muss noch implementiert werden.
+*   ✅ Migration von `tools/validators/clauderules-validator.js` nach `clauderules-validator.ts` abgeschlossen und Unit-Tests erstellt.
+*   ✅ `validateConfig` in `config-manager.ts` mit `zod` robuster implementiert (durch `.strict()`).
+*   ✅ `validateSchema` in `schema-loader.ts` mit `ajv` implementiert.
 
 ### 3.2. Sicherheitsempfehlungen aus dem Sicherheits-Audit (NEU)
-*   ⭕ **Kritisch:** Entfernung hartcodierter JWT-Secret-Keys in `a2a-security-middleware.ts` und Verwendung von Umgebungsvariablen
-*   ⭕ **Kritisch:** Einführung einer sicheren Speicherlösung für API-Schlüssel anstelle von Klartext-JSON-Dateien
-*   ⭕ **Kritisch:** Umstellung auf `.env`-Dateien für sensible Konfigurationen (außerhalb der Versionskontrolle)
+*   ✅ **Kritisch:** Entfernung hartcodierter JWT-Secret-Keys in `a2a-security-middleware.ts` und Verwendung von Umgebungsvariablen (A2A_JWT_SECRET, etc. via `env-validator.ts`).
+*   ⏳ **Kritisch:** Einführung einer sicheren Speicherlösung für API-Schlüssel anstelle von Klartext-JSON-Dateien (Pfad zu `api-keys.json` nun via `API_KEYS_PATH` env var; Datei enthält Hashes, nicht Klartextschlüssel. Weitere Maßnahmen wie Verschlüsselung oder dedizierter Secret Store sind noch offen).
+*   ✅ **Kritisch:** Umstellung auf `.env`-Dateien für sensible Konfigurationen (außerhalb der Versionskontrolle) (`.env.example` erstellt, `.gitignore` aktualisiert).
 *   ⭕ **Kritisch:** Implementierung einer umfassenden serverseitigen Validierung für alle Eingaben
 *   ⭕ **Hoch:** Vervollständigung der Sitzungsverwaltung mit ordnungsgemäßer Timeout-Behandlung
 *   ⭕ **Hoch:** Integration automatisierter Abhängigkeits-Scans (z.B. Dependabot, Snyk) in die CI/CD-Pipeline
@@ -92,6 +92,11 @@ Die folgende Liste fasst die Hauptaufgaben zusammen, die im Rahmen der Audit v4 
 *   ⭕ Manuelle Überprüfung auf vergessene Kommentare, nicht benötigte Dateien.
 *   ⭕ Systematische Überprüfung und Adressierung aller `// TODO:` Kommentare (insb. UI-bezogene).
 *   ⭕ Sicherstellen korrekter Konfigurationswerte für Deployment.
+
+### 3.9. Dashboard-Entwicklung (agentland.saarland UI)
+*   ⏳ **Context7 MCP Beispiel Integration**: UI-Elemente und Backend-API-Routen (`/api/mcp/context7/*`) für `MCPToolManager.tsx` erstellt. MCP-Tool-Aufrufe in APIs sind derzeit gemockt.
+*   ⭕ **Graph Library Integration**: Integration einer Graphenbibliothek (z.B. React Flow) in `LiveAgentGraph.tsx` oder `WorkflowDesignCanvas.tsx`.
+*   ⭕ **Weitere UI/Styling Verfeinerungen**: Kontinuierliche Verbesserung des UI/UX des Dashboards.
 
 ## 4. Bekannte Probleme und Herausforderungen
 

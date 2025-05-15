@@ -10,9 +10,11 @@ import crypto from 'crypto';
 import path from 'path';
 import { Logger } from '../../../core/src/logging/logger';
 import { ValidationError } from '../../../core/src/error/error-handler';
+import { validateEnv } from '../../../core/src/config/env-validator';
 import {
   AgentAccessLevel,
   AgentCredentialType,
+  AgentCredentials, // Added import for AgentCredentials
   AuthenticationResult,
   SecureA2AMessage,
   MessagePriority,
@@ -64,15 +66,19 @@ export class A2ASecurityMiddleware {
     this.authorizationRules = [];
     this.securityEvents = [];
     this.lastAuditFlush = Date.now();
+
+    // Validate required environment variables for A2A security
+    // This will throw an error and halt initialization if A2A_JWT_SECRET is not set.
+    validateEnv(['A2A_JWT_SECRET']);
     
     // Initialize authentication provider
     this.authProvider = new A2AAuthProvider({
-      apiKeysFile: this.config.auditLogPath ? path.join(path.dirname(this.config.auditLogPath), 'api-keys.json') : undefined,
+      apiKeysFile: process.env.API_KEYS_PATH || (this.config.auditLogPath ? path.join(path.dirname(this.config.auditLogPath), 'api-keys.json') : undefined),
       jwt: {
-        secretKey: process.env.A2A_JWT_SECRET || 'default-secret-key-that-should-be-changed',
-        issuer: 'a2a-manager',
-        audience: 'a2a-agents',
-        expiresIn: '1d' // 1 day
+        secretKey: process.env.A2A_JWT_SECRET as string, // Already validated by validateEnv
+        issuer: process.env.A2A_JWT_ISSUER || 'a2a-manager',
+        audience: process.env.A2A_JWT_AUDIENCE || 'a2a-agents',
+        expiresIn: process.env.A2A_JWT_EXPIRES_IN || '1d'
       }
     });
     
@@ -308,7 +314,7 @@ export class A2ASecurityMiddleware {
    * @returns Authentication result
    * @private
    */
-  private async authenticateAgent(message: SecureA2AMessage): Promise<AuthenticationResult> {
+  private async authenticateAgent(message: SecureA2AMessage): Promise<AuthenticationResult> { // Already async, good.
     // Check if credentials are provided
     if (!message.credentials) {
       this.logSecurityEvent({
@@ -331,7 +337,15 @@ export class A2ASecurityMiddleware {
     }
     
     // Use the authentication provider
-    const authResult = this.authProvider.authenticate(message);
+    // Assuming authenticate might be async based on other methods in A2AAuthProvider
+    // If A2AAuthProvider.authenticate is synchronous, this await is not needed
+    // but if it can be async, this makes it robust.
+    // However, the error suggests it's returning a Promise OR the direct result.
+    // Let's assume it's always a Promise for consistency or that the type implies it *can* be.
+    // The error "Property 'authenticated' does not exist on type 'AuthenticationResult | Promise<AuthenticationResult>'"
+    // means authResult can be a Promise. We must await it.
+    const resolvedAuthResult = await this.authProvider.authenticate(message); 
+    const authResult: AuthenticationResult = resolvedAuthResult; // Explicitly type after await
     
     // Log the authentication result
     if (authResult.authenticated) {
@@ -426,7 +440,7 @@ export class A2ASecurityMiddleware {
     // Validate against each rule
     for (const rule of rules) {
       try {
-        const value = this.getNestedValue(message, rule.field);
+        const value = this.getNestedValue(message as unknown as Record<string, unknown>, rule.field);
         
         if (!rule.validator(value)) {
           this.logSecurityEvent({

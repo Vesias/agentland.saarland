@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FaTools, FaSearch, FaInfoCircle, FaPuzzlePiece, FaServer, FaLink, FaUnlink } from 'react-icons/fa';
+import React, { useState, useEffect, useCallback } from 'react';
+import { FaTools, FaSearch, FaInfoCircle, FaPuzzlePiece, FaServer, FaLink, FaUnlink, FaBook, FaSpinner } from 'react-icons/fa';
 
 interface MCPToolSchema {
   // Simplified schema for now
@@ -30,7 +30,17 @@ const MCPToolManager: React.FC = () => {
   ]);
   const [selectedTool, setSelectedTool] = useState<MCPTool | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // General loading for initial tool list
+
+  // Context7 States
+  const [libraryNameInput, setLibraryNameInput] = useState('');
+  const [topicInput, setTopicInput] = useState('');
+  const [resolvedLibraries, setResolvedLibraries] = useState<any[]>([]); // Store full resolve-library-id results
+  const [selectedLibraryId, setSelectedLibraryId] = useState<string | null>(null);
+  const [documentation, setDocumentation] = useState<string | null>(null);
+  const [context7Loading, setContext7Loading] = useState(false);
+  const [context7Error, setContext7Error] = useState<string | null>(null);
+
 
   // useEffect(() => {
   //   setIsLoading(true);
@@ -58,17 +68,178 @@ const MCPToolManager: React.FC = () => {
     // Potentially fetch detailed schema if not already loaded
     // if (!tool.schema) { fetchToolSchema(tool.id); }
   };
+
+  const handleResolveLibrary = async () => {
+    if (!libraryNameInput.trim()) {
+      setContext7Error("Please enter a library name.");
+      return;
+    }
+    setContext7Loading(true);
+    setContext7Error(null);
+    setResolvedLibraries([]);
+    setSelectedLibraryId(null);
+    setDocumentation(null);
+    try {
+      const response = await fetch('/api/mcp/context7/resolve-library', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ libraryName: libraryNameInput }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Failed to resolve library: ${response.statusText}`);
+      }
+      const data = await response.json();
+      if (data.success && data.result) {
+        setResolvedLibraries(data.result);
+        if (data.result.length === 1) {
+          setSelectedLibraryId(data.result[0].id); // Auto-select if only one result
+        }
+      } else {
+        setResolvedLibraries([]);
+        setContext7Error(data.error || "No libraries found or unexpected response.");
+      }
+    } catch (error: any) {
+      setContext7Error(error.message || "An error occurred while resolving the library.");
+      setResolvedLibraries([]);
+    } finally {
+      setContext7Loading(false);
+    }
+  };
+
+  const handleFetchDocs = async () => {
+    if (!selectedLibraryId) {
+      setContext7Error("Please select a resolved library first.");
+      return;
+    }
+    if (!topicInput.trim()) {
+      setContext7Error("Please enter a topic.");
+      return;
+    }
+    setContext7Loading(true);
+    setContext7Error(null);
+    setDocumentation(null);
+    try {
+      const response = await fetch('/api/mcp/context7/get-docs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ context7CompatibleLibraryID: selectedLibraryId, topic: topicInput }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Failed to fetch documentation: ${response.statusText}`);
+      }
+      const data = await response.json();
+      if (data.success && data.result) {
+        // Assuming result is the documentation string or an object with a content field
+        setDocumentation(typeof data.result === 'string' ? data.result : JSON.stringify(data.result, null, 2));
+      } else {
+        setDocumentation(null);
+        setContext7Error(data.error || "Failed to fetch documentation or unexpected response.");
+      }
+    } catch (error: any) {
+      setContext7Error(error.message || "An error occurred while fetching documentation.");
+      setDocumentation(null);
+    } finally {
+      setContext7Loading(false);
+    }
+  };
   
   if (isLoading) {
     return <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 text-center">Lade MCP Tools...</div>;
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 max-w-5xl mx-auto">
+    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 max-w-7xl mx-auto"> {/* Increased max-width */}
       <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 flex items-center">
         <FaPuzzlePiece className="mr-3 text-indigo-500" /> MCP Tool Discovery & Management
       </h1>
 
+      {/* Context7 Tool Section */}
+      <div className="mb-8 p-4 border border-dashed border-indigo-300 dark:border-indigo-700 rounded-lg">
+        <h2 className="text-xl font-semibold text-indigo-700 dark:text-indigo-300 mb-4 flex items-center">
+          <FaBook className="mr-2" /> Context7 Documentation Fetcher
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label htmlFor="libName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Library Name</label>
+            <input 
+              type="text" 
+              id="libName"
+              value={libraryNameInput} 
+              onChange={(e) => setLibraryNameInput(e.target.value)}
+              placeholder="e.g., react, express, zod"
+              className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white sm:text-sm"
+            />
+          </div>
+          <div className="self-end">
+            <button 
+              onClick={handleResolveLibrary}
+              disabled={context7Loading}
+              className="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center"
+            >
+              {context7Loading && resolvedLibraries.length === 0 ? <FaSpinner className="animate-spin mr-2" /> : <FaSearch className="mr-2" />}
+              Resolve Library ID
+            </button>
+          </div>
+        </div>
+
+        {resolvedLibraries.length > 0 && (
+          <div className="mb-4">
+            <label htmlFor="resolvedLib" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Resolved Library</label>
+            <select 
+              id="resolvedLib"
+              value={selectedLibraryId || ''}
+              onChange={(e) => setSelectedLibraryId(e.target.value)}
+              className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white sm:text-sm"
+            >
+              <option value="" disabled>-- Select a library --</option>
+              {resolvedLibraries.map((lib: any) => (
+                <option key={lib.id} value={lib.id}>{lib.name} ({lib.id}) - Stars: {lib.stars}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {selectedLibraryId && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label htmlFor="docTopic" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Documentation Topic</label>
+              <input 
+                type="text" 
+                id="docTopic"
+                value={topicInput}
+                onChange={(e) => setTopicInput(e.target.value)}
+                placeholder="e.g., hooks, routing, validation"
+                className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white sm:text-sm"
+              />
+            </div>
+            <div className="self-end">
+              <button 
+                onClick={handleFetchDocs}
+                disabled={context7Loading || !selectedLibraryId}
+                className="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center"
+              >
+                {context7Loading && documentation === null ? <FaSpinner className="animate-spin mr-2" /> : <FaBook className="mr-2" />}
+                Fetch Documentation
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {context7Error && <p className="text-sm text-red-600 dark:text-red-400 mb-2">{context7Error}</p>}
+
+        {documentation && (
+          <div>
+            <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">Fetched Documentation:</h3>
+            <pre className="bg-gray-100 dark:bg-gray-900 p-3 rounded-md text-xs text-gray-800 dark:text-gray-200 max-h-96 overflow-auto">
+              {documentation}
+            </pre>
+          </div>
+        )}
+      </div>
+
+      {/* Existing Tool Discovery Section */}
       <div className="mb-4">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
